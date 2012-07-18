@@ -5,6 +5,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -24,6 +26,7 @@ public class Gui extends JFrame {
 
   public JTextField matchNum = new JTextField(3);
   public JTextField genNum = new JTextField(4);
+	private JTextField tfLoadGenNum;
 
   public Gui(Main main) {
     this.program = main;
@@ -60,6 +63,9 @@ public class Gui extends JFrame {
       }
 
       textFields.add(choice);
+      if ("Generation to load".equalsIgnoreCase(field[0].toString())) {
+      	tfLoadGenNum = (JTextField) choice;
+      }
       
       gbc.gridx = 0;
       gbc.anchor = GridBagConstraints.EAST;
@@ -73,7 +79,9 @@ public class Gui extends JFrame {
       
       gbc.gridy += 1;
     }
-    
+
+    changeGenNumEditable(Main.loadFromDisk);
+
     JPanel genPanel = new JPanel();
     genPanel.add(new JLabel("Generation: "));
     genPanel.add(genNum);
@@ -131,7 +139,13 @@ public class Gui extends JFrame {
   @SuppressWarnings("rawtypes")
   private void setComboBoxSelection(JComboBox choice, String label) {
     if (label.equalsIgnoreCase(Main.loadFromDiskLabel)) {
-      ((JComboBox) choice).setSelectedItem(Main.loadFromDisk);
+    	JComboBox comboBox = (JComboBox) choice;
+      comboBox.setSelectedItem(Main.loadFromDisk);
+      comboBox.addItemListener(new ItemListener(){
+				@Override
+        public void itemStateChanged(ItemEvent e) {
+					changeGenNumEditable(e.getItem());
+        }});
     } else if (label.equalsIgnoreCase(Main.randomSeedLabel)) {
       ((JComboBox) choice).setSelectedItem(Main.useRandomSeed);      
     } else {
@@ -141,7 +155,15 @@ public class Gui extends JFrame {
     }
   }
 
-  private void setExecutionValues()
+  protected void changeGenNumEditable(Object item) {
+		if (item.equals(LoadTypes.NO_LOAD)) {
+			tfLoadGenNum.setEditable(false);
+		} else {
+			tfLoadGenNum.setEditable(true);
+		}
+  }
+
+	private void setExecutionValues()
   {
     int i = 0;
     for (JComponent choice : textFields) {

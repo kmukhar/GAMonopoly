@@ -30,7 +30,7 @@ public class GAEngine implements Runnable {
    * The minimum score required for a player chromosome to advance to the next
    * generation.
    */
-  private int minEliteScore;
+//  private int minEliteScore;
 
   /**
    * A map sorted by score; the key for each entry is a score and the entry
@@ -81,25 +81,30 @@ public class GAEngine implements Runnable {
   }
 
   /**
-   * Create a pool of players. If Main.loadFromDisk is true, this method loads
-   * players from stored data files. Otherwise this methods creates a pool
-   * of randomly generated players.
-   */
+	 * Create a pool of players. If Main.loadFromDisk is LOAD_AND_EVOLVE or
+	 * LOAD_AND_COMPETE, this method loads players from stored data files.
+	 * Otherwise this methods creates a pool of randomly generated players.
+	 */
   private void createPlayers() {
-    if (Main.loadFromDisk) {
-      playerPool.addAll(PopulationPropagator.loadPlayers(Main.lastGeneration));
-      Vector<AbstractPlayer> newPopulation = PopulationPropagator.evolve(
-          playerPool, minEliteScore);
-      playerPool.clear();
-      playerPool.addAll(newPopulation);
-    } else {
+  	if (Main.loadFromDisk == LoadTypes.NO_LOAD) {
       // Create new population of players
       for (int i = 0; i < Main.maxPlayers; i++) {
         AbstractPlayer player = PlayerFactory.getPlayer(i, Main.chromoType);
         player.initCash(1500);
         playerPool.add(player);
+      }  		
+
+  	} else {
+      playerPool.clear();
+      playerPool.addAll(PopulationPropagator.loadPlayers(Main.loadGeneration));
+
+      if (Main.loadFromDisk == LoadTypes.LOAD_AND_EVOLVE) {
+        Vector<AbstractPlayer> newPopulation = PopulationPropagator.evolve(
+            playerPool, computeMinEliteScore());
+        playerPool.clear();
+        playerPool.addAll(newPopulation);
       }
-    }
+  	}
   }
 
   /**
@@ -125,13 +130,14 @@ public class GAEngine implements Runnable {
    * Create and evolve a population of players. 
    */
   public void runGames() {
-    if (Main.loadFromDisk) {
-      generation = Main.lastGeneration + 1;
+    if (Main.loadFromDisk != LoadTypes.NO_LOAD) {
+      generation = Main.loadGeneration + 1;
     }
+    int maxGeneration = generation + Main.numGenerations;
 
     runnableGames = new LinkedBlockingQueue<Runnable>();
 
-    while (generation < Main.numGenerations) {
+    while (generation < maxGeneration) {
       main.setGenNum(generation);
       matches = 0;
 
@@ -193,12 +199,12 @@ public class GAEngine implements Runnable {
         games.clear();
       }
 
-      computeMinEliteScore();
+      int minEliteScore = computeMinEliteScore();
 
       // dump the player data every dumpPeriod generations and the last
       // generation
       if (generation % Main.dumpPeriod == 0
-          || generation == Main.numGenerations - 1) {
+          || generation == maxGeneration - 1) {
         dumpGenome();
 
         // not sure if normalization is useful, so don't call it for now.
@@ -209,7 +215,7 @@ public class GAEngine implements Runnable {
 
       generation++;
 
-      if (generation < Main.numGenerations) {
+      if (generation < maxGeneration) {
         Vector<AbstractPlayer> newPopulation = 
             PopulationPropagator.evolve(playerPool, minEliteScore);
         playerPool.clear();
@@ -312,7 +318,7 @@ public class GAEngine implements Runnable {
    * Compute the minimum elite score to allow 10% of the players to directly
    * propagate to the next generation.
    */
-  private void computeMinEliteScore()
+  private int computeMinEliteScore()
   {
     scores = new TreeMap<Integer, Integer>();
 
@@ -326,7 +332,7 @@ public class GAEngine implements Runnable {
       }
     }
 
-    minEliteScore = 0;
+    int minEliteScore = 0;
     int playerCount = 0;
     int maxPlayerCount = (int) (0.1 * Main.maxPlayers);
     // Ensure at least 1 player move to next generation based on eliteness
@@ -341,6 +347,7 @@ public class GAEngine implements Runnable {
         break;
       }
     }
+    return minEliteScore;
   }
 
   /**

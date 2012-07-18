@@ -1264,6 +1264,9 @@ public abstract class AbstractPlayer
         lots.elementAt(1).addHouse();
         --houseCount;
         break;
+
+      default:
+				break;
       }
     }
     

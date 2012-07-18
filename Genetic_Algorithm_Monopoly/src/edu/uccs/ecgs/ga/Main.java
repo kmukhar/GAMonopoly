@@ -51,17 +51,17 @@ public class Main {
   public static FitEvalTypes fitnessEvaluator = FitEvalTypes.NUM_WINS;
 
   /**
-   * Should existing players be loaded from data files (loadFromDisk=true) or
-   * generated from scratch (loadFromDisk=false).
-   */
-  public static boolean loadFromDisk = false;
+	 * Should existing players be loaded from data files
+	 * (loadFromDisk=LOAD_AND_EVOLVE or LOAD_AND_COMPETE) or generated from
+	 * scratch (loadFromDisk=NO_LOAD).
+	 */
+  public static LoadTypes loadFromDisk = LoadTypes.NO_LOAD;
 
   /**
    * When loading existing players from disk, this value indicates which
-   * generation to load the players from. Normally this will be the last
-   * generation to complete a round of games.
+   * generation to load the players from.
    */
-  public static int lastGeneration = 417;
+  public static int loadGeneration = 0;
 
   /**
    * Whether or not to output debug information.
@@ -168,9 +168,8 @@ public class Main {
           { "Number of players in population", "" + maxPlayers },
           { "Number of players per game", "" + numPlayers },
           { "Fitness Evaluator", FitEvalTypes.values() },
-          { loadFromDiskLabel,
-              new Boolean[] { Boolean.TRUE, Boolean.FALSE } },
-          { "Generation to load", "" + lastGeneration },
+			    { loadFromDiskLabel, LoadTypes.values() },
+          { "Generation to load", "" + loadGeneration },
           { "Debug",
               new String[] { Level.OFF.toString(), Level.FINEST.toString(),
                   Level.INFO.toString(), Level.SEVERE.toString() } },
@@ -268,7 +267,7 @@ public class Main {
       break;
     case 7:
       // Generation to load
-      lastGeneration = Integer.parseInt(text);
+      loadGeneration = Integer.parseInt(text);
       break;
     case 10:
       // Mutation Rate
@@ -311,7 +310,7 @@ public class Main {
       break;
     case 6:
       // Load players from disk 
-      loadFromDisk = (Boolean) selectedItem;
+      loadFromDisk = (LoadTypes) selectedItem;
       break;
     case 8:
       // Debug
@@ -348,9 +347,9 @@ public class Main {
     } else if (key.equalsIgnoreCase("fitnessEvaluator")) {
       fitnessEvaluator = FitEvalTypes.valueOf(value);
     } else if (key.equalsIgnoreCase("loadFromDisk")) {
-      loadFromDisk = Boolean.parseBoolean(value);
-    } else if (key.equalsIgnoreCase("lastGeneration")) {
-      lastGeneration = Integer.parseInt(value);
+      loadFromDisk = LoadTypes.valueOf(value);
+    } else if (key.equalsIgnoreCase("loadGeneration")) {
+      loadGeneration = Integer.parseInt(value);
     } else if (key.equalsIgnoreCase("useGui")) {
       useGui = Boolean.parseBoolean(value);
     } else if (key.equalsIgnoreCase("debug")) {

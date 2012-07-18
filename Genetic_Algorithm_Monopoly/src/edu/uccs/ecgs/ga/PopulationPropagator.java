@@ -157,7 +157,7 @@ public class PopulationPropagator {
       // filenames run from player0000.dat to player0999.dat
       if (filename.matches("player\\d\\d\\d\\d.dat")) {
         //System.out.println("Found matching filename: " + filename);
-        int index = Integer.parseInt(filename.substring(4, 8));
+        int index = Integer.parseInt(filename.substring(6, 10));
         AbstractPlayer player = loadPlayer(dir + "/" + filename, index);
         newPopulation.add(player);
         
