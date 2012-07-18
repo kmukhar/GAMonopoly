@@ -41,6 +41,7 @@ public class NetWorthComparator implements Comparator<AbstractPlayer> {
       return o1.getNumProperties() < o2.getNumProperties() ? -1 : 1;
     }
 
+    // TODO This is currently N/A because initialGeneration is not fully implemented
     if (o1.initialGeneration != o2.initialGeneration) {
       return o1.initialGeneration < o2.initialGeneration ? -1 : 1;
     }
