@@ -53,7 +53,7 @@ public class GenomeReader {
 			return;
 		}
 
-		String playerIndex = filename.substring(4, 8);
+		String playerIndex = filename.substring(6, 10);
 
 		DataInputStream dis = null;
 		

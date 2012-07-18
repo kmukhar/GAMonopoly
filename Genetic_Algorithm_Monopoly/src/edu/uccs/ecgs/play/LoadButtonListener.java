@@ -10,28 +10,31 @@ import edu.uccs.ecgs.ga.PopulationPropagator;
 
 public class LoadButtonListener implements ActionListener {
 
-  private PlayerPanel playerPanel;
-  private final JFileChooser fc = new JFileChooser();
+	private PlayerPanel playerPanel;
+	private final JFileChooser fc = new JFileChooser();
 
-  public LoadButtonListener(PlayerPanel p) {
-    playerPanel = p;
-  }
+	public LoadButtonListener(PlayerPanel p) {
+		playerPanel = p;
+	}
 
-  @Override
-  public void actionPerformed(ActionEvent arg0) {
-    int returnVal = fc.showOpenDialog(playerPanel);
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-      File file = fc.getSelectedFile();
-      int index = Integer.parseInt(file.getName().substring(4,8));
-      playerPanel.player = PopulationPropagator.loadPlayer(file.getAbsolutePath(), index);
-      playerPanel.idField.setText(""+playerPanel.player.playerIndex);
-      playerPanel.idField.setEditable(false);
-      playerPanel.cashField.setText(""+playerPanel.player.cash);
-      playerPanel.cashField.setEditable(true);
-      playerPanel.cashField.addFocusListener(new CashFieldFocusListener(playerPanel));
-      playerPanel.cashField.addActionListener(new CashFieldActionListener(playerPanel));
-      // TODO playerPanel.addPlayer();
-      playerPanel.disableLoadButton();
-    }
-  }
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		int returnVal = fc.showOpenDialog(playerPanel);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			int index = Integer.parseInt(file.getName().substring(6, 10));
+			playerPanel.player = PopulationPropagator.loadPlayer(
+			    file.getAbsolutePath(), index);
+			playerPanel.idField.setText("" + playerPanel.player.playerIndex);
+			playerPanel.idField.setEditable(false);
+			playerPanel.cashField.setText("" + playerPanel.player.cash);
+			playerPanel.cashField.setEditable(true);
+			playerPanel.cashField.addFocusListener(new CashFieldFocusListener(
+			    playerPanel));
+			playerPanel.cashField.addActionListener(new CashFieldActionListener(
+			    playerPanel));
+			// TODO playerPanel.addPlayer();
+			playerPanel.disableLoadButton();
+		}
+	}
 }
