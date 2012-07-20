@@ -390,6 +390,8 @@ public class Main {
   {
     if (useGui) {
       gui.genNum.setText("" + generation);
+    } else {
+      System.out.println("Starting generation " + generation);
     }
   }
 }

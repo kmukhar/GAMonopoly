@@ -52,14 +52,15 @@ public class GAEngine implements Runnable {
   private Random r;
 
   /**
-   * A queue that contains games to be played. This queue is used by the gameExecutor.
+   * A queue that contains games to be played. This queue is used by the
+   * gameExecutor.
    */
   private LinkedBlockingQueue<Runnable> runnableGames;
 
   /**
-   * A list of games. The games in this list are the same as the games in runnableGames.
-   * This list enables the GAEngine to call some cleanup methods on the games after all
-   * the games are complete. 
+   * A list of games. The games in this list are the same as the games in
+   * runnableGames. This list enables the GAEngine to call some cleanup methods
+   * on the games after all the games are complete.
    */
   private ArrayList<Monopoly> games;
 
