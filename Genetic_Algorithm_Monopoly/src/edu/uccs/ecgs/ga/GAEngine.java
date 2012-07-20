@@ -216,13 +216,20 @@ public class GAEngine implements Runnable {
       generation++;
 
       if (generation < maxGeneration) {
-        Vector<AbstractPlayer> newPopulation = 
-            PopulationPropagator.evolve(playerPool, minEliteScore);
-        playerPool.clear();
-        playerPool.addAll(newPopulation);
-        
-        for (AbstractPlayer player : playerPool) {
-          assert player.getFitness() == 0;
+        if (Main.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
+          // don't evolve in this case
+          for (AbstractPlayer player : playerPool) {
+            player.resetFitness();
+          }
+        } else {
+          Vector<AbstractPlayer> newPopulation = PopulationPropagator.evolve(
+              playerPool, minEliteScore);
+          playerPool.clear();
+          playerPool.addAll(newPopulation);
+
+          for (AbstractPlayer player : playerPool) {
+            assert player.getFitness() == 0;
+          }
         }
       }
 
