@@ -1,7 +1,8 @@
 package edu.uccs.ecgs.ga;
 
 import java.io.*;
-import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
@@ -122,9 +123,25 @@ public class Main {
 
   public static void main(String[] args)
   {
-    Main main = new Main();
+    // TEMP TO PERFORM ANALYSIS -- DELETE WHEN DONE
+    for (ChromoTypes ctype : ChromoTypes.values()) {
+      for (FitEvalTypes fitType : FitEvalTypes.values()) {
+        if (fitType == FitEvalTypes.TOURNAMENT)
+          continue;
 
-    main.start(args);
+        Date now = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
+        System.out.println("Starting next population " + sdf.format(now));
+
+        args = new String[] { "chromoType=" + ctype.name(),
+            "fitnessEvaluator=" + fitType.name() };
+        //BUT KEEP THIS
+        Main main = new Main();
+        main.start(args);
+        //END KEEP SECTION
+      }
+    }    
+    // END DELETE
   }
 
   public void start(String[] args)
@@ -208,7 +225,6 @@ public class Main {
     } else {
       System.out.println("Monopoly simulation is complete");
     }
-    System.exit(0);
   }
 
   /**
@@ -391,7 +407,9 @@ public class Main {
     if (useGui) {
       gui.genNum.setText("" + generation);
     } else {
-      System.out.println("Starting generation " + generation);
+      System.out.println("Starting generation " + generation
+          + " for Chromo Type " + Main.chromoType.name()
+          + " and Fitness Evaluator " + Main.fitnessEvaluator.name());
     }
   }
 }

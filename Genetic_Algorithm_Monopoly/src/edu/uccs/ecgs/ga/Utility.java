@@ -29,7 +29,7 @@ public class Utility {
         f = fc.getSelectedFile();
       } else {
         // not using gui
-        f = new File("data");
+        f = new File("data_num_wins");
       }
 
       rootDir = f.getAbsolutePath();

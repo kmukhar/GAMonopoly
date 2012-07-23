@@ -104,6 +104,10 @@ public class GAEngine implements Runnable {
             playerPool, computeMinEliteScore());
         playerPool.clear();
         playerPool.addAll(newPopulation);
+      } else {
+        for (AbstractPlayer player : playerPool) {
+          player.resetFitness();
+        }
       }
   	}
   }
@@ -142,7 +146,15 @@ public class GAEngine implements Runnable {
       main.setGenNum(generation);
       matches = 0;
 
-      IFitnessEvaluator fitEval = Main.fitnessEvaluator.get();
+      IFitnessEvaluator fitEval = null;
+      if (Main.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
+        // for now, with load and compete always use finish order for the
+        // competitive analysis
+        fitEval = FitEvalTypes.NUM_WINS.get();
+      } else {
+        // otherwise use the specified evaluator
+        fitEval = Main.fitnessEvaluator.get();
+      }
 
       while (matches < Main.numMatches) {
         main.setMatchNum(matches);
