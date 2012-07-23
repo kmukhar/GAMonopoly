@@ -24,7 +24,7 @@ public class LoadButtonListener implements ActionListener {
 			File file = fc.getSelectedFile();
 			int index = Integer.parseInt(file.getName().substring(6, 10));
 			playerPanel.player = PopulationPropagator.loadPlayer(
-			    file.getAbsolutePath(), index);
+			    file, index);
 			playerPanel.idField.setText("" + playerPanel.player.playerIndex);
 			playerPanel.idField.setEditable(false);
 			playerPanel.cashField.setText("" + playerPanel.player.cash);

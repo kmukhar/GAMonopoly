@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -112,12 +113,12 @@ public class FitnessReader extends JFrame implements ActionListener {
     }
 
     for (int i = start; i <= end; i++) {
-      StringBuilder filename = Utility.getDirForGen(i);
-      filename.append("/player_fitness.csv");
+      Path filename = Utility.getDirForGen(i);
+      filename.resolve("player_fitness.csv");
 
       BufferedReader br = null;
       try {
-        FileReader fr = new FileReader(filename.toString());
+        FileReader fr = new FileReader(filename.toFile());
         br = new BufferedReader(fr);
 
         String line = br.readLine();

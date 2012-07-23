@@ -2,6 +2,7 @@ package edu.uccs.ecgs.ga;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -304,19 +305,20 @@ public class Monopoly implements Runnable {
    * the formatter to the logger.
    */
   public void logFileSetup() {
-    StringBuilder dir = Utility.getDirForGen(Main.chromoType,
+    Path dir = Utility.getDirForGen(Main.chromoType,
         Main.fitnessEvaluator, generation);
 
-    dir.append("/").append(getMatchString());
-    File file = new File(dir.toString());
+    dir = dir.resolve(getMatchString().toString());
+    File file = dir.toFile();
     if (!file.exists()) {
       file.mkdir();
     }
 
-    StringBuilder fileName = new StringBuilder(getGameString().append(".rtf"));
+    StringBuilder fileName = new StringBuilder();
+    fileName.append(getGameString()).append(".rtf");
 
     try {
-      fh = new FileHandler(dir + "/" + fileName, false);
+      fh = new FileHandler(dir.resolve(fileName.toString()).toString(), false);
       logger.addHandler(fh);
       fh.setFormatter(formatter);
 
@@ -349,7 +351,7 @@ public class Monopoly implements Runnable {
    * 
    * @return A string of the form "Game_nnn" where nnn is the game number.
    */
-  private StringBuilder getGameString() {
+  private String getGameString() {
     StringBuilder result = new StringBuilder("" + game);
 
     while (result.length() < 3) {
@@ -358,7 +360,7 @@ public class Monopoly implements Runnable {
 
     result.insert(0, "Game_");
 
-    return result;
+    return result.toString();
   }
 
   /**

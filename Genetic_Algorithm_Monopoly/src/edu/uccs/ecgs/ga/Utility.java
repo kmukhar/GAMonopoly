@@ -1,19 +1,22 @@
 package edu.uccs.ecgs.ga;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+
 import javax.swing.JFileChooser;
 
-public class Utility {
+public class Utility
+{
   private static String rootDir;
 
-  public static synchronized StringBuilder getDirForGen(int generation)
+  public static synchronized Path getDirForGen(int generation)
   {
     return getDirForGen(null, null, generation);
   }
 
-  public static synchronized StringBuilder getDirForGen(ChromoTypes chromoType,
-                                                        FitEvalTypes fitEval,
-                                                        int generation)
+  public static synchronized Path getDirForGen(ChromoTypes chromoType,
+      FitEvalTypes fitEval, int generation)
   {
     File f = null;
     if (rootDir == null || rootDir.equals("")) {
@@ -29,34 +32,35 @@ public class Utility {
         f = fc.getSelectedFile();
       } else {
         // not using gui
-        f = new File("data_num_wins");
+        String dataDirName = System.getProperty("dataDirName");
+        f = new File(dataDirName);
       }
 
       rootDir = f.getAbsolutePath();
       System.out.println("Log dir: " + rootDir);
     }
 
-    StringBuilder dir = new StringBuilder(rootDir);
-    dir.append("/").append(chromoType.toString());
-    dir.append("/").append(fitEval.get().getDirName()).append("/");
+    Path path = FileSystems.getDefault().getPath(rootDir);
+    path = path.resolve(chromoType.toString()).resolve(
+        fitEval.get().getDirName());
 
     if (generation < 10) {
-      dir.append("Generation_0000" + generation);
+      path = path.resolve("Generation_0000" + generation);
     } else if (generation < 100) {
-      dir.append("Generation_000" + generation);
+      path = path.resolve("Generation_000" + generation);
     } else if (generation < 1000) {
-      dir.append("Generation_00" + generation);
+      path = path.resolve("Generation_00" + generation);
     } else if (generation < 10000) {
-      dir.append("Generation_0" + generation);
+      path = path.resolve("Generation_0" + generation);
     } else if (generation < 100000) {
-      dir.append("Generation_" + generation);
+      path = path.resolve("Generation_" + generation);
     }
-    
-    f = new File(dir.toString());
+
+    f = path.toFile();
     if (!f.exists()) {
       f.mkdirs();
     }
 
-    return dir;
+    return path;
   }
 }

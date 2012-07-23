@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Random;
 import java.util.Vector;
 
@@ -143,10 +144,10 @@ public class PopulationPropagator {
 
     Vector<AbstractPlayer> newPopulation = new Vector<AbstractPlayer>(Main.maxPlayers);
 
-    StringBuilder dir = Utility.getDirForGen(Main.chromoType,
-        Main.fitnessEvaluator, generation);
+    Path dir = Utility.getDirForGen(Main.chromoType, Main.fitnessEvaluator,
+        generation);
 
-    File theDirectory = new File(dir.toString());
+    File theDirectory = dir.toFile();
     String[] files = theDirectory.list();
     
     for (String filename : files) {
@@ -158,7 +159,7 @@ public class PopulationPropagator {
       if (filename.matches("player\\d\\d\\d\\d.dat")) {
         //System.out.println("Found matching filename: " + filename);
         int index = Integer.parseInt(filename.substring(6, 10));
-        AbstractPlayer player = loadPlayer(dir + "/" + filename, index);
+        AbstractPlayer player = loadPlayer(dir.resolve(filename), index);
         newPopulation.add(player);
         
         playerCount++;
@@ -168,12 +169,13 @@ public class PopulationPropagator {
     return newPopulation;
   }
 
-  public static AbstractPlayer loadPlayer(String filename, int index) {
+  public static AbstractPlayer loadPlayer(File file, int index)
+  {
     DataInputStream dis = null;
     AbstractPlayer player = null;
 
     try {
-      FileInputStream fis = new FileInputStream(filename);
+      FileInputStream fis = new FileInputStream(file);
       dis  = new DataInputStream(fis);
 
       char[] header = new char[3];
@@ -201,5 +203,10 @@ public class PopulationPropagator {
     }
 
     return player;
+  }
+
+  public static AbstractPlayer loadPlayer(Path path, int index)
+  {
+    return loadPlayer(path.toFile(), index);
   }
 }

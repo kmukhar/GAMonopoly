@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -148,9 +149,10 @@ public class GAEngine implements Runnable {
 
       IFitnessEvaluator fitEval = null;
       if (Main.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
-        // for now, with load and compete always use finish order for the
-        // competitive analysis
-        fitEval = FitEvalTypes.NUM_WINS.get();
+        // when competing, we may want to use a different evaluator than
+        // specified in the startup
+        String evaluator = System.getProperty("evaluator");
+        fitEval = FitEvalTypes.valueOf(evaluator).get();
       } else {
         // otherwise use the specified evaluator
         fitEval = Main.fitnessEvaluator.get();
@@ -270,13 +272,13 @@ public class GAEngine implements Runnable {
 
     fitness.addAll(playerPool);
 
-    StringBuilder dir = Utility.getDirForGen(Main.chromoType,
+    Path dir = Utility.getDirForGen(Main.chromoType,
         Main.fitnessEvaluator, generation);
 
     // dump the score counts
     BufferedWriter bw = null;
     try {
-      FileWriter fw = new FileWriter(dir.toString() + "/fitness_scores.csv");
+      FileWriter fw = new FileWriter(dir.resolve("fitness_scores.csv").toFile());
       bw = new BufferedWriter(fw);
 
       bw.write("fitness,num players");
@@ -311,7 +313,7 @@ public class GAEngine implements Runnable {
 
     // dump individual fitness scores
     try {
-      FileWriter fw = new FileWriter(dir.toString() + "/player_fitness.csv");
+      FileWriter fw = new FileWriter(dir.resolve("player_fitness.csv").toFile());
       bw = new BufferedWriter(fw);
 
       bw.write("fitness,player id");
@@ -385,13 +387,13 @@ public class GAEngine implements Runnable {
       fn1.insert(0, "player");
       fn1.append(".dat");
 
-      StringBuilder dir = Utility.getDirForGen(Main.chromoType,
+      Path dir = Utility.getDirForGen(Main.chromoType,
           Main.fitnessEvaluator, generation);
 
       DataOutputStream dos = null;
       try {
-        FileOutputStream fos = new FileOutputStream(dir.toString() + "/"
-            + fn1.toString());
+        FileOutputStream fos = new FileOutputStream(dir.resolve(fn1.toString())
+            .toFile());
         dos = new DataOutputStream(fos);
         player.dumpGenome(dos);
       } catch (FileNotFoundException e) {
