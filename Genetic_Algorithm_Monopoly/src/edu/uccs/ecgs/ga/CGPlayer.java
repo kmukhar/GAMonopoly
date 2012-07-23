@@ -57,8 +57,8 @@ public abstract class CGPlayer extends AbstractPlayer {
   // TODO Chromosome to determine when and how to trade properties?
   // Or use some other technique? For now, we ignore trading.
 
-  public CGPlayer(int index) {
-    super(index);
+  public CGPlayer(int index, ChromoTypes chromoType) {
+    super(index, chromoType);
   }
 
   /**
@@ -317,7 +317,7 @@ public abstract class CGPlayer extends AbstractPlayer {
       double[] chrOpponentOwns, double[] chrTwoOpponentOwns,
       double[][] chrJail) 
   {
-    CGPlayer player = (CGPlayer) Main.chromoType.getPlayer(index);
+    CGPlayer player = (CGPlayer) chromoType.getPlayer(index);
     player.jailLength = this.jailLength;
     player.chrNoOwners = chrNoOwners;
     player.chrPlayerOwns = chrPlayerOwns;

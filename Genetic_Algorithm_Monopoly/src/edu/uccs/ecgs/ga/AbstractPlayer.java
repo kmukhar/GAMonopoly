@@ -56,12 +56,15 @@ public abstract class AbstractPlayer
   protected Monopoly game;
   // the total net worth of all players in a single game
   private int gameNetWorth;
+  protected ChromoTypes chromoType;
 
   /**
    * Constructor
    * @param index An id for the player
+   * @param chromoType 
    */
-  public AbstractPlayer(int index) {
+  public AbstractPlayer(int index, ChromoTypes chromoType) {
+    this.chromoType = chromoType;
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();

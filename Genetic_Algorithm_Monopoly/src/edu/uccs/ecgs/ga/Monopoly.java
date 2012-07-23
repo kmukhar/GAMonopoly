@@ -48,6 +48,7 @@ public class Monopoly implements Runnable {
 
   public String gamekey;
   private long seed;
+  private Main program;
 
   /**
    * Constructor
@@ -56,8 +57,9 @@ public class Monopoly implements Runnable {
    * @param gameNumber Game number for this game.
    * @param players Array of players for this game.
    */
-  public Monopoly(int generation, int match, int gameNumber,
+  public Monopoly(Main main, int generation, int match, int gameNumber,
       AbstractPlayer[] players) {
+    this.program = main;
     this.generation = generation;
     this.match = match;
     this.game = gameNumber;
@@ -277,13 +279,13 @@ public class Monopoly implements Runnable {
 
   /**
    * Create a formatter and set logging on or off depending on state of
-   * {@link edu.uccs.ecgs.ga.Main#debug}. If Main.debug is true, then logging is
+   * {@link Main#debug}. If Main.debug is true, then logging is
    * turned on; if debug is false, logging is turned off.
    */
   public void initLogger() {
-    if (Main.debug != Level.OFF) {
+    if (program.debug != Level.OFF) {
       logger = Logger.getLogger(gamekey);
-      logger.setLevel(Main.debug);
+      logger.setLevel(program.debug);
 
       formatter = new Formatter() {
         @Override
@@ -305,8 +307,8 @@ public class Monopoly implements Runnable {
    * the formatter to the logger.
    */
   public void logFileSetup() {
-    Path dir = Utility.getDirForGen(Main.chromoType,
-        Main.fitnessEvaluator, generation);
+    Path dir = program.getDirForGen(program.chromoType,
+        program.fitnessEvaluator, generation);
 
     dir = dir.resolve(getMatchString().toString());
     File file = dir.toFile();

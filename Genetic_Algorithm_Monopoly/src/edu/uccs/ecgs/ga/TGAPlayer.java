@@ -12,7 +12,7 @@ public class TGAPlayer extends CGPlayer {
   private static final int JAIL_LENGTH = 4;
 
   public TGAPlayer(int index) {
-    super(index);
+    super(index, ChromoTypes.TGA);
     jailLength = JAIL_LENGTH;
 
     chrNoOwners = new double[lotLength];
@@ -36,7 +36,7 @@ public class TGAPlayer extends CGPlayer {
   }
 
   public TGAPlayer(int index, DataInputStream dis) throws IOException {
-    super(index);
+    super(index, ChromoTypes.TGA);
     jailLength = JAIL_LENGTH;
 
     chrNoOwners = new double[lotLength];
@@ -71,7 +71,7 @@ public class TGAPlayer extends CGPlayer {
       double[] chrOpponentOwns, double[] chrTwoOpponentOwns,
       double[][] chrJail) 
   {
-    super(index);
+    super(index, ChromoTypes.TGA);
     jailLength = JAIL_LENGTH;
 
     this.chrNoOwners = chrNoOwners;

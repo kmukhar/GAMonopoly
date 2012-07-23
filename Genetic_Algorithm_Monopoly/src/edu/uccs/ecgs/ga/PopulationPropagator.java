@@ -17,24 +17,23 @@ public class PopulationPropagator {
   // be around 50. Add a buffer fact of 1.
   private static final int avgPointsPerGame = 51;
 
-  private static final int rouletteSize = avgPointsPerGame * Main.maxPlayers;
+  private final int rouletteSize;
   
-  private static PopulationPropagator _this = new PopulationPropagator();
+  private Main program;
 
-  private PopulationPropagator() {
+  public PopulationPropagator(Main main) {
+    program = main;
+    rouletteSize = avgPointsPerGame * Main.maxPlayers;
+    
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }
     r.setSeed(seed);    
   }
-  
-  public PopulationPropagator getEvolver() {
-    return _this;
-  }
-  
-  public static Vector<AbstractPlayer> evolve(Vector<AbstractPlayer> population,
-                                              int minEliteScore)
+    
+  public Vector<AbstractPlayer> evolve(Vector<AbstractPlayer> population,
+      int minEliteScore)
   {
     Vector<AbstractPlayer> newPopulation = new Vector<AbstractPlayer>(
         Main.maxPlayers);
@@ -139,12 +138,12 @@ public class PopulationPropagator {
     return newPopulation;
   }
   
-  public static Vector<AbstractPlayer> loadPlayers(int generation) {
+  public Vector<AbstractPlayer> loadPlayers(int generation) {
     int playerCount = 0;
 
     Vector<AbstractPlayer> newPopulation = new Vector<AbstractPlayer>(Main.maxPlayers);
 
-    Path dir = Utility.getDirForGen(Main.chromoType, Main.fitnessEvaluator,
+    Path dir = program.getDirForGen(program.chromoType, program.fitnessEvaluator,
         generation);
 
     File theDirectory = dir.toFile();

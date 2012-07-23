@@ -9,18 +9,20 @@ import javax.swing.JFileChooser;
 public class Utility
 {
   private static String rootDir;
+  private String rootDir2;
 
-  public static synchronized Path getDirForGen(int generation)
+  public synchronized Path getDirForGen(int generation)
   {
     return getDirForGen(null, null, generation);
   }
 
-  public static synchronized Path getDirForGen(ChromoTypes chromoType,
+  public synchronized Path getDirForGen(ChromoTypes chromoType,
       FitEvalTypes fitEval, int generation)
   {
     File f = null;
-    if (rootDir == null || rootDir.equals("")) {
-      if (Main.useGui) {
+
+    if (Main.useGui) {
+      if (rootDir == null || rootDir.equals("")) {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Select directory to save data files");
@@ -30,17 +32,24 @@ public class Utility
         }
 
         f = fc.getSelectedFile();
+        rootDir = f.getAbsolutePath();
+        System.out.println("Log dir: " + rootDir);
       } else {
-        // not using gui
+        f = new File(rootDir);
+      }
+    } else {
+      // not using gui
+      if (rootDir2 == null) {
         String dataDirName = System.getProperty("dataDirName");
         f = new File(dataDirName);
+        rootDir2 = f.getAbsolutePath();
+        System.out.println("Log dir: " + rootDir2);
+      } else {
+        f = new File(rootDir2);
       }
-
-      rootDir = f.getAbsolutePath();
-      System.out.println("Log dir: " + rootDir);
     }
 
-    Path path = FileSystems.getDefault().getPath(rootDir);
+    Path path = FileSystems.getDefault().getPath(f.getAbsolutePath());
     path = path.resolve(chromoType.toString()).resolve(
         fitEval.get().getDirName());
 

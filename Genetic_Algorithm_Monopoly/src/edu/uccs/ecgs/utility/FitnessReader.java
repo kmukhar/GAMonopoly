@@ -26,12 +26,14 @@ public class FitnessReader extends JFrame implements ActionListener {
   JTextField t2;
   JTextField t1;
   JButton button;
+  Utility utility;
 
   public static void main(String[] args) {
     new FitnessReader();
   }
 
   public FitnessReader() {
+    utility = new Utility();
     setDefaultCloseOperation(EXIT_ON_CLOSE);
 
     GridBagLayout layout = new GridBagLayout();
@@ -113,7 +115,7 @@ public class FitnessReader extends JFrame implements ActionListener {
     }
 
     for (int i = start; i <= end; i++) {
-      Path filename = Utility.getDirForGen(i);
+      Path filename = utility.getDirForGen(i);
       filename.resolve("player_fitness.csv");
 
       BufferedReader br = null;

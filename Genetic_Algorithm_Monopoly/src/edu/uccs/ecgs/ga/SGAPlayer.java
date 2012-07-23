@@ -22,7 +22,7 @@ public class SGAPlayer extends AbstractPlayer {
   private static final int maxGeneVal = 64; // 2^numBitsPerGene
 
   public SGAPlayer(int index) {
-    super(index);
+    super(index, ChromoTypes.SGA);
     chrNoOwners = new BitSet(chromoLength);
     chrPlayerOwns = new BitSet(chromoLength);
     chrOpponentOwns = new BitSet(chromoLength);
@@ -72,7 +72,7 @@ public class SGAPlayer extends AbstractPlayer {
   }
 
   public SGAPlayer(int index, DataInputStream dis) throws IOException {
-    super(index);
+    super(index, ChromoTypes.SGA);
 
     addToFitness(dis.readInt());
 
@@ -93,7 +93,7 @@ public class SGAPlayer extends AbstractPlayer {
       BitSet chrOpponentOwns, BitSet chrTwoOpponentOwns,
       BitSet chrJail) 
   {
-    super(index);
+    super(index, ChromoTypes.SGA);
     this.chrNoOwners = chrNoOwners;
     this.chrPlayerOwns = chrPlayerOwns;
     this.chrOpponentOwns = chrOpponentOwns;

@@ -39,16 +39,16 @@ public class GAEngine implements Runnable {
    */
   TreeMap<Integer, Integer> scores = null;
 
+  private Main program;
+
   /**
    * The pool of available players in a generation. When a player is picked for
    * a game, the player is removed from playerPool and placed into playersDone.
    * After all games have been played, the players are placed back into the
    * playerPool for the next set of games.
    */
-  private Vector<AbstractPlayer> playerPool = new Vector<AbstractPlayer>(
-      Main.maxPlayers);
-  private Vector<AbstractPlayer> playersDone = new Vector<AbstractPlayer>(
-      Main.maxPlayers);
+  private Vector<AbstractPlayer> playerPool;
+  private Vector<AbstractPlayer> playersDone;
 
   private Random r;
 
@@ -69,10 +69,13 @@ public class GAEngine implements Runnable {
    * A Thread pool for executing the games in runnableGames.
    */
   private ThreadPoolExecutor gameExecutor;
-  private Main main;
 
   public GAEngine(Main main) {
-    this.main = main;
+    program = main;
+    
+    playerPool = new Vector<AbstractPlayer>(Main.maxPlayers);
+    playersDone = new Vector<AbstractPlayer>(Main.maxPlayers);
+
     r = new Random();
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -88,21 +91,22 @@ public class GAEngine implements Runnable {
 	 * Otherwise this methods creates a pool of randomly generated players.
 	 */
   private void createPlayers() {
-  	if (Main.loadFromDisk == LoadTypes.NO_LOAD) {
+  	if (program.loadFromDisk == LoadTypes.NO_LOAD) {
       // Create new population of players
       for (int i = 0; i < Main.maxPlayers; i++) {
-        AbstractPlayer player = PlayerFactory.getPlayer(i, Main.chromoType);
+        AbstractPlayer player = PlayerFactory.getPlayer(i, program.chromoType);
         player.initCash(1500);
         playerPool.add(player);
       }  		
 
   	} else {
       playerPool.clear();
-      playerPool.addAll(PopulationPropagator.loadPlayers(Main.loadGeneration));
+      PopulationPropagator propagator = new PopulationPropagator(program);
+      playerPool.addAll(propagator.loadPlayers(program.loadGeneration));
 
-      if (Main.loadFromDisk == LoadTypes.LOAD_AND_EVOLVE) {
-        Vector<AbstractPlayer> newPopulation = PopulationPropagator.evolve(
-            playerPool, computeMinEliteScore());
+      if (program.loadFromDisk == LoadTypes.LOAD_AND_EVOLVE) {
+        Vector<AbstractPlayer> newPopulation = propagator.evolve(playerPool,
+            computeMinEliteScore());
         playerPool.clear();
         playerPool.addAll(newPopulation);
       } else {
@@ -136,37 +140,38 @@ public class GAEngine implements Runnable {
    * Create and evolve a population of players. 
    */
   public void runGames() {
-    if (Main.loadFromDisk != LoadTypes.NO_LOAD) {
-      generation = Main.loadGeneration + 1;
+    if (program.loadFromDisk != LoadTypes.NO_LOAD) {
+      generation = program.loadGeneration + 1;
     }
     int maxGeneration = generation + Main.numGenerations;
 
     runnableGames = new LinkedBlockingQueue<Runnable>();
 
     while (generation < maxGeneration) {
-      main.setGenNum(generation);
+      program.setGenNum(generation);
       matches = 0;
 
       IFitnessEvaluator fitEval = null;
-      if (Main.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
+      if (program.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
         // when competing, we may want to use a different evaluator than
         // specified in the startup
         String evaluator = System.getProperty("evaluator");
         fitEval = FitEvalTypes.valueOf(evaluator).get();
       } else {
         // otherwise use the specified evaluator
-        fitEval = Main.fitnessEvaluator.get();
+        fitEval = program.fitnessEvaluator.get();
       }
 
       while (matches < Main.numMatches) {
-        main.setMatchNum(matches);
-        gameExecutor = new ThreadPoolExecutor(Main.numThreads, Main.numThreads*2, 1L, TimeUnit.MINUTES, runnableGames);
+        program.setMatchNum(matches);
+        gameExecutor = new ThreadPoolExecutor(Main.numThreads,
+            Main.numThreads * 2, 1L, TimeUnit.MINUTES, runnableGames);
         gameNumber = 0;
 
         games = new ArrayList<Monopoly>();
 
         while (!playerPool.isEmpty()) {
-          Monopoly game = new Monopoly(generation, matches, gameNumber,
+          Monopoly game = new Monopoly(program, generation, matches, gameNumber,
               getFourPlayers());
 
           games.add(game);
@@ -231,14 +236,15 @@ public class GAEngine implements Runnable {
       generation++;
 
       if (generation < maxGeneration) {
-        if (Main.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
+        if (program.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
           // don't evolve in this case
           for (AbstractPlayer player : playerPool) {
             player.resetFitness();
           }
         } else {
-          Vector<AbstractPlayer> newPopulation = PopulationPropagator.evolve(
-              playerPool, minEliteScore);
+          PopulationPropagator propagator = new PopulationPropagator(program);
+          Vector<AbstractPlayer> newPopulation = propagator.evolve(playerPool,
+              minEliteScore);
           playerPool.clear();
           playerPool.addAll(newPopulation);
 
@@ -272,8 +278,8 @@ public class GAEngine implements Runnable {
 
     fitness.addAll(playerPool);
 
-    Path dir = Utility.getDirForGen(Main.chromoType,
-        Main.fitnessEvaluator, generation);
+    Path dir = program.getDirForGen(program.chromoType, program.fitnessEvaluator,
+        generation);
 
     // dump the score counts
     BufferedWriter bw = null;
@@ -387,8 +393,8 @@ public class GAEngine implements Runnable {
       fn1.insert(0, "player");
       fn1.append(".dat");
 
-      Path dir = Utility.getDirForGen(Main.chromoType,
-          Main.fitnessEvaluator, generation);
+      Path dir = program.getDirForGen(program.chromoType,
+          program.fitnessEvaluator, generation);
 
       DataOutputStream dos = null;
       try {

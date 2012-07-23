@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.ga;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ public class Main {
    * where the game goes forever when no player is ever able to dominate the
    * game.
    */
-  public static int maxTurns = 50;
+  public static int maxTurns = 100;
 
   /**
    * The number of players that participate in a game.
@@ -49,25 +50,25 @@ public class Main {
   /**
    * The fitness evaluator type to use for the algorithm.
    */
-  public static FitEvalTypes fitnessEvaluator = FitEvalTypes.NUM_WINS;
+  public FitEvalTypes fitnessEvaluator = FitEvalTypes.NUM_WINS;
 
   /**
 	 * Should existing players be loaded from data files
 	 * (loadFromDisk=LOAD_AND_EVOLVE or LOAD_AND_COMPETE) or generated from
 	 * scratch (loadFromDisk=NO_LOAD).
 	 */
-  public static LoadTypes loadFromDisk = LoadTypes.NO_LOAD;
+  public LoadTypes loadFromDisk = LoadTypes.NO_LOAD;
 
   /**
    * When loading existing players from disk, this value indicates which
    * generation to load the players from.
    */
-  public static int loadGeneration = 0;
+  public int loadGeneration = 0;
 
   /**
    * Whether or not to output debug information.
    */
-  public static Level debug = Level.OFF;
+  public Level debug = Level.OFF;
 
   /**
    * Which chromosome types to use for a player. See
@@ -76,7 +77,7 @@ public class Main {
    * {@link edu.uccs.ecgs.ga.PlayerFactory#getPlayer(int index, ChromoTypes chromoType)}
    * .
    */
-  public static ChromoTypes chromoType = ChromoTypes.TGA;
+  public ChromoTypes chromoType = ChromoTypes.TGA;
 
   /**
    * Rate at which to mutate the genome.
@@ -95,11 +96,13 @@ public class Main {
    * 1 game, and when the game is complete, the thread can then run another
    * game.
    */
-  public static int numThreads = 8;
+  public static int numThreads = 6;
   
-  private static GAEngine gaEngine;
+  private GAEngine gaEngine;
 
   private Gui gui = null;
+
+  private Utility utility;
 
   public static boolean useGui = false;
 
@@ -133,14 +136,20 @@ public class Main {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
         System.out.println("Starting next population " + sdf.format(now));
 
-        args = new String[] { "chromoType=" + ctype.name(),
-            "fitnessEvaluator=" + fitType.name() };
-        //BUT KEEP THIS
+        final ArrayList<String> moreArgs = new ArrayList<String>();
+        for (String anArg : args) {
+          moreArgs.add(anArg);
+        }
+
+        moreArgs.add("chromoType=" + ctype.name());
+        moreArgs.add("fitnessEvaluator=" + fitType.name());
+
+        // BUT KEEP THIS
         Main main = new Main();
-        main.start(args);
-        //END KEEP SECTION
+        main.start(moreArgs.toArray(new String[0]));
+        // END KEEP SECTION
       }
-    }    
+    }
     // END DELETE
   }
 
@@ -230,7 +239,7 @@ public class Main {
   /**
    * Pause the simulation
    */
-  public static void pause()
+  public void pause()
   {
     paused = true;
   }
@@ -238,7 +247,7 @@ public class Main {
   /**
    * Resume the simulation
    */
-  public static void resume()
+  public void resume()
   {
     paused = false;
     gaEngine.resume();
@@ -258,7 +267,7 @@ public class Main {
    * @param text
    *          The value of the parameter
    */
-  public static void setExecutionValue(int index, String text)
+  public void setExecutionValue(int index, String text)
   {
     switch (index) {
     case 0:
@@ -318,7 +327,7 @@ public class Main {
    *          Chromosome Type, the object is an instance of the appropriate
    *          enum. For Log Level, the object is a String.
    */
-  public static void setExecutionValue(int index, Object selectedItem) {
+  public void setExecutionValue(int index, Object selectedItem) {
     switch (index) {
     case 5:
       // Fitness Evaluator
@@ -408,8 +417,18 @@ public class Main {
       gui.genNum.setText("" + generation);
     } else {
       System.out.println("Starting generation " + generation
-          + " for Chromo Type " + Main.chromoType.name()
-          + " and Fitness Evaluator " + Main.fitnessEvaluator.name());
+          + " for Chromo Type " + chromoType.name()
+          + " and Fitness Evaluator " + fitnessEvaluator.name());
     }
+  }
+
+  public Main() {
+    utility = new Utility();
+  }
+
+  public Path getDirForGen(ChromoTypes chromoType,
+      FitEvalTypes fitEval, int generation)
+  {
+    return utility.getDirForGen(chromoType, fitEval, generation);
   }
 }

@@ -34,7 +34,7 @@ public class Gui extends JFrame {
   
   public void init(Object[][] fields) {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setTitle("Simulation with chromosome type " + Main.chromoType);
+    setTitle("Simulation with chromosome type " + program.chromoType);
 
     this.getContentPane().add(getSimPanel(fields));
     this.pack();
@@ -80,7 +80,7 @@ public class Gui extends JFrame {
       gbc.gridy += 1;
     }
 
-    changeGenNumEditable(Main.loadFromDisk);
+    changeGenNumEditable(program.loadFromDisk);
 
     JPanel genPanel = new JPanel();
     genPanel.add(new JLabel("Generation: "));
@@ -124,11 +124,11 @@ public class Gui extends JFrame {
         } else if (Main.paused) {
           // button currently says Run Monopoly
           button.setText("Pause All Games");
-          Main.resume();
+          program.resume();
         } else {
           // button currently says Pause Monopoly
           button.setText("Restart All Games");
-          Main.pause();
+          program.pause();
         }
       }
     });
@@ -140,7 +140,7 @@ public class Gui extends JFrame {
   private void setComboBoxSelection(JComboBox choice, String label) {
     if (label.equalsIgnoreCase(Main.loadFromDiskLabel)) {
     	JComboBox comboBox = (JComboBox) choice;
-      comboBox.setSelectedItem(Main.loadFromDisk);
+      comboBox.setSelectedItem(program.loadFromDisk);
       comboBox.addItemListener(new ItemListener(){
 				@Override
         public void itemStateChanged(ItemEvent e) {
@@ -149,9 +149,9 @@ public class Gui extends JFrame {
     } else if (label.equalsIgnoreCase(Main.randomSeedLabel)) {
       ((JComboBox) choice).setSelectedItem(Main.useRandomSeed);      
     } else {
-      ((JComboBox) choice).setSelectedItem(Main.fitnessEvaluator);
-      ((JComboBox) choice).setSelectedItem(Main.debug);
-      ((JComboBox) choice).setSelectedItem(Main.chromoType);
+      ((JComboBox) choice).setSelectedItem(program.fitnessEvaluator);
+      ((JComboBox) choice).setSelectedItem(program.debug);
+      ((JComboBox) choice).setSelectedItem(program.chromoType);
     }
   }
 
@@ -171,11 +171,11 @@ public class Gui extends JFrame {
         JTextField field = (JTextField) choice;
         field.setEditable(false);
         String value = field.getText();
-        Main.setExecutionValue(i++, value);
+        program.setExecutionValue(i++, value);
       } else {
         JComboBox<?> field = (JComboBox<?>) choice;
         field.setEditable(false);
-        Main.setExecutionValue(i++, field.getSelectedItem());
+        program.setExecutionValue(i++, field.getSelectedItem());
       }
     }
     startSimulation();
