@@ -126,29 +126,28 @@ public class Main {
 
   public static void main(String[] args)
   {
-    // TEMP TO PERFORM ANALYSIS -- DELETE WHEN DONE
-    for (ChromoTypes ctype : ChromoTypes.values()) {
-      for (FitEvalTypes fitType : FitEvalTypes.values()) {
-        if (fitType == FitEvalTypes.TOURNAMENT)
-          continue;
+    for (FitEvalTypes fitType : FitEvalTypes.values()) {
+      if (fitType == FitEvalTypes.TOURNAMENT)
+        continue;
 
-        Date now = Calendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
-        System.out.println("Starting next population " + sdf.format(now));
+      // TEMP TO PERFORM ANALYSIS -- DELETE WHEN DONE
+      Date now = Calendar.getInstance().getTime();
+      SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
+      System.out.println("Starting next population " + sdf.format(now));
 
-        final ArrayList<String> moreArgs = new ArrayList<String>();
-        for (String anArg : args) {
-          moreArgs.add(anArg);
-        }
-
-        moreArgs.add("chromoType=" + ctype.name());
-        moreArgs.add("fitnessEvaluator=" + fitType.name());
-
-        // BUT KEEP THIS
-        Main main = new Main();
-        main.start(moreArgs.toArray(new String[0]));
-        // END KEEP SECTION
+      final ArrayList<String> moreArgs = new ArrayList<String>();
+      for (String anArg : args) {
+        moreArgs.add(anArg);
       }
+
+      moreArgs.add("chromoType=" + System.getProperty("chromoType"));
+      moreArgs.add("fitnessEvaluator=" + fitType.name());
+      System.setProperty("evaluator", FitEvalTypes.NUM_WINS.name());
+
+      // BUT KEEP THIS
+      Main main = new Main();
+      main.start(moreArgs.toArray(new String[0]));
+      // END KEEP SECTION
     }
     // END DELETE
   }
@@ -418,7 +417,7 @@ public class Main {
     } else {
       System.out.println("Starting generation " + generation
           + " for Chromo Type " + chromoType.name()
-          + " and Fitness Evaluator " + fitnessEvaluator.name());
+          + " and original Fitness Evaluator " + fitnessEvaluator.name());
     }
   }
 
