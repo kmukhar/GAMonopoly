@@ -142,7 +142,8 @@ public class Main {
 
       moreArgs.add("chromoType=" + System.getProperty("chromoType"));
       moreArgs.add("fitnessEvaluator=" + fitType.name());
-      System.setProperty("evaluator", FitEvalTypes.NUM_WINS.name());
+      // TODO
+      System.setProperty("evaluator", FitEvalTypes.FINISH_ORDER.name());
 
       // BUT KEEP THIS
       Main main = new Main();
@@ -231,7 +232,9 @@ public class Main {
       JOptionPane.showMessageDialog(null, "Monopoly simulation is complete",
           "Simulation Complete", JOptionPane.INFORMATION_MESSAGE);
     } else {
-      System.out.println("Monopoly simulation is complete");
+      Date now = Calendar.getInstance().getTime();
+      SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
+      System.out.println("Monopoly simulation is complete " + sdf.format(now));
     }
   }
 

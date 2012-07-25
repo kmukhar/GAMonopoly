@@ -3,7 +3,6 @@
 /data
 /Main.properties
 /copyrightnotice
-/data_finorder
 /data_finish_order
 /data_num_wins
 /data_n050_finish_order
@@ -12,3 +11,5 @@
 /data_n025_num_wins
 /data_n007_finish_order
 /data_n007_num_wins
+/data_n100_finish_order
+/data_n100_num_wins
