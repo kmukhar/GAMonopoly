@@ -126,31 +126,8 @@ public class Main {
 
   public static void main(String[] args)
   {
-    for (FitEvalTypes fitType : FitEvalTypes.values()) {
-      if (fitType == FitEvalTypes.TOURNAMENT)
-        continue;
-
-      // TEMP TO PERFORM ANALYSIS -- DELETE WHEN DONE
-      Date now = Calendar.getInstance().getTime();
-      SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
-      System.out.println("Starting next population " + sdf.format(now));
-
-      final ArrayList<String> moreArgs = new ArrayList<String>();
-      for (String anArg : args) {
-        moreArgs.add(anArg);
-      }
-
-      moreArgs.add("chromoType=" + System.getProperty("chromoType"));
-      moreArgs.add("fitnessEvaluator=" + fitType.name());
-      // TODO
-      System.setProperty("evaluator", FitEvalTypes.FINISH_ORDER.name());
-
-      // BUT KEEP THIS
-      Main main = new Main();
-      main.start(moreArgs.toArray(new String[0]));
-      // END KEEP SECTION
-    }
-    // END DELETE
+    Main main = new Main();
+    main.start(args);
   }
 
   public void start(String[] args)
@@ -236,6 +213,7 @@ public class Main {
       SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy hh:mm");
       System.out.println("Monopoly simulation is complete " + sdf.format(now));
     }
+    System.exit(0);
   }
 
   /**
