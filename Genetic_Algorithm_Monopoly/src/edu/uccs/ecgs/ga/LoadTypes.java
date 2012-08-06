@@ -14,5 +14,4 @@ public enum LoadTypes {
   public String toString() {
     return name;
   }
-
 }
