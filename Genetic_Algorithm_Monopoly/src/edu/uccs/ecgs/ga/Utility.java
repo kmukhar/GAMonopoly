@@ -40,9 +40,11 @@ public class Utility
     } else {
       // not using gui
       if (rootDir2 == null) {
-        String dataDirName = System.getProperty("dataDirName") + "_"
-            + System.getProperty("evaluator").toLowerCase();
-        f = new File(dataDirName);
+        // String dataDirName = System.getProperty("dataDirName") + "_"
+        // + System.getProperty("evaluator").toLowerCase();
+
+        // f = new File(dataDirName);
+        f = new File("data");
         rootDir2 = f.getAbsolutePath();
         System.out.println("Log dir: " + rootDir2);
       } else {
