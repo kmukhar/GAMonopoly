@@ -31,7 +31,7 @@ public class GAEngine implements Runnable {
    * The minimum score required for a player chromosome to advance to the next
    * generation.
    */
-//  private int minEliteScore;
+  // private int minEliteScore;
 
   /**
    * A map sorted by score; the key for each entry is a score and the entry
@@ -48,6 +48,7 @@ public class GAEngine implements Runnable {
    * playerPool for the next set of games.
    */
   private Vector<AbstractPlayer> playerPool;
+  private Vector<AbstractPlayer> waitingPool;
   private Vector<AbstractPlayer> playersDone;
 
   private Random r;
@@ -72,8 +73,9 @@ public class GAEngine implements Runnable {
 
   public GAEngine(Main main) {
     program = main;
-    
+
     playerPool = new Vector<AbstractPlayer>(Main.maxPlayers);
+    waitingPool = new Vector<AbstractPlayer>(Main.maxPlayers);
     playersDone = new Vector<AbstractPlayer>(Main.maxPlayers);
 
     r = new Random();
@@ -86,20 +88,21 @@ public class GAEngine implements Runnable {
   }
 
   /**
-	 * Create a pool of players. If Main.loadFromDisk is LOAD_AND_EVOLVE or
-	 * LOAD_AND_COMPETE, this method loads players from stored data files.
-	 * Otherwise this methods creates a pool of randomly generated players.
-	 */
-  private void createPlayers() {
-  	if (program.loadFromDisk == LoadTypes.NO_LOAD) {
+   * Create a pool of players. If Main.loadFromDisk is LOAD_AND_EVOLVE or
+   * LOAD_AND_COMPETE, this method loads players from stored data files.
+   * Otherwise this methods creates a pool of randomly generated players.
+   */
+  private void createPlayers()
+  {
+    if (program.loadFromDisk == LoadTypes.NO_LOAD) {
       // Create new population of players
       for (int i = 0; i < Main.maxPlayers; i++) {
         AbstractPlayer player = PlayerFactory.getPlayer(i, program.chromoType);
         player.initCash(1500);
         playerPool.add(player);
-      }  		
+      }
 
-  	} else {
+    } else {
       playerPool.clear();
       PopulationPropagator propagator = new PopulationPropagator(program);
       playerPool.addAll(propagator.loadPlayers(program.loadGeneration));
@@ -114,14 +117,16 @@ public class GAEngine implements Runnable {
           player.resetFitness();
         }
       }
-  	}
+    }
   }
 
   /**
    * Pick four players at random from the pool of available players.
+   * 
    * @return A list of four randomly selected players.
    */
-  private AbstractPlayer[] getFourPlayers() {
+  private AbstractPlayer[] getFourPlayers()
+  {
     AbstractPlayer[] players = new AbstractPlayer[Main.numPlayers];
     for (int i = 0; i < players.length; i++) {
       players[i] = playerPool.remove(r.nextInt(playerPool.size()));
@@ -132,14 +137,16 @@ public class GAEngine implements Runnable {
   }
 
   @Override
-  public void run() {
+  public void run()
+  {
     runGames();
   }
 
   /**
-   * Create and evolve a population of players. 
+   * Create and evolve a population of players.
    */
-  public void runGames() {
+  public void runGames()
+  {
     if (program.loadFromDisk != LoadTypes.NO_LOAD) {
       generation = program.loadGeneration + 1;
     }
@@ -162,6 +169,8 @@ public class GAEngine implements Runnable {
         fitEval = program.fitnessEvaluator.get();
       }
 
+      validateNumMatches(fitEval);
+
       while (matches < Main.numMatches) {
         program.setMatchNum(matches);
         gameExecutor = new ThreadPoolExecutor(Main.numThreads,
@@ -171,8 +180,8 @@ public class GAEngine implements Runnable {
         games = new ArrayList<Monopoly>();
 
         while (!playerPool.isEmpty()) {
-          Monopoly game = new Monopoly(program, generation, matches, gameNumber,
-              getFourPlayers());
+          Monopoly game = new Monopoly(program, generation, matches,
+              gameNumber, getFourPlayers());
 
           games.add(game);
           gameExecutor.execute(game);
@@ -191,7 +200,7 @@ public class GAEngine implements Runnable {
 
         // ...but wait for all games to complete, at which point the executor
         // will actually be shutdown
-        boolean allGamesComplete = false; 
+        boolean allGamesComplete = false;
         while (!allGamesComplete) {
           try {
             // This will block until the executor is terminated or there is an
@@ -209,22 +218,39 @@ public class GAEngine implements Runnable {
           assert game.done;
         }
         fitEval.evaluate(playersDone);
-        
+
         ++matches;
 
-        // Move all the players back to the player pool.
-        playerPool.addAll(playersDone);
+        // Move the players back to the player pool.
+        // When fitness evaluator is tournament, move winning players to
+        // the player pool and losing players to the waiting pool.
+        if (FitEvalTypes.isType(fitEval, FitEvalTypes.TOURNAMENT)) {
+          for (AbstractPlayer player : playersDone) {
+            // if the player finished as 1st or 2nd add back to player pool
+            if (player.getFinishOrder() < 3)
+              playerPool.add(player);
+            else
+              waitingPool.add(player);
+          }
+        } else {
+          // not tournament evaluator, so add all players back to pool
+          playerPool.addAll(playersDone);
+        }
+
         playersDone.removeAllElements();
 
         games.clear();
       }
 
+      // if any players are in the waiting pool, add them back to playerPool
+      playerPool.addAll(waitingPool);
+      waitingPool.removeAllElements();
+
       int minEliteScore = computeMinEliteScore();
 
       // dump the player data every dumpPeriod generations and the last
       // generation
-      if (generation % Main.dumpPeriod == 0
-          || generation == maxGeneration - 1) {
+      if (generation % Main.dumpPeriod == 0 || generation == maxGeneration - 1) {
         dumpGenome();
 
         // not sure if normalization is useful, so don't call it for now.
@@ -257,7 +283,7 @@ public class GAEngine implements Runnable {
       // TODO There seems to be memory being held onto by the program.
       // I suspect it is the loggers or in the loggers. We have a different
       // logger instance for every game, and it does not appear that they ever
-      // get released. This is here in the hope that it will help release some 
+      // get released. This is here in the hope that it will help release some
       // of the memory.
       try {
         System.gc(); // suggest garbage collection
@@ -268,9 +294,27 @@ public class GAEngine implements Runnable {
   }
 
   /**
+   * If the fitness evaluator is TOURNAMENT, then adjust Main.numMatches so that
+   * it has the correct value. When using the TOURNAMENT evaluator, the number
+   * of players must be a multiple of 4, and the number of matches will then
+   * be 1 less than the log base 2 of the number of players. 
+   * 
+   * @param fitEval
+   *          The fitness evaluator being used
+   */
+  private void validateNumMatches(IFitnessEvaluator fitEval)
+  {
+    if (FitEvalTypes.isType(fitEval, FitEvalTypes.TOURNAMENT)) {
+      double log2 = Math.log(Main.maxPlayers) / Math.log(2);
+      Main.numMatches = ((int) log2) - 1;
+    }
+  }
+
+  /**
    * Output files with player fitness data.
    */
-  private void dumpPlayerFitness() {
+  private void dumpPlayerFitness()
+  {
     // the set is used to dump a list of each player with the player's
     // individual score
     ArrayList<AbstractPlayer> fitness = new ArrayList<AbstractPlayer>(
@@ -278,8 +322,8 @@ public class GAEngine implements Runnable {
 
     fitness.addAll(playerPool);
 
-    Path dir = program.getDirForGen(program.chromoType, program.fitnessEvaluator,
-        generation);
+    Path dir = program.getDirForGen(program.chromoType,
+        program.fitnessEvaluator, generation);
 
     // dump the score counts
     BufferedWriter bw = null;
@@ -381,10 +425,11 @@ public class GAEngine implements Runnable {
   /**
    * Output data files with the chromosome for each player.
    */
-  private void dumpGenome() {
+  private void dumpGenome()
+  {
     for (AbstractPlayer player : playerPool) {
       StringBuilder fn1 = new StringBuilder(32);
-      // prepend 0s to the player index number 
+      // prepend 0s to the player index number
       fn1.append("000").append(player.playerIndex);
       // now take just the last four chars so we have 0000 to 9999
       while (fn1.length() > 4) {
@@ -421,7 +466,8 @@ public class GAEngine implements Runnable {
   /**
    * Send unpause signal to all games.
    */
-  public void resume() {
+  public void resume()
+  {
     for (Monopoly game : games) {
       game.resume();
     }
