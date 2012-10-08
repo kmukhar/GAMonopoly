@@ -26,4 +26,12 @@ public class NumPropertiesFitnessEvaluator extends AbstractFitnessEvaluator {
   {
     return "num_properties";
   }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.NUM_PROPERTIES)
+      return true;
+    
+    return false;
+  }
 }

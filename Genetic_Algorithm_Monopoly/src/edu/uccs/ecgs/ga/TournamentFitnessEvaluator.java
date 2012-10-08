@@ -23,4 +23,12 @@ public class TournamentFitnessEvaluator extends AbstractFitnessEvaluator {
   {
     return "tournament";
   }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.TOURNAMENT)
+      return true;
+    
+    return false;
+  }
 }

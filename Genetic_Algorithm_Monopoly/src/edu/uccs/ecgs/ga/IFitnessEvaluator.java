@@ -6,4 +6,5 @@ public interface IFitnessEvaluator {
   public void evaluate(Vector<AbstractPlayer> players);
   public void normalize(Vector<AbstractPlayer> playerPool);
   public String getDirName();
+  public boolean isType(FitEvalTypes type);
 }

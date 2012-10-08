@@ -38,4 +38,12 @@ public class NetWorthFitnessEvaluator extends AbstractFitnessEvaluator {
   {
     return "net_worth";
   }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.NET_WORTH)
+      return true;
+    
+    return false;
+  }
 }

@@ -11,8 +11,7 @@ import java.util.Vector;
  */
 public class FinishOrderFitnessEvaluator extends AbstractFitnessEvaluator {
   @Override
-  public void evaluate(Vector<AbstractPlayer> players)
-  {
+  public void evaluate(Vector<AbstractPlayer> players) {
     for (AbstractPlayer player : players) {
       // Compute the score for the most recent game
       int gameScore = Main.numPlayers - player.getFinishOrder();
@@ -23,8 +22,15 @@ public class FinishOrderFitnessEvaluator extends AbstractFitnessEvaluator {
   }
 
   @Override
-  public String getDirName()
-  {
+  public String getDirName() {
     return "finish_order";
+  }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.FINISH_ORDER)
+      return true;
+    
+    return false;
   }
 }

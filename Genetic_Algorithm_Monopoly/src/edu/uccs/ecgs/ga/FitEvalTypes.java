@@ -29,13 +29,4 @@ public enum FitEvalTypes {
   public String toString() {
     return name;
   }
-
-  public static boolean isType(IFitnessEvaluator fitEval,
-                               FitEvalTypes theType)
-  {
-    if (fitEval.getClass().equals(theType.get().getClass()))
-      return true;
-
-    return false;
-  }
 }

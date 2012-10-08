@@ -32,4 +32,12 @@ public class NumWinsFitnessEvaluator extends AbstractFitnessEvaluator {
   {
     return "num_wins";
   }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.NUM_WINS)
+      return true;
+    
+    return false;
+  }
 }

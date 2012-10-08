@@ -26,4 +26,12 @@ public class NumMonopoliesFitnessEvaluator extends AbstractFitnessEvaluator {
   {
     return "num_monopolies";
   }
+
+  @Override
+  public boolean isType(FitEvalTypes type) {
+    if (type == FitEvalTypes.NUM_MONOPOLIES)
+      return true;
+    
+    return false;
+  }
 }

@@ -6,6 +6,9 @@ import java.util.*;
 import edu.uccs.ecgs.states.Events;
 import edu.uccs.ecgs.states.PlayerState;
 
+/**
+ * A class that is the basis of all player classes in the simulation
+ */
 public abstract class AbstractPlayer 
   implements Comparable<AbstractPlayer>, Cloneable
 {
@@ -27,7 +30,7 @@ public abstract class AbstractPlayer
 
   PlayerState playerState = PlayerState.inactiveState;
 
-  //build in this order
+  //build houses on property groups in this order
   // 1 Orange
   // 2 Light Blue
   // 3 Red
@@ -1027,12 +1030,21 @@ public abstract class AbstractPlayer
     return result;
   }
 
+  /**
+   * Take all cash away from the player (called during bankruptcy processing); resets
+   * the player cash amount to 0.
+   * 
+   * @return The value of cash held by the player
+   */
   public int getAllCash() {
     int amount = cash;
     cash = 0;
     return amount;
   }
 
+  /**
+   * Set the bankrupt flag for this player
+   */
   public void setBankrupt() {
     isBankrupt = true;
   }
@@ -1299,16 +1311,36 @@ public abstract class AbstractPlayer
     bankruptIndex = index;
   }
 
+  /**
+   * Print the chromosome for this player
+   */
   public abstract void printGenome();
 
+  /**
+   * Compare players based on fitness score.
+   */
   public int compareTo(AbstractPlayer arg0) {
     return Integer.valueOf(fitnessScore).compareTo(Integer.valueOf(arg0.fitnessScore));
   }
 
+  /**
+   * Set this player's index value
+   * @param index The ID or index of the player
+   */
   public void setIndex(int index) {
     playerIndex = index;    
   }
 
+  /**
+   * Create a child player by recombination with another parent
+   * 
+   * @param parent2
+   *          The parent to use in reproduction
+   * @param index
+   *          The index of the child player
+   * @return An array containing the child players created by mating this player
+   *         with the other parent player.
+   */
   public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2, int index);
   
   public String toString() {
@@ -1332,11 +1364,19 @@ public abstract class AbstractPlayer
     return result.toString();
   }
 
+  /**
+   * Copy this player and optionally mutate the new player as well.
+   * @return
+   */
   public abstract AbstractPlayer copyAndMutate();
 
   @Override
   protected abstract Object clone() throws CloneNotSupportedException;
 
+  /**
+   * Join the given game with this player.
+   * @param game
+   */
   public void joinGame(Monopoly game) {
     this.game = game;
     resetAll();
@@ -1370,6 +1410,9 @@ public abstract class AbstractPlayer
     return owned.size();
   }
 
+  /**
+   * @return The number of monopolies controlled by this player
+   */
   public int getNumMonopolies() {
     int result = 0;
     PropertyGroups lastGroup = PropertyGroups.SPECIAL;

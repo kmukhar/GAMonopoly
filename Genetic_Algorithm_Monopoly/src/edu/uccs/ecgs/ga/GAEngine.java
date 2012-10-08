@@ -224,7 +224,7 @@ public class GAEngine implements Runnable {
         // Move the players back to the player pool.
         // When fitness evaluator is tournament, move winning players to
         // the player pool and losing players to the waiting pool.
-        if (FitEvalTypes.isType(fitEval, FitEvalTypes.TOURNAMENT)) {
+        if (fitEval.isType(FitEvalTypes.TOURNAMENT)) {
           for (AbstractPlayer player : playersDone) {
             // if the player finished as 1st or 2nd add back to player pool
             if (player.getFinishOrder() < 3)
@@ -304,7 +304,7 @@ public class GAEngine implements Runnable {
    */
   private void validateNumMatches(IFitnessEvaluator fitEval)
   {
-    if (FitEvalTypes.isType(fitEval, FitEvalTypes.TOURNAMENT)) {
+    if (fitEval.isType(FitEvalTypes.TOURNAMENT)) {
       double log2 = Math.log(Main.maxPlayers) / Math.log(2);
       Main.numMatches = ((int) log2) - 1;
     }
