@@ -2,8 +2,7 @@ package edu.uccs.ecgs.ga;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Hashtable;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

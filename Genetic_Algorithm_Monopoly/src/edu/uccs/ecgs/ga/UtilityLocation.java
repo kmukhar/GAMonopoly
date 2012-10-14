@@ -66,4 +66,11 @@ public class UtilityLocation extends Location {
     return super.toString() + (isMortgaged() ? " (mortgaged)" : "");
 
   }
+
+  @Override
+  public int getPotentialRent(int numHouses, int diceRoll)
+  {
+    // rent with a monopoly of utilities is 10 * dice roll
+    return diceRoll * 10;
+  }
 }

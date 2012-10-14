@@ -61,6 +61,10 @@ public abstract class AbstractPlayer
   private int gameNetWorth;
   protected ChromoTypes chromoType;
 
+  PropertyNegotiator propertyTrader;
+  public double w1 = 0.5;
+  public double w2 = 0.5;
+
   /**
    * Constructor
    * @param index An id for the player
@@ -78,6 +82,8 @@ public abstract class AbstractPlayer
     owned = new TreeMap<Integer, Location>();
     clearAllProperties();
     cash = 1500;
+    
+    propertyTrader = new PropertyNegotiator(this, game.gamekey);
   }
 
   /**
@@ -1435,5 +1441,31 @@ public abstract class AbstractPlayer
   public int getGameNetWorth()
   {
     return gameNetWorth;
+  }
+
+  /**
+   * Determine if this player can use the given location to increase the chances
+   * of getting monopoly.
+   * @param location2 The location to check
+   * @return True if the player owns another property in the same group as
+   * location
+   */
+  public boolean needs(Location location2)
+  {
+    PropertyGroups group = location2.getGroup();
+    for (Location location : owned.values())
+      if (location.getGroup() == group)
+        return true;
+
+    return false;
+  }
+
+  public int evaluateTrade(TradeProposal trade)
+  {
+    int base = propertyTrader.evaluateOwnersHoldings();
+    int newVal = propertyTrader.evaluateOwnersHoldings(trade.location2,
+        trade.location);
+    
+    return newVal - base;
   }
 }

@@ -40,4 +40,10 @@ public class SpecialLocation extends Location {
   public void setMortgaged() {}
   @Override
   public void setMortgaged(boolean b) {}
+
+  @Override
+  public int getPotentialRent(int numHouses, int diceRoll)
+  {
+    return 0;
+  }
 }

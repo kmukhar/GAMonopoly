@@ -74,4 +74,11 @@ public class RailroadLocation extends Location {
   public String toString() {
     return super.toString() + (isMortgaged() ? " (mortgaged)" : "");
   }
+
+  @Override
+  public int getPotentialRent(int numHouses, int diceRoll)
+  {
+    // rent with a monopoly of railroads is 200
+    return 200;
+  }
 }

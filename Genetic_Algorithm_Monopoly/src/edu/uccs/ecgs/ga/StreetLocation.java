@@ -33,26 +33,7 @@ public class StreetLocation extends Location {
     rentHotel = getInteger(key + ".rent.hotel", properties);
 
     String grp = properties.getProperty(key + ".group");
-    if (grp.equals("brown")) {
-      group = PropertyGroups.BROWN;
-    } else if (grp.equals("light_blue")) {
-      group = PropertyGroups.LIGHT_BLUE;
-    } else if (grp.equals("purple")) {
-      group = PropertyGroups.PURPLE;
-    } else if (grp.equals("red")) {
-      group = PropertyGroups.RED;
-    } else if (grp.equals("orange")) {
-      group = PropertyGroups.ORANGE;
-    } else if (grp.equals("yellow")) {
-      group = PropertyGroups.YELLOW;
-    } else if (grp.equals("green")) {
-      group = PropertyGroups.GREEN;
-    } else if (grp.equals("dark_blue")) {
-      group = PropertyGroups.DARK_BLUE;
-    } else {
-      group = null;
-      assert false : "Invalid Group [" + grp + "] for location " + name;
-    }
+    group = PropertyGroups.valueOf(grp);
 
     _string = "Name           : " + name + "\n  index        : " + index
         + "\n  group        : " + group + "\n  type         : " + type
@@ -65,33 +46,83 @@ public class StreetLocation extends Location {
   }
 
   @Override
-  public int getCost() {
+  public int getCost()
+  {
     return cost;
   }
 
   @Override
-  public int getHotelCost() {
+  public int getHotelCost()
+  {
     return hotelCost;
   }
 
   @Override
-  public int getHouseCost() {
+  public int getHouseCost()
+  {
     return houseCost;
   }
 
   @Override
-  public int getRent(int diceRoll) {
+  public int getRent(int diceRoll)
+  {
     int rent = 0;
 
     assert !isMortgaged() : "Location is mortgaged in getRent";
 
+    int buildCount = getNumHouses() + (getNumHotels() * 5);
     // Unimproved properties that are part of a monopoly receive double rent.
     if (partOfMonopoly) {
       setRentMultiplier(2);
     }
+
+    rent = getRentForHouses(buildCount);
     
-    int buildCount = getNumHouses() + (getNumHotels() * 5);
-    switch (buildCount) {
+    resetRentMultiplier();
+
+    return rent;
+  }
+
+  @Override
+  public PropertyGroups getGroup()
+  {
+    return group;
+  }
+
+  @Override
+  public void setMortgaged()
+  {
+    setMortgaged(true);
+  }
+
+  @Override
+  public void setMortgaged(boolean b)
+  {
+    isMortgaged = b;
+  }
+
+  @Override
+  public String toString()
+  {
+    return super.toString() + (isMortgaged() ? " (mortgaged)" : "") + " ("
+        + getNumHouses() + " houses/" + getNumHotels() + " hotels)";
+
+  }
+
+  @Override
+  public int getPotentialRent(int numHouses, int diceRoll)
+  {
+    setRentMultiplier(2);
+    int rent = getRentForHouses(numHouses);
+    resetRentMultiplier();
+    return rent;
+  }
+
+  private int getRentForHouses(int numHouses)
+  {
+    int rent = 0;
+
+    switch (numHouses) {
     case 0:
       rent = rentUnimproved * multiple;
       break;
@@ -111,30 +142,6 @@ public class StreetLocation extends Location {
       rent = rentHotel;
       break;
     }
-    
-    resetRentMultiplier();
     return rent;
-  }
-
-  @Override
-  public PropertyGroups getGroup() {
-    return group;
-  }
-
-  @Override
-  public void setMortgaged() {
-    setMortgaged(true);
-  }
-
-  @Override
-  public void setMortgaged(boolean b) {
-    isMortgaged = b;
-  }
-
-  @Override
-  public String toString() {
-    return super.toString() + (isMortgaged() ? " (mortgaged)" : "") + " ("
-        + getNumHouses() + " houses/" + getNumHotels() + " hotels)";
-
   }
 }
