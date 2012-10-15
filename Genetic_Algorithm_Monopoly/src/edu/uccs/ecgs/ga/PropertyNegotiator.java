@@ -13,35 +13,42 @@ import java.util.TreeMap;
  */
 public class PropertyNegotiator {
 
-  private String gamekey;
   private AbstractPlayer[] players;
   private AbstractPlayer owner;
   private TreeMap<PropertyGroups, ArrayList<Location>> locationGroups;
+  private String gamekey;
+  private int alpha = 1;
   private static double[] stProbs = new double[] { 0.0, 0.0, 1.0 / 36.0,
       2.0 / 36.0, 3.0 / 36.0, 4.0 / 36.0, 5.0 / 36.0, 6.0 / 36.0, 5.0 / 36.0,
       4.0 / 36.0, 3.0 / 36.0, 2.0 / 36.0, 1.0 / 36.0 };
 
   private static TreeMap<PropertyGroups, Double> mtProbs;
 
+  private enum GroupType {
+    GROUP_2, GROUP_3, GROUP_4, NULL
+  };
+
   public PropertyNegotiator(AbstractPlayer player, String gamekey) {
     this.owner = player;
     this.gamekey = gamekey;
-    
+
+    players = owner.getAllPlayers();
+
     locationGroups = new TreeMap<PropertyGroups, ArrayList<Location>>();
     initLocationGroups();
 
     mtProbs = new TreeMap<PropertyGroups, Double>();
 
-    mtProbs.put(PropertyGroups.RAILROADS, 64.0);
-    mtProbs.put(PropertyGroups.ORANGE, 50.0);
-    mtProbs.put(PropertyGroups.RED, 49.0);
-    mtProbs.put(PropertyGroups.YELLOW, 45.0);
-    mtProbs.put(PropertyGroups.GREEN, 44.0);
-    mtProbs.put(PropertyGroups.PURPLE, 43.0);
-    mtProbs.put(PropertyGroups.LIGHT_BLUE, 39.0);
-    mtProbs.put(PropertyGroups.UTILITIES, 32.0);
-    mtProbs.put(PropertyGroups.DARK_BLUE, 27.0);
-    mtProbs.put(PropertyGroups.BROWN, 24.0);
+    mtProbs.put(PropertyGroups.RAILROADS, 0.64);
+    mtProbs.put(PropertyGroups.ORANGE, 0.50);
+    mtProbs.put(PropertyGroups.RED, 0.49);
+    mtProbs.put(PropertyGroups.YELLOW, 0.45);
+    mtProbs.put(PropertyGroups.GREEN, 0.44);
+    mtProbs.put(PropertyGroups.PURPLE, 0.43);
+    mtProbs.put(PropertyGroups.LIGHT_BLUE, 0.39);
+    mtProbs.put(PropertyGroups.UTILITIES, 0.32);
+    mtProbs.put(PropertyGroups.DARK_BLUE, 0.27);
+    mtProbs.put(PropertyGroups.BROWN, 0.24);
   }
 
   private void initLocationGroups()
@@ -94,9 +101,9 @@ public class PropertyNegotiator {
 
       double[] playerProbs = new double[40];
       for (int i = 0; i < 13; i++) {
-        index += i;
-        index %= 40;
-        playerProbs[index] = stProbs[i];
+        int newIndex = index + i;
+        newIndex %= 40;
+        playerProbs[newIndex] = stProbs[i];
       }
 
       ArrayList<Location> locationGroup = locationGroups.get(group);
@@ -150,16 +157,16 @@ public class PropertyNegotiator {
       if (playerLocation == 10)
         continue;
 
+      // Get the first location in the group for rent query
       ArrayList<Location> locationGroup = locationGroups.get(group);
-      for (Location location : locationGroup) {
-        double prob = mtProbs.get(group).doubleValue();
+      Location location = locationGroup.get(0);
+      double prob = mtProbs.get(group).doubleValue();
 
-        // dice roll is only used for utilities, so use average roll of 7
-        int diceRoll = 7;
-        double rent = (double) location.getPotentialRent(numHouses, diceRoll);
+      // dice roll is only used for utilities, so use average roll of 7
+      int diceRoll = 7;
+      double rent = (double) location.getPotentialRent(numHouses, diceRoll);
 
-        mtGain += prob * rent;
-      }
+      mtGain += prob * rent;
     }
 
     return (int) mtGain;
@@ -176,7 +183,8 @@ public class PropertyNegotiator {
    */
   private int computeLongTermGain(PropertyGroups group)
   {
-    return computeMidTermGain(group, 1000);
+    int ltGain = computeMidTermGain(group, 1000);
+    return ltGain;
   }
 
   /**
@@ -251,55 +259,169 @@ public class PropertyNegotiator {
    * 
    * @param location
    */
-  public int evaluateProperty(Location aLocation)
+  public int evaluateProperty(PropertyGroups group)
   {
     int selfOwned = 0;
-    AbstractPlayer owner1 = null;
+    int otherOwned = 0;
 
-    PropertyGroups group = aLocation.getGroup();
+    GroupType groupType = getGroupType(group);
+
     int cash = owner.cash;
 
     ArrayList<Location> locationGroup = locationGroups.get(group);
 
     // figure out how many players own properties in the group
-    for (Location location : locationGroup) {
-      AbstractPlayer player = location.getOwner();
+    for (Location aLocation : locationGroup) {
+      AbstractPlayer player = aLocation.getOwner();
       if (player == null)
         continue;
 
       if (owner == player)
         ++selfOwned;
       else
-        owner1 = owner;
+        ++otherOwned;
     }
 
     int propertyValue = 0;
-    if (selfOwned == 1) {
-      // Case 1 - owner will trade to get the first property in group
-      // f(c) = 0.5 * FV + ltGain
-      propertyValue = getCase1Value(aLocation);
-    } else if (selfOwned == 2) {
-      if (owner1 == null) {
-        // Case 2 - no other player owns a property in the group
-        // f(c) = 2 * Case 1 value + mtGain
-        propertyValue = getCase2Value(aLocation);
-      } else {
-        // Case 3 - 1 other player owns a property in the group
-        // f(c) = case 2 value + stgain
-        propertyValue = getCase2Value(aLocation)
-            + computeShortTermGain(group, cash);
+    for (Location aLocation : locationGroup) {
+      switch (groupType) {
+      case GROUP_2:
+        // Property Group 2 is the groups that have only two properties: BROWN,
+        // DARK BLUE, and UTILITIES. There are three ownership situations to
+        // deal with here: 1-0, 1-1, and 2-0
+        switch (selfOwned) {
+        case 1:
+          if (otherOwned == 0) {
+            // ownership: 1-0
+            propertyValue = getCase1Value(aLocation);
+          } else {
+            // ownership: 1-1
+            propertyValue = getCase2Value(aLocation)
+                + computeShortTermGain(group, cash);
+          }
+          break;
+        case 2:
+          // ownership: 2-0
+          propertyValue = (3 * getCase1Value(aLocation))
+              + alpha
+              * (computeMidTermGain(group, cash) + computeShortTermGain(group,
+                  cash));
+          break;
+        default:
+          propertyValue = 0;
+          break;
+        }
+        break;
+      case GROUP_3:
+        // Property Group 3 is all the groups that have three properties. There
+        // are four ownership situations to
+        // deal with here: 1-0-0, 1-1-0, 1-1-1, 1-2-0 (Case 1)
+        // 2-0-0 (Case 2)
+        // 2-1-0, and (Case 3)
+        // 3-0-0 (Case 4)
+        // See the Yasamura paper for more details.
+        switch (selfOwned) {
+        case 1:
+          // ownership: 1-0-0, 1-1-0, 1-1-1, 1-2-0
+          propertyValue = getCase1Value(aLocation);
+          break;
+        case 2:
+          if (otherOwned == 0) {
+            // ownership: 2-0-0
+            propertyValue = getCase2Value(aLocation);
+          } else {
+            // ownership: 2-1-0
+            propertyValue = getCase2Value(aLocation)
+                + computeShortTermGain(group, cash);
+          }
+          break;
+        case 3:
+          // ownership: 3-0-0
+          propertyValue = (3 * getCase1Value(aLocation))
+              + alpha
+              * (computeMidTermGain(group, cash) + computeShortTermGain(group,
+                  cash));
+          break;
+        default:
+          propertyValue = 0;
+          break;
+        }
+        break;
+      case GROUP_4:
+        // Property Group 4 is the railroads where there are four properties.
+        // There are four ownership situations to
+        // deal with here: 1-x-x-x (Case 1)
+        // 2-0-0, 2-1-0, 3-0-0 (Case 2)
+        // 2-2-0, 3-1-0 (Case 3)
+        // 4-0-0 (Case 4)
+        // See the Yasamura paper for more details.
+        switch (selfOwned) {
+        case 1:
+          // ownership: 1-x-x-x
+          propertyValue = getCase1Value(aLocation);
+          break;
+        case 2:
+          if (otherOwned == 0 || otherOwned == 1) {
+            // ownership: 2-0-0 or 2-1-0
+            propertyValue = getCase2Value(aLocation);
+          } else if (otherOwned == 2) {
+            // ownership: 2-2-0
+            propertyValue = getCase2Value(aLocation)
+                + computeShortTermGain(group, cash);
+          }
+          break;
+        case 3:
+          // ownership: 3-0-0
+          if (otherOwned == 0) {
+            propertyValue = getCase2Value(aLocation);
+          } else {
+            // ownership: 3-1-0
+            propertyValue = getCase2Value(aLocation)
+                + computeShortTermGain(group, cash);
+          }
+        case 4:
+          // ownership: 4-0-0-0
+          propertyValue = (3 * getCase1Value(aLocation))
+              + alpha
+              * (computeMidTermGain(group, cash) + computeShortTermGain(group,
+                  cash));
+          break;
+        default:
+          propertyValue = 0;
+          break;
+        }
+        break;
+      default:
+        propertyValue = 0;
+        break;
       }
-    } else if (selfOwned == 3) {
-      // Case 4 - owner has a monopoly
-      // f(c) = 3 * case 1 value + alpha * (mtGain + stGain)
-      // paper does not define alpha, so arbitrarily set it to 2
-      propertyValue = 3
-          * getCase1Value(aLocation)
-          + 2
-          * (computeMidTermGain(group, cash) + computeShortTermGain(group, cash));
     }
 
     return propertyValue;
+  }
+
+  private GroupType getGroupType(PropertyGroups group)
+  {
+    switch (group) {
+    case LIGHT_BLUE:
+    case PURPLE:
+    case RED:
+    case ORANGE:
+    case YELLOW:
+    case GREEN:
+      return GroupType.GROUP_3;
+
+    case BROWN:
+    case DARK_BLUE:
+    case UTILITIES:
+      return GroupType.GROUP_2;
+
+    case RAILROADS:
+      return GroupType.GROUP_4;
+
+    default:
+      return GroupType.NULL;
+    }
   }
 
   /**
@@ -308,7 +430,9 @@ public class PropertyNegotiator {
    */
   private int getCase1Value(Location aLocation)
   {
-    return aLocation.getCost() / 2 + computeLongTermGain(aLocation.getGroup());
+    int result = aLocation.getCost() / 2
+        + computeLongTermGain(aLocation.getGroup());
+    return result;
   }
 
   /**
@@ -317,50 +441,62 @@ public class PropertyNegotiator {
    */
   private int getCase2Value(Location aLocation)
   {
-    return 2 * getCase1Value(aLocation)
+    int result = 2 * getCase1Value(aLocation)
         + computeMidTermGain(aLocation.getGroup(), owner.cash);
+    return result;
   }
-  
+
   /**
    * this is the big U eval function from the paper, but this is the baseline
    * calculation<br>
    * U = w1 * (sum(f(c)) + M) <br>
-   *
+   * 
    */
-  public int evaluateOwnersHoldings() {
-    TreeMap<Integer, Location> owned = owner.getAllProperties();
+  public int evaluateOwnersHoldings()
+  {
     double bigU = 0.0;
-    for (Location location : owned.values()) {
-      bigU += evaluateProperty(location);
+    for (PropertyGroups group : PropertyGroups.values()) {
+      bigU += evaluateProperty(group);
     }
-    
+
     bigU += owner.cash;
     bigU *= owner.w1;
-    
+
     return (int) bigU;
   }
-  
+
   /**
-   * this is the big U eval function from the paper, but now compute the
-   * players holdings based on a possible trade<br>
+   * this is the big U eval function from the paper, but now compute the players
+   * holdings based on a possible trade<br>
    * U = w1 * (sum(f(c)) + M) - w2 * (stLoss + mtLoss)<br>
-   *
+   * 
    */
-  public int evaluateOwnersHoldings(Location losing, Location gaining) {
+  public int evaluateOwnersHoldings(TradeProposal trade)
+  {
+    Location gaining = null;
+    Location losing = null;
+    if (trade.location.owner == owner) {
+      losing = trade.location;
+      gaining = trade.location2;
+    } else {
+      gaining = trade.location;
+      losing = trade.location2;
+    }
+    
     // This seems dangerous to me, but this is the quick and dirty solution
     // we reset the owners as if a trade has been made, so we can evaluate
     // the result of the trade. At the end of the method these will be reset.
     AbstractPlayer originalOwner = gaining.getOwner();
 
-    tradeProperties(losing, gaining);
-    
+    PropertyTrader.tradeProperties(losing, gaining);
+
     double bigU = evaluateOwnersHoldings();
-    
+
     bigU -= owner.w2
         * ((double) (computeShortTermLoss(gaining) + computeMidTermLoss(gaining)));
-    
-    tradeProperties(gaining, losing);
-    
+
+    PropertyTrader.tradeProperties(gaining, losing);
+
     assert losing.getOwner() == owner;
     assert gaining.getOwner() == originalOwner;
     assert owner.getAllProperties().containsValue(losing);
@@ -372,78 +508,103 @@ public class PropertyNegotiator {
   }
 
   /**
-   * Trade the given properties between the owner of this PropertyNegotiator
-   * and the player who owns "gaining" 
-   * @param losing The property that owner is trading away
-   * @param gaining The property that owner is receiving
+   * Create a list of all possible property trades between owner and the other
+   * players
    */
-  private void tradeProperties(Location losing, Location gaining)
+  public ArrayList<TradeProposal> getTradeProposals()
   {
-    AbstractPlayer otherPlayer = gaining.getOwner();
-    losing.setOwner(otherPlayer);
-    otherPlayer.getAllProperties().put(losing.index, losing);
-    otherPlayer.getAllProperties().remove(gaining.index);
-    
-    gaining.setOwner(owner);
-    owner.getAllProperties().put(gaining.index, gaining);
-    owner.getAllProperties().remove(losing.index);
-  }
-  
-  /**
-   * Create a list of all possible property trades between owner and the
-   * other players  
-   */
-  public ArrayList<TradeProposal> getTradeProposals() {
-    ArrayList<Location> otherProperties = new ArrayList<Location> ();
-    ArrayList<Location> ownerProperties = new ArrayList<Location> ();
+    ArrayList<Location> otherProperties = new ArrayList<Location>();
+    ArrayList<Location> ownerProperties = new ArrayList<Location>();
     ArrayList<TradeProposal> tradeProposals = new ArrayList<TradeProposal>();
-    
+
     // start by getting all the properties owned by other players
     for (AbstractPlayer player : players) {
       if (owner == player)
         ownerProperties.addAll(player.getAllProperties().values());
       else
         otherProperties.addAll(player.getAllProperties().values());
-    }    
+    }
 
     for (Location location : ownerProperties) {
       for (Location location2 : otherProperties) {
-        //no point in trading two properties in the same group
+        // no point in trading two properties in the same group
         if (location.getGroup() == location2.getGroup())
           continue;
-        
-        //and only trade if each player needs the other property
+
+        // and only trade if each player needs the other property
         AbstractPlayer owner2 = location2.getOwner();
-        if (!owner.needs(location2) || !owner2.needs(location)) 
+        if (!owner.needs(location2) || !owner2.needs(location))
           continue;
 
         tradeProposals.add(new TradeProposal(location, location2));
       }
     }
-    
+
     return tradeProposals;
   }
-  
+
   /**
-   * Evaluate all possible trades, and return the trade with the highest
-   * profit.
+   * Evaluate all possible trades, and return the trade with the highest profit.
+   * 
    * @return The trade with the highest profit.
    */
-  public TradeProposal findBestTrade() {
+  public TradeProposal findBestTrade()
+  {
     TradeProposal bestTrade = null;
     ArrayList<TradeProposal> proposals = getTradeProposals();
+    
     int base = evaluateOwnersHoldings();
+
+    if (proposals.size() > 0) {
+      owner.game.logInfo("All proposals: ");
+      for (TradeProposal proposal : proposals) {
+        owner.game.logInfo("    " + proposal);
+      }
+
+      owner.game.logInfo("Base value of owner is " + base);
+    }
+
     int gain = Integer.MIN_VALUE;
 
     for (TradeProposal trade : proposals) {
-      int newVal = evaluateOwnersHoldings(trade.location, trade.location2);
+      int newVal = evaluateOwnersHoldings(trade);
+      owner.game.logInfo("\nNew val after trading " + trade.location + " for "
+          + trade.location2 + " is " + newVal);
+
       int ownerProfit = newVal - base;
+      owner.game.logInfo("Owner profit is " + ownerProfit);
+      
+      ownerProfit = owner.evaluateTrade(trade);
+      owner.game.logInfo("Owner profit is " + ownerProfit);
+
       int agentProfit = trade.location2.getOwner().evaluateTrade(trade);
+      owner.game.logInfo("Agent profit is " + agentProfit);
+      
       int cashDiff = ownerProfit - agentProfit;
-      if (ownerProfit - cashDiff > gain) {
-        bestTrade = trade;
-        bestTrade.setCash(cashDiff);
-        bestTrade.setProfit(agentProfit);
+      owner.game.logInfo("Cash difference is " + cashDiff);
+
+      int addCashToTrade = cashDiff/2;
+      int ownerAdjProfit = ownerProfit - addCashToTrade;
+      int agentAdjProfit = agentProfit + addCashToTrade;
+      
+      owner.game.logInfo("Owner adjusted profit is " + ownerAdjProfit);
+      owner.game.logInfo("Agent adjusted profit is " + agentAdjProfit);
+
+      // if this is a better gain...
+      if (ownerAdjProfit > gain) {
+        // and if the player has the cash...
+        if (owner.cash > cashDiff) {
+          //then make this the current best trade
+          gain = ownerAdjProfit;
+          bestTrade = trade;
+          bestTrade.setCash(addCashToTrade);
+          bestTrade.setProfit(ownerAdjProfit);
+          owner.game.logInfo("Best trade is " + trade);
+        } else {
+          owner.game.logInfo("Owner does not have enough cash; no change to best trade");
+        }
+      } else {
+        owner.game.logInfo("Not better than current best trade; no change to best trade");
       }
     }
 

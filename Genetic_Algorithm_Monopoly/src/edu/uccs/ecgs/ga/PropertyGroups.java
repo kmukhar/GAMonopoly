@@ -61,6 +61,9 @@ public enum PropertyGroups {
       numHouses /= 3;
     }
 
+    if (numHouses > 5) 
+      numHouses = 5;
+
     return numHouses;
   }
 }

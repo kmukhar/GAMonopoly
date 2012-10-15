@@ -148,9 +148,11 @@ public class Gui extends JFrame {
         }});
     } else if (label.equalsIgnoreCase(Main.randomSeedLabel)) {
       ((JComboBox) choice).setSelectedItem(Main.useRandomSeed);      
-    } else {
+    } else if (label.equalsIgnoreCase(Main.fitEvalLabel)){
       ((JComboBox) choice).setSelectedItem(program.fitnessEvaluator);
-      ((JComboBox) choice).setSelectedItem(program.debug);
+    } else if (label.equalsIgnoreCase(Main.debugLabel)) {
+      ((JComboBox) choice).setSelectedItem(program.debug.toString());
+    } else if (label.equalsIgnoreCase(Main.chromoLabel)) {
       ((JComboBox) choice).setSelectedItem(program.chromoType);
     }
   }

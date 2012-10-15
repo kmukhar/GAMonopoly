@@ -9,12 +9,11 @@ import edu.uccs.ecgs.states.PlayerState;
 /**
  * A class that is the basis of all player classes in the simulation
  */
-public abstract class AbstractPlayer 
-  implements Comparable<AbstractPlayer>, Cloneable
-{
+public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
+    Cloneable {
   public int cash;
   private boolean rolledDoubles = false;
-  
+
   // Set to 3 when entering jail, must leave when count reaches 0
   protected int jailSentence = 0;
 
@@ -30,7 +29,7 @@ public abstract class AbstractPlayer
 
   PlayerState playerState = PlayerState.inactiveState;
 
-  //build houses on property groups in this order
+  // build houses on property groups in this order
   // 1 Orange
   // 2 Light Blue
   // 3 Red
@@ -39,12 +38,11 @@ public abstract class AbstractPlayer
   // 6 Yellow
   // 8 Green
   // 9 Brown
-  private static final PropertyGroups[] groupOrder = new PropertyGroups[] 
-      {PropertyGroups.ORANGE, PropertyGroups.LIGHT_BLUE,
-      PropertyGroups.RED, PropertyGroups.PURPLE, 
-      PropertyGroups.DARK_BLUE, PropertyGroups.YELLOW,
-      PropertyGroups.GREEN, PropertyGroups.BROWN};
-  
+  private static final PropertyGroups[] groupOrder = new PropertyGroups[] {
+      PropertyGroups.ORANGE, PropertyGroups.LIGHT_BLUE, PropertyGroups.RED,
+      PropertyGroups.PURPLE, PropertyGroups.DARK_BLUE, PropertyGroups.YELLOW,
+      PropertyGroups.GREEN, PropertyGroups.BROWN };
+
   public Random r = new Random();
 
   private TreeMap<Integer, Location> owned;
@@ -53,7 +51,7 @@ public abstract class AbstractPlayer
   private CommunityChest ccGOOJ; // community chest get out of jail card
   private int fitnessScore = 0;
   private int finishOrder = 0;
-  
+
   private boolean isBankrupt = false;
   private int bankruptIndex = 0;
   protected Monopoly game;
@@ -67,8 +65,10 @@ public abstract class AbstractPlayer
 
   /**
    * Constructor
-   * @param index An id for the player
-   * @param chromoType 
+   * 
+   * @param index
+   *          An id for the player
+   * @param chromoType
    */
   public AbstractPlayer(int index, ChromoTypes chromoType) {
     this.chromoType = chromoType;
@@ -82,8 +82,6 @@ public abstract class AbstractPlayer
     owned = new TreeMap<Integer, Location>();
     clearAllProperties();
     cash = 1500;
-    
-    propertyTrader = new PropertyNegotiator(this, game.gamekey);
   }
 
   /**
@@ -91,7 +89,8 @@ public abstract class AbstractPlayer
    * player's list of owned properties. No other changes are made to the
    * player's state or to the properties' state.
    */
-  public void clearAllProperties() {
+  public void clearAllProperties()
+  {
     if (owned != null) {
       owned.clear();
     }
@@ -105,7 +104,8 @@ public abstract class AbstractPlayer
    * @return True --> if the player's cash is greater than or equal to amount.<br>
    *         False --> otherwise.
    */
-  public boolean hasAtLeastCash(int amount) {
+  public boolean hasAtLeastCash(int amount)
+  {
     if (cash >= amount) {
       return true;
     }
@@ -115,9 +115,12 @@ public abstract class AbstractPlayer
 
   /**
    * Initialize the player's cash to amount.
-   * @param amount The amount of cash the player should have.
+   * 
+   * @param amount
+   *          The amount of cash the player should have.
    */
-  public void initCash(int amount) {
+  public void initCash(int amount)
+  {
     cash = amount;
   }
 
@@ -125,15 +128,18 @@ public abstract class AbstractPlayer
    * Reset the doubles counter for this player; should only be called at the
    * start of the player's turn.
    */
-  public void resetDoubles() {
+  public void resetDoubles()
+  {
     rolledDoubles = false;
   }
-  
+
   /**
-   * Reset the player to the default state, ready to play a game. This resets cash to 1500,
-   * removes all properties, resets location, resets bankruptcy state, etc.
+   * Reset the player to the default state, ready to play a game. This resets
+   * cash to 1500, removes all properties, resets location, resets bankruptcy
+   * state, etc.
    */
-  private void resetAll() {
+  private void resetAll()
+  {
     logFinest("Player " + playerIndex + " entering resetAll()");
     cash = 1500;
     rolledDoubles = false;
@@ -161,20 +167,25 @@ public abstract class AbstractPlayer
   /**
    * Set player's state to inactive.
    */
-  public void setInactive() {
+  public void setInactive()
+  {
     setNewState(GameState.INACTIVE);
   }
 
-  public Actions getNextActionEnum(Events event) {
+  public Actions getNextActionEnum(Events event)
+  {
     playerState = playerState.processEvent(game, this, event);
     return nextAction;
   }
 
   /**
    * Set player's state to gameState.
-   * @param gameState State in which player is.
+   * 
+   * @param gameState
+   *          State in which player is.
    */
-  public void setNewState(GameState gameState) {
+  public void setNewState(GameState gameState)
+  {
     currentState = gameState;
   }
 
@@ -183,15 +194,17 @@ public abstract class AbstractPlayer
    * is in jail and the parameter is false (player did not roll doubles), this
    * method reduces the jail term counter.
    * 
-   * @param rolledDoubles True if the player rolled doubles, false otherwise.
+   * @param rolledDoubles
+   *          True if the player rolled doubles, false otherwise.
    */
-  public void setDoubles(boolean rolledDoubles) {
+  public void setDoubles(boolean rolledDoubles)
+  {
     this.rolledDoubles = rolledDoubles;
     if (inJail && !rolledDoubles) {
       --jailSentence;
-      
+
       logFinest("Player " + playerIndex + " jailSentence: " + jailSentence);
-      assert jailSentence>=0 : "Illegal jailSentence value: " + jailSentence;
+      assert jailSentence >= 0 : "Illegal jailSentence value: " + jailSentence;
     }
   }
 
@@ -202,7 +215,8 @@ public abstract class AbstractPlayer
    * @param numSpaces
    *          The number of spaces to move.
    */
-  public void move(int numSpaces) {
+  public void move(int numSpaces)
+  {
     passedGo = false;
     locationIndex += numSpaces;
     if (locationIndex >= 40) {
@@ -216,27 +230,32 @@ public abstract class AbstractPlayer
         logFinest("Player " + playerIndex + " passed Go");
       }
     }
-    
+
     if (locationIndex < 0) {
       locationIndex += 40;
     }
 
-    Location location = PropertyFactory.getPropertyFactory(game.gamekey).getLocationAt(locationIndex);
+    Location location = PropertyFactory.getPropertyFactory(game.gamekey)
+        .getLocationAt(locationIndex);
     setCurrentLocation(location);
   }
 
   /**
    * @return The player's current location index.
    */
-  public int getLocationIndex() {
+  public int getLocationIndex()
+  {
     return locationIndex;
   }
 
   /**
    * Set the player's current location to the location parameter.
-   * @param location The location where the player is currently located.
+   * 
+   * @param location
+   *          The location where the player is currently located.
    */
-  public void setCurrentLocation(Location location) {
+  public void setCurrentLocation(Location location)
+  {
     this.location = location;
 
     logFinest("Player " + playerIndex + " landed on " + location.name);
@@ -262,7 +281,8 @@ public abstract class AbstractPlayer
    *         recent movement,<br>
    *         false --> otherwise.
    */
-  public boolean passedGo() {
+  public boolean passedGo()
+  {
     return passedGo;
   }
 
@@ -272,7 +292,8 @@ public abstract class AbstractPlayer
    * @param amount
    *          The amount of cash to add the player's current amount of cash.
    */
-  public void receiveCash(int amount) {
+  public void receiveCash(int amount)
+  {
     cash += amount;
     logFinest("Player " + playerIndex + " received " + amount + " dollars.");
     logFinest("Player " + playerIndex + " has " + cash + " dollars.");
@@ -287,7 +308,8 @@ public abstract class AbstractPlayer
    *           If player does not have the amount and cannot sell houses or
    *           hotels and cannot mortgage any properties to raise the amount.
    */
-  public void getCash(int amount) throws BankruptcyException {
+  public void getCash(int amount) throws BankruptcyException
+  {
     raiseCash(amount);
     cash = cash - amount;
     logFinest("Player " + playerIndex + " paid " + amount + " dollars.");
@@ -297,7 +319,8 @@ public abstract class AbstractPlayer
   /**
    * @return The number of railroads that the player owns.
    */
-  public int getNumRailroads() {
+  public int getNumRailroads()
+  {
     int count = 0;
     for (Location property : owned.values()) {
       if (property.type.equals("railroad")) {
@@ -310,7 +333,8 @@ public abstract class AbstractPlayer
   /**
    * @return The number of Utilities that the player owns.
    */
-  public int getNumUtilities() {
+  public int getNumUtilities()
+  {
     int count = 0;
     for (Location property : owned.values()) {
       if (property.type.equals("utility")) {
@@ -327,9 +351,10 @@ public abstract class AbstractPlayer
    * @param location2
    *          The property to be added.
    */
-  public void addProperty(Location location2) {
+  public void addProperty(Location location2)
+  {
     owned.put(location2.index, location2);
-    // mark all the properties that are part of monopolies 
+    // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
   }
 
@@ -341,21 +366,24 @@ public abstract class AbstractPlayer
    *          having index 0 and increasing sequentially counter-clockwise
    *          around the board.
    */
-  public void setLocationIndex(int index) {
+  public void setLocationIndex(int index)
+  {
     locationIndex = index;
   }
 
-  /** 
+  /**
    * @return True if the player is in jail, false otherwise.
    */
-  public boolean inJail() {
+  public boolean inJail()
+  {
     return inJail;
   }
 
   /**
    * @return A reference to the Location where the player current is.
    */
-  public Location getCurrentLocation() {
+  public Location getCurrentLocation()
+  {
     return location;
   }
 
@@ -363,14 +391,16 @@ public abstract class AbstractPlayer
    * @return True --> if the player rolled doubles on most recent dice roll,<br>
    *         False --> otherwise.
    */
-  public boolean rolledDoubles() {
+  public boolean rolledDoubles()
+  {
     return rolledDoubles;
   }
 
   /**
    * @return True if the player has either Get Out Of Jail Free card.
    */
-  public boolean hasGetOutOfJailCard() {
+  public boolean hasGetOutOfJailCard()
+  {
     return chanceGOOJ != null || ccGOOJ != null;
   }
 
@@ -379,7 +409,8 @@ public abstract class AbstractPlayer
    * collection; modifying other state related to being in jail is not performed
    * by this method.
    */
-  public void useGetOutOfJailCard() {
+  public void useGetOutOfJailCard()
+  {
     if (chanceGOOJ != null) {
       game.getCards().returnChanceGetOutOfJail();
       chanceGOOJ = null;
@@ -387,7 +418,8 @@ public abstract class AbstractPlayer
       game.getCards().returnCCGetOutOfJail();
       ccGOOJ = null;
     } else {
-      throw new IllegalArgumentException("Illegal attempt to use Get Out Of Jail Card");
+      throw new IllegalArgumentException(
+          "Illegal attempt to use Get Out Of Jail Card");
     }
   }
 
@@ -395,22 +427,23 @@ public abstract class AbstractPlayer
    * @return The total worth of the player including cash, value of all houses
    *         and hotels, and value of all property owned by the player.
    */
-  public int getTotalWorth() {
+  public int getTotalWorth()
+  {
     int totalWorth = cash;
 
     for (Location location : owned.values()) {
       totalWorth += location.getNumHouses() * location.getHouseCost();
-      
+
       if (location.getNumHotels() != 0) {
         // for hotels, add the cost of the 4 houses that had to be built
         // before the hotel was built
         totalWorth += (location.getHotelCost() * 5);
       }
-      
+
       if (location.isMortgaged()) {
-        totalWorth += location.getCost()/2;
+        totalWorth += location.getCost() / 2;
       } else {
-        totalWorth += location.getCost();        
+        totalWorth += location.getCost();
       }
     }
 
@@ -423,7 +456,8 @@ public abstract class AbstractPlayer
    * @param score
    *          The amount to add to the player's fitness.
    */
-  public void addToFitness(int score) {
+  public void addToFitness(int score)
+  {
     fitnessScore += score;
     assert fitnessScore >= 0;
   }
@@ -434,28 +468,32 @@ public abstract class AbstractPlayer
    * @param score
    *          The new value for the fitness score.
    */
-  public void setFitness (int score) {
+  public void setFitness(int score)
+  {
     fitnessScore = score;
   }
 
   /**
    * Reset the fitness value to 0
    */
-  public void resetFitness() {
+  public void resetFitness()
+  {
     fitnessScore = 0;
   }
 
   /**
    * @return The player's current fitness score.
    */
-  public int getFitness() {
+  public int getFitness()
+  {
     return fitnessScore;
   }
 
   /**
    * @return the finishOrder
    */
-  public int getFinishOrder() {
+  public int getFinishOrder()
+  {
     return finishOrder;
   }
 
@@ -466,7 +504,8 @@ public abstract class AbstractPlayer
    * @param finishOrder
    *          the finishOrder to set
    */
-  public void setFinishOrder(int finishOrder) {
+  public void setFinishOrder(int finishOrder)
+  {
     this.finishOrder = finishOrder;
   }
 
@@ -474,23 +513,30 @@ public abstract class AbstractPlayer
    * @return True --> if the player is bankrupt,<br>
    *         False --> otherwise.
    */
-  public boolean bankrupt() {
-    return isBankrupt ;
+  public boolean bankrupt()
+  {
+    return isBankrupt;
   }
 
   /**
    * Add the Get Out Of Jail Free Card to the player's inventory.
-   * @param chanceJailCard The card to add.
+   * 
+   * @param chanceJailCard
+   *          The card to add.
    */
-  public void setGetOutOfJail(Chance chanceJailCard) {
+  public void setGetOutOfJail(Chance chanceJailCard)
+  {
     chanceGOOJ = chanceJailCard;
   }
 
   /**
    * Add the Get Out Of Jail Free Card to the player's inventory.
-   * @param ccJailCard The card to add.
+   * 
+   * @param ccJailCard
+   *          The card to add.
    */
-  public void setGetOutOfJail(CommunityChest ccJailCard) {
+  public void setGetOutOfJail(CommunityChest ccJailCard)
+  {
     ccGOOJ = ccJailCard;
   }
 
@@ -498,9 +544,10 @@ public abstract class AbstractPlayer
    * @return The number of houses that have been bought for all properties that
    *         are owned by this player
    */
-  public int getNumHouses() {
+  public int getNumHouses()
+  {
     int result = 0;
-    
+
     for (Location loc : owned.values()) {
       result += loc.getNumHouses();
     }
@@ -512,9 +559,10 @@ public abstract class AbstractPlayer
    * @return The number of hotels that have been bought for all properties that
    *         are owned by this player.
    */
-  public int getNumHotels() {
+  public int getNumHotels()
+  {
     int result = 0;
-    
+
     for (Location loc : owned.values()) {
       result += loc.getNumHotels();
     }
@@ -537,9 +585,10 @@ public abstract class AbstractPlayer
    * @return True if the player has or can sell stuff to raise cash greater than
    *         amount, false otherwise.
    */
-  public boolean canRaiseCash (int amount) {
+  public boolean canRaiseCash(int amount)
+  {
     int totalWorth = cash;
-    
+
     if (totalWorth >= amount) {
       return true;
     }
@@ -554,11 +603,11 @@ public abstract class AbstractPlayer
         totalWorth += location.getCost() / 2;
       }
     }
-    
+
     if (totalWorth >= amount) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -591,8 +640,10 @@ public abstract class AbstractPlayer
   /**
    * Output the player genome to a data file.
    * 
-   * @param out The output stream to which data should be written.
-   * @throws IOException If there is a problem writing out the data.
+   * @param out
+   *          The output stream to which data should be written.
+   * @throws IOException
+   *           If there is a problem writing out the data.
    */
   public abstract void dumpGenome(DataOutputStream out) throws IOException;
 
@@ -605,34 +656,36 @@ public abstract class AbstractPlayer
    *          The property being auctioned.
    * @return The amount of this player's bid.
    */
-  public int getBidForLocation(Location currentLocation) {
+  public int getBidForLocation(Location currentLocation)
+  {
     int bid = 0;
 
     if (cash < 50) {
       bid = 0;
     } else if (buyProperty(currentLocation)) {
-      //player wants to buy, so start with current cost
+      // player wants to buy, so start with current cost
       bid = currentLocation.getCost();
-      
+
       double adjustFactor = Math.abs(r.nextGaussian());
-      adjustFactor = adjustFactor * (double)(bid / 10);
+      adjustFactor = adjustFactor * (double) (bid / 10);
       bid += (int) adjustFactor;
     } else {
       // otherwise, player does not want location
       if (currentLocation == location) {
-        //if player is the one at the location, then bid some small
-        //amount (cost/2 or cost/3 or cost/4)
-        int factor = r.nextInt(3) + 2; //factor is 2,3,4
-        bid = currentLocation.getCost()/factor;
+        // if player is the one at the location, then bid some small
+        // amount (cost/2 or cost/3 or cost/4)
+        int factor = r.nextInt(3) + 2; // factor is 2,3,4
+        bid = currentLocation.getCost() / factor;
       } else {
-        //otherwise, other players bid half cost 
-        //plus some random fluctuation
+        // otherwise, other players bid half cost
+        // plus some random fluctuation
         bid = (currentLocation.getCost() / 2)
-            + (int) (Math.abs(r.nextGaussian()) * (double)(currentLocation.getCost() / 6));
+            + (int) (Math.abs(r.nextGaussian()) * (double) (currentLocation
+                .getCost() / 6));
       }
     }
-    
-    //ensure bid does not exceed cash
+
+    // ensure bid does not exceed cash
     if (bid > cash) {
       bid = cash;
     }
@@ -645,9 +698,10 @@ public abstract class AbstractPlayer
   /**
    * Called by game if the player lands in jail either through rolling doubles
    * three times, getting a Go To Jail card, or landing on the Go To Jail
-   * location.  
+   * location.
    */
-  public void enteredJail() {
+  public void enteredJail()
+  {
     inJail = true;
     jailSentence = 3;
   }
@@ -659,14 +713,16 @@ public abstract class AbstractPlayer
    * 
    * @return True if the player must pay bail and leave jail, false otherwise.
    */
-  public boolean jailSentenceCompleted() {
+  public boolean jailSentenceCompleted()
+  {
     return jailSentence == 0;
   }
 
   /**
    * Change player state based on having paid bail to leave jail.
    */
-  public void paidBail() {
+  public void paidBail()
+  {
     inJail = false;
     jailSentence = 0;
   }
@@ -682,7 +738,8 @@ public abstract class AbstractPlayer
    * 
    * @return True if the player has at least one monopoly, false otherwise.
    */
-  public boolean hasMonopoly() {
+  public boolean hasMonopoly()
+  {
     boolean result = false;
     for (Location l : owned.values()) {
       if (l.partOfMonopoly) {
@@ -690,7 +747,7 @@ public abstract class AbstractPlayer
         break;
       }
     }
-    
+
     return result;
   }
 
@@ -703,22 +760,21 @@ public abstract class AbstractPlayer
    * @throws BankruptcyException
    *           If the player cannot raise enough cash to equal or exceed amount.
    */
-  public void raiseCash(int amount) throws BankruptcyException {
+  public void raiseCash(int amount) throws BankruptcyException
+  {
     logFinest("Player " + playerIndex + " has " + cash + " dollars");
     if (cash >= amount) {
       return;
     }
-    
+
     if (canRaiseCash(amount)) {
       logFinest("Player " + playerIndex + " attempting to raise " + amount
           + " dollars");
       for (Location l : owned.values()) {
-        //mortgage single street properties first
-        if (!l.partOfMonopoly
-            && !l.isMortgaged()
+        // mortgage single street properties first
+        if (!l.partOfMonopoly && !l.isMortgaged()
             && l.getGroup() != PropertyGroups.UTILITIES
-            && l.getGroup() != PropertyGroups.RAILROADS) 
-        {
+            && l.getGroup() != PropertyGroups.RAILROADS) {
           // mortgage property if not part of monopoly
           logFinest("Player will mortgage " + l.name);
           l.setMortgaged();
@@ -732,8 +788,7 @@ public abstract class AbstractPlayer
       // then mortgage single utilities
       if (getNumUtilities() == 1) {
         for (Location l : owned.values()) {
-          if (l.getGroup() == PropertyGroups.UTILITIES && !l.isMortgaged()) 
-          {
+          if (l.getGroup() == PropertyGroups.UTILITIES && !l.isMortgaged()) {
             logFinest("Player will mortgage " + l.name);
             l.setMortgaged();
             receiveCash(l.getCost() / 2);
@@ -754,7 +809,7 @@ public abstract class AbstractPlayer
           logFinest("Player will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
-        }        
+        }
         if (cash >= amount) {
           return;
         }
@@ -788,10 +843,9 @@ public abstract class AbstractPlayer
         --maxHouses;
       }
 
-      //then mortgage any remaining unmortgaged lots
+      // then mortgage any remaining unmortgaged lots
       for (Location l : owned.values()) {
-        if (!l.isMortgaged()) 
-        {
+        if (!l.isMortgaged()) {
           logFinest("Player will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
@@ -802,11 +856,12 @@ public abstract class AbstractPlayer
       }
     }
 
-    //don't have cash and can't raise cash
+    // don't have cash and can't raise cash
     throw new BankruptcyException();
   }
 
-  public TreeMap<Integer, Location> getAllProperties() {
+  public TreeMap<Integer, Location> getAllProperties()
+  {
     return owned;
   }
 
@@ -818,22 +873,22 @@ public abstract class AbstractPlayer
    * @param gameOver
    *          Whether the game is over because the bankrupt player is the last
    *          other player in the game
-   * @throws BankruptcyException 
+   * @throws BankruptcyException
    */
-  public void addProperties(TreeMap<Integer, Location> allProperties, 
-                            boolean gameOver) throws BankruptcyException 
+  public void addProperties(TreeMap<Integer, Location> allProperties,
+                            boolean gameOver) throws BankruptcyException
   {
-    //add all properties first
+    // add all properties first
     for (Location l : allProperties.values()) {
       owned.put(l.index, l);
       l.owner = this;
     }
 
-    // mark all the properties that are part of monopolies 
+    // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
-  
+
     // if the game isn't over, then the gaining player needs to pay the
-    // 10% fee on any mortgaged properties, and possible unmortgage the 
+    // 10% fee on any mortgaged properties, and possible unmortgage the
     // properties
     if (!gameOver) {
       processMortgagedNewProperties(allProperties);
@@ -850,8 +905,8 @@ public abstract class AbstractPlayer
    * @throws BankruptcyException
    *           If the player receiving the properties cannot pay the interest.
    */
-  private void processMortgagedNewProperties(TreeMap<Integer, Location> newProperties) 
-      throws BankruptcyException 
+  private void processMortgagedNewProperties(TreeMap<Integer, Location> newProperties)
+      throws BankruptcyException
   {
     Vector<Location> mortgaged = new Vector<Location>();
 
@@ -862,11 +917,11 @@ public abstract class AbstractPlayer
         mortgaged.add(lot);
       }
     }
-        
+
     // utility monopolies
     int countUtilities = getNumUtilities();
-    
-    //add utilities if player has 2 utilities
+
+    // add utilities if player has 2 utilities
     if (countUtilities == 2) {
       for (Location lot : newProperties.values()) {
         if (lot.getGroup() == PropertyGroups.UTILITIES && lot.isMortgaged()) {
@@ -874,14 +929,14 @@ public abstract class AbstractPlayer
         }
       }
     }
-    
+
     // add railroads
     for (Location lot : newProperties.values()) {
       if (lot.getGroup() == PropertyGroups.RAILROADS && lot.isMortgaged()) {
         mortgaged.add(lot);
       }
     }
-    
+
     // add single utilities
     if (countUtilities == 1) {
       for (Location lot : newProperties.values()) {
@@ -891,13 +946,13 @@ public abstract class AbstractPlayer
       }
     }
 
-    //lots that are not part of monopolies
+    // lots that are not part of monopolies
     for (Location lot : newProperties.values()) {
       if (!lot.partOfMonopoly && lot.getGroup() != PropertyGroups.RAILROADS
           && lot.getGroup() != PropertyGroups.UTILITIES && lot.isMortgaged()) {
         mortgaged.add(lot);
       }
-    }    
+    }
 
     // Decide whether to pay off any of the mortgaged properties, and if so,
     // then pay them off
@@ -908,9 +963,8 @@ public abstract class AbstractPlayer
       if (lot.isMortgaged()) {
         // pay the interest of 10%
         int amountToPay = (int) (0.1 * lot.getCost() / 2);
-        logFinest("Player " + playerIndex + 
-                    " will only pay mortgage fee for " + lot.name + 
-                    "; fee is " + amountToPay);
+        logFinest("Player " + playerIndex + " will only pay mortgage fee for "
+            + lot.name + "; fee is " + amountToPay);
 
         getCash(amountToPay);
       }
@@ -921,11 +975,13 @@ public abstract class AbstractPlayer
    * Create a list of all mortgaged properties and decide whether or not to pay
    * them off.
    */
-  public void payOffMortgages() {
+  public void payOffMortgages()
+  {
     Vector<Location> mortgaged = new Vector<Location>();
     for (Location lot : owned.values()) {
       if (lot.isMortgaged()) {
-        logFinest(lot.name + " is mortgaged; added to list of properties to unmortgage");
+        logFinest(lot.name
+            + " is mortgaged; added to list of properties to unmortgage");
         mortgaged.add(lot);
       }
     }
@@ -935,12 +991,14 @@ public abstract class AbstractPlayer
 
   /**
    * Actually does the work of paying off the mortgages in the list created by
-   * {@link #payOffMortgages()} or {@link #processMortgagedNewProperties(TreeMap)}.
+   * {@link #payOffMortgages()} or
+   * {@link #processMortgagedNewProperties(TreeMap)}.
    * 
    * @param mortgaged
    *          A list of mortgaged properties owned by the player.
    */
-  private void processMortgagedLots(Vector<Location> mortgaged) {
+  private void processMortgagedLots(Vector<Location> mortgaged)
+  {
     // only unmortgage when other monopolies have been fully developed
     //
     // TODO: Need to validate this FOR block. It appears that the original
@@ -952,14 +1010,13 @@ public abstract class AbstractPlayer
         continue;
       }
 
-      if (location.partOfMonopoly && !location.isFullyBuilt()) 
-      {
+      if (location.partOfMonopoly && !location.isFullyBuilt()) {
         return;
       }
     }
 
     int count = 0;
-    
+
     for (Location lot : mortgaged) {
       int amountToPay = 0;
 
@@ -982,17 +1039,20 @@ public abstract class AbstractPlayer
         }
       }
     }
-    logFinest(count + " mortgaged lots were paid off; " + 
-        (mortgaged.size()-count) + " lots are still mortgaged");
+    logFinest(count + " mortgaged lots were paid off; "
+        + (mortgaged.size() - count) + " lots are still mortgaged");
   }
 
   /**
    * make the decision of whether or not to pay the mortgage on the property
-   * @param lot The property for which to pay off mortgage 
+   * 
+   * @param lot
+   *          The property for which to pay off mortgage
    * @return True if the player can pay the mortgage, False otherwise
    */
-  private boolean canPayMortgage(Location lot) {
-    int cost = (int) (1.1 * lot.getCost() / 2); 
+  private boolean canPayMortgage(Location lot)
+  {
+    int cost = (int) (1.1 * lot.getCost() / 2);
 
     // After paying cost, player should still have minimum cash, so player can
     // pay off mortgage if player's current cash is more than minimum
@@ -1006,21 +1066,23 @@ public abstract class AbstractPlayer
    * 
    * @return The minimum amount of cash the player should have to avoid problems
    */
-  private int getMinimumCash() {
-    //Frayn: Keep a minimum of 200 pounds (dollars) in cash,
+  private int getMinimumCash()
+  {
+    // Frayn: Keep a minimum of 200 pounds (dollars) in cash,
     int result = 200;
-    
-    //plus 1% of the total and average opponent net worth,
+
+    // plus 1% of the total and average opponent net worth,
     int totalnet = game.getTotalNetWorth();
     totalnet -= getTotalWorth();
-    
+
     int count = game.getNumActivePlayers() - 1;
-    
+
     int avgnet = totalnet / count;
     result += (int) (totalnet * 0.01);
     result += (int) (avgnet * 0.01);
 
-    //plus 5% of the number of houses or hotels. (assume frayn meant 5% of cost)
+    // plus 5% of the number of houses or hotels. (assume frayn meant 5% of
+    // cost)
     PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
     for (int i = 0; i < 40; i++) {
       Location l = pf.getLocationAt(i);
@@ -1028,21 +1090,22 @@ public abstract class AbstractPlayer
         result += (int) (l.getNumHouses() * l.getHouseCost() * 0.05);
       }
       if (l.getNumHotels() > 0 && l.owner != this) {
-        //multiply by 5 because hotels cost is hotelCost + 4 houses
+        // multiply by 5 because hotels cost is hotelCost + 4 houses
         result += (int) (l.getNumHotels() * l.getHotelCost() * 0.05) * 5;
       }
     }
-    
+
     return result;
   }
 
   /**
-   * Take all cash away from the player (called during bankruptcy processing); resets
-   * the player cash amount to 0.
+   * Take all cash away from the player (called during bankruptcy processing);
+   * resets the player cash amount to 0.
    * 
    * @return The value of cash held by the player
    */
-  public int getAllCash() {
+  public int getAllCash()
+  {
     int amount = cash;
     cash = 0;
     return amount;
@@ -1051,14 +1114,16 @@ public abstract class AbstractPlayer
   /**
    * Set the bankrupt flag for this player
    */
-  public void setBankrupt() {
+  public void setBankrupt()
+  {
     isBankrupt = true;
   }
 
   /**
    * Sell all the hotels and houses owned by the player
    */
-  public void sellAllHousesAndHotels() {
+  public void sellAllHousesAndHotels()
+  {
     // Sell all hotels first
     for (Location l : owned.values()) {
       if (l.getNumHotels() > 0) {
@@ -1080,19 +1145,20 @@ public abstract class AbstractPlayer
   /**
    * Attempt to buy a house for a property
    */
-  public void processDevelopHouseEvent() {
+  public void processDevelopHouseEvent()
+  {
     // Bank has to have houses available
     if (game.getNumHouses() == 0) {
       logFinest("Bank has no more houses");
       return;
     }
-      
-    //Player has to have a monopoly
+
+    // Player has to have a monopoly
     if (!hasMonopoly()) {
       logFinest("Player does not have monopoly");
       return;
     }
-    
+
     logFinest("Player has " + cash + " dollars");
     int minCash = getMinimumCash();
     logFinest("Player minimum cash is " + minCash);
@@ -1116,7 +1182,7 @@ public abstract class AbstractPlayer
     for (Location location : owned.values()) {
       if (PropertyFactory.getPropertyFactory(game.gamekey).groupIsMortgaged(
           location.getGroup())) {
-        //skip this property since the group is mortgaged
+        // skip this property since the group is mortgaged
         continue;
       }
 
@@ -1126,30 +1192,33 @@ public abstract class AbstractPlayer
             + " added to list of monopolies in processDevelopHouseEvent");
       }
     }
-    
+
     for (int i = 0; i < groupOrder.length; i++) {
       for (Location location : monopolies) {
-        // Process properties in group order, so if location is not part of current
+        // Process properties in group order, so if location is not part of
+        // current
         // group, then skip it for now
         if (location.getGroup() != groupOrder[i]) {
           continue;
         }
-        
+
         logFinest("Checking " + location.name + " for build decision");
-        
+
         if (location.getNumHotels() > 0) {
-          logFinest("Location " + location.name + " has a hotel; nothing to build");
+          logFinest("Location " + location.name
+              + " has a hotel; nothing to build");
           continue;
         }
 
-        logFinest("Location " + location.name + " has " + location.getNumHouses()
-            + " houses");
+        logFinest("Location " + location.name + " has "
+            + location.getNumHouses() + " houses");
 
         // At this point, location is part of a monopoly and the player might
         // want to build on the property.
         //
         // But good strategy says to build all properties up to 3 houses first,
-        // and then if all monopolies of player have 3 houses, then build hotels.
+        // and then if all monopolies of player have 3 houses, then build
+        // hotels.
         //
         // So while location has less than three houses, build on it
         while (location.getNumHouses() < 3) {
@@ -1182,9 +1251,12 @@ public abstract class AbstractPlayer
    * @param group
    *          The group for which to balance the house distribution.
    */
-  private void balanceHouses(Vector<Location> monopolies, PropertyGroups group) {
+  private void balanceHouses(Vector<Location> monopolies, PropertyGroups group)
+  {
     logInfo("Player " + playerIndex + " entered balance houses.");
-    for (Location l : monopolies) { logInfo(l.toString()); }
+    for (Location l : monopolies) {
+      logInfo(l.toString());
+    }
     logInfo("Group: " + group.toString());
     logInfo(toString());
 
@@ -1194,7 +1266,7 @@ public abstract class AbstractPlayer
     int houseCount = 0;
     PropertyGroups g = group;
     int lotSize = 0;
-    
+
     // go through the list of monopolies and add all street locations for group
     // to the list
     for (Location location : monopolies) {
@@ -1206,25 +1278,25 @@ public abstract class AbstractPlayer
       }
     }
 
-   if (g != PropertyGroups.BROWN && g != PropertyGroups.DARK_BLUE) {
+    if (g != PropertyGroups.BROWN && g != PropertyGroups.DARK_BLUE) {
       if (lotSize != 3) {
         logInfo("Bad lot size!!!");
       }
       assert lotSize == 3 : "Bad lot size!!!";
-   }
-   if (g == PropertyGroups.BROWN || g == PropertyGroups.DARK_BLUE) {
-     if (lotSize != 2) {
-       logInfo("Bad lot size!!!");
-     }
-     assert lotSize == 2 : "Bad lot size!!!";
-   }
-        
-    // verify that the lots are in order by index
-    for (int i = 0; i < lots.size() - 1; i++) {
-      assert lots.elementAt(i).index < lots.elementAt(i+1).index : "Lot order is invalid";
+    }
+    if (g == PropertyGroups.BROWN || g == PropertyGroups.DARK_BLUE) {
+      if (lotSize != 2) {
+        logInfo("Bad lot size!!!");
+      }
+      assert lotSize == 2 : "Bad lot size!!!";
     }
 
-    // start by evenly distributing the houses among the streets, 
+    // verify that the lots are in order by index
+    for (int i = 0; i < lots.size() - 1; i++) {
+      assert lots.elementAt(i).index < lots.elementAt(i + 1).index : "Lot order is invalid";
+    }
+
+    // start by evenly distributing the houses among the streets,
     if (houseCount % lots.size() == 0) {
       // all houses can be distributed evenly
       while (houseCount > 0) {
@@ -1249,10 +1321,12 @@ public abstract class AbstractPlayer
       case RED:
       case YELLOW:
       case GREEN:
-        assert lots.size() == 3 : "Bad lot size: " + lots.elementAt(0).toString() + "; " + lots.elementAt(1).toString();
+        assert lots.size() == 3 : "Bad lot size: "
+            + lots.elementAt(0).toString() + "; "
+            + lots.elementAt(1).toString();
         try {
-        // extra houses on third and first property
-        lots.elementAt(2).addHouse();
+          // extra houses on third and first property
+          lots.elementAt(2).addHouse();
         } catch (ArrayIndexOutOfBoundsException e) {
           for (Location location : lots) {
             System.out.println(location.toString());
@@ -1268,7 +1342,8 @@ public abstract class AbstractPlayer
 
       case LIGHT_BLUE:
       case ORANGE:
-        assert lots.size() == 3 : "Bad lot size: " + lots.elementAt(0).toString() + "/" + lots.elementAt(1).toString();
+        assert lots.size() == 3 : "Bad lot size: "
+            + lots.elementAt(0).toString() + "/" + lots.elementAt(1).toString();
         // extra houses on third and second property
         lots.elementAt(2).addHouse();
         --houseCount;
@@ -1281,16 +1356,17 @@ public abstract class AbstractPlayer
 
       case BROWN:
       case DARK_BLUE:
-        assert lots.size() == 2 : "Bad lot size: " + lots.elementAt(0).toString();
+        assert lots.size() == 2 : "Bad lot size: "
+            + lots.elementAt(0).toString();
         lots.elementAt(1).addHouse();
         --houseCount;
         break;
 
       default:
-				break;
+        break;
       }
     }
-    
+
     for (Location location : lots) {
       logInfo(location.name + " has " + location.getNumHouses() + " houses");
     }
@@ -1301,7 +1377,8 @@ public abstract class AbstractPlayer
    * @return The index which indicates in which order the player went bankrupt
    *         in a game: 0 for first, 1 for second, 2 for third, etc.
    */
-  public Integer getBankruptIndex() {
+  public Integer getBankruptIndex()
+  {
     return Integer.valueOf(bankruptIndex);
   }
 
@@ -1313,7 +1390,8 @@ public abstract class AbstractPlayer
    * @param index
    *          The value to set.
    */
-  public void setBankruptIndex(int index) {
+  public void setBankruptIndex(int index)
+  {
     bankruptIndex = index;
   }
 
@@ -1325,16 +1403,21 @@ public abstract class AbstractPlayer
   /**
    * Compare players based on fitness score.
    */
-  public int compareTo(AbstractPlayer arg0) {
-    return Integer.valueOf(fitnessScore).compareTo(Integer.valueOf(arg0.fitnessScore));
+  public int compareTo(AbstractPlayer arg0)
+  {
+    return Integer.valueOf(fitnessScore).compareTo(
+        Integer.valueOf(arg0.fitnessScore));
   }
 
   /**
    * Set this player's index value
-   * @param index The ID or index of the player
+   * 
+   * @param index
+   *          The ID or index of the player
    */
-  public void setIndex(int index) {
-    playerIndex = index;    
+  public void setIndex(int index)
+  {
+    playerIndex = index;
   }
 
   /**
@@ -1347,18 +1430,20 @@ public abstract class AbstractPlayer
    * @return An array containing the child players created by mating this player
    *         with the other parent player.
    */
-  public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2, int index);
-  
-  public String toString() {
+  public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2,
+                                                  int index);
+
+  public String toString()
+  {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-    result.append(separator)
-        .append("Player ").append(playerIndex).append(separator)
-        .append("  Total cash  : ").append(cash).append(separator)
-        .append("  Net worth   : ").append(getTotalWorth()).append(separator)
-        .append("  Fitness     : ").append(fitnessScore).append(separator)
-        .append("  Has Monopoly: ").append(hasMonopoly()).append(separator)
-        .append("  Is Bankrupt : ").append(isBankrupt).append(separator);
+    result.append(separator).append("Player ").append(playerIndex)
+        .append(separator).append("  Total cash  : ").append(cash)
+        .append(separator).append("  Net worth   : ").append(getTotalWorth())
+        .append(separator).append("  Fitness     : ").append(fitnessScore)
+        .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
+        .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
+        .append(separator);
 
     if (!owned.isEmpty()) {
       result.append("  Properties owned: ").append(separator);
@@ -1372,6 +1457,7 @@ public abstract class AbstractPlayer
 
   /**
    * Copy this player and optionally mutate the new player as well.
+   * 
    * @return
    */
   public abstract AbstractPlayer copyAndMutate();
@@ -1381,19 +1467,26 @@ public abstract class AbstractPlayer
 
   /**
    * Join the given game with this player.
+   * 
    * @param game
    */
-  public void joinGame(Monopoly game) {
+  public void joinGame(Monopoly game)
+  {
     this.game = game;
+    propertyTrader = new PropertyNegotiator(this, game.gamekey);
     resetAll();
-    location = PropertyFactory.getPropertyFactory(game.gamekey).getLocationAt(locationIndex);
+    location = PropertyFactory.getPropertyFactory(game.gamekey).getLocationAt(
+        locationIndex);
   }
 
   /**
    * Log a string to the debug log using INFO level
-   * @param s The string to log
+   * 
+   * @param s
+   *          The string to log
    */
-  public void logInfo(String s) {
+  public void logInfo(String s)
+  {
     if (game != null) {
       game.logInfo(s);
     }
@@ -1401,9 +1494,12 @@ public abstract class AbstractPlayer
 
   /**
    * Log a string to the debug log using FINEST level
-   * @param s The string to log
+   * 
+   * @param s
+   *          The string to log
    */
-  public void logFinest(String s) {
+  public void logFinest(String s)
+  {
     if (game != null) {
       game.logFinest(s);
     }
@@ -1412,14 +1508,16 @@ public abstract class AbstractPlayer
   /**
    * @return The number of properties owned by the player
    */
-  public int getNumProperties() {
+  public int getNumProperties()
+  {
     return owned.size();
   }
 
   /**
    * @return The number of monopolies controlled by this player
    */
-  public int getNumMonopolies() {
+  public int getNumMonopolies()
+  {
     int result = 0;
     PropertyGroups lastGroup = PropertyGroups.SPECIAL;
 
@@ -1437,7 +1535,7 @@ public abstract class AbstractPlayer
   {
     gameNetWorth = totalNetWorth;
   }
-  
+
   public int getGameNetWorth()
   {
     return gameNetWorth;
@@ -1446,9 +1544,11 @@ public abstract class AbstractPlayer
   /**
    * Determine if this player can use the given location to increase the chances
    * of getting monopoly.
-   * @param location2 The location to check
+   * 
+   * @param location2
+   *          The location to check
    * @return True if the player owns another property in the same group as
-   * location
+   *         location
    */
   public boolean needs(Location location2)
   {
@@ -1463,9 +1563,47 @@ public abstract class AbstractPlayer
   public int evaluateTrade(TradeProposal trade)
   {
     int base = propertyTrader.evaluateOwnersHoldings();
-    int newVal = propertyTrader.evaluateOwnersHoldings(trade.location2,
-        trade.location);
-    
+    int newVal = propertyTrader.evaluateOwnersHoldings(trade);
+
     return newVal - base;
+  }
+
+  /**
+   * A method to make trading decisions and act on those decisions.
+   */
+  public void processTradeDecisionEvent()
+  {
+    // only try to trade if this player owns two or more properties
+    if (owned.size() > 1) {
+      TradeProposal bestTrade = propertyTrader.findBestTrade();
+
+      if (bestTrade != null) {
+        assert bestTrade.cashDiff <= cash;
+        game.proposeTrade(bestTrade);
+      }
+    }
+  }
+
+  public boolean answerProposedTrade(TradeProposal bestTrade)
+  {
+    if (cash + bestTrade.cashDiff < getMinimumCash()) {
+      game.logInfo("Trade would reduce cash of player " + this.playerIndex
+          + " below minimum; trade refused");
+      return false;
+    }
+
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  /**
+   * Return a list of all the players in the game that this player is in.
+   * Includes this player
+   * 
+   * @return An AbstractPlayer array that contains all the players in a game
+   */
+  public AbstractPlayer[] getAllPlayers()
+  {
+    return game.getAllPlayers();
   }
 }

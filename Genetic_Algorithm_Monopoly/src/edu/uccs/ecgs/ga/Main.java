@@ -123,6 +123,9 @@ public class Main {
   public static final String loadFromDiskLabel = "Load players from disk";
   public static final String randomSeedLabel = "Use random seed for games";
   public static final String dumpPeriodLabel = "Dump Player Data every n generations";
+  public static final String fitEvalLabel = "Fitness Evaluator";
+  public static final String debugLabel = "Debug Level";
+  public static final String chromoLabel = "ChromosomeType";
 
   public static void main(String[] args)
   {
@@ -170,13 +173,13 @@ public class Main {
           { "Max number of turns per game", "" + maxTurns },
           { "Number of players in population", "" + maxPlayers },
           { "Number of players per game", "" + numPlayers },
-          { "Fitness Evaluator", FitEvalTypes.values() },
+          { fitEvalLabel, FitEvalTypes.values() },
 			    { loadFromDiskLabel, LoadTypes.values() },
           { "Generation to load", "" + loadGeneration },
-          { "Debug",
+          { debugLabel,
               new String[] { Level.OFF.toString(), Level.FINEST.toString(),
                   Level.INFO.toString(), Level.SEVERE.toString() } },
-          { "Chromosome Type", ChromoTypes.values() },
+          { chromoLabel, ChromoTypes.values() },
           { "Mutation Rate", "" + mutationRate },
           { randomSeedLabel, new Boolean[] { Boolean.TRUE, Boolean.FALSE } },
           { "Number of threads (1 thread per concurrent game)", "" + numThreads },

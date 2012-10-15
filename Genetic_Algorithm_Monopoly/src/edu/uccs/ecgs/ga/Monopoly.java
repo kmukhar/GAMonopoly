@@ -290,11 +290,13 @@ public class Monopoly implements Runnable {
       formatter = new Formatter() {
         @Override
         public String format(LogRecord record) {
-          return Monopoly.this.generation + ":" + Monopoly.this.match
-              + ":" + Monopoly.this.game + ":"
-              + Thread.currentThread().getName() + ":"
-              + dateFormat.format(Calendar.getInstance().getTime()) + ": "
-              + record.getMessage() + "\n";
+          return record.getMessage() + "\n";
+          //TODO
+//          return Monopoly.this.generation + ":" + Monopoly.this.match
+//              + ":" + Monopoly.this.game + ":"
+//              + Thread.currentThread().getName() + ":"
+//              + dateFormat.format(Calendar.getInstance().getTime()) + ": "
+//              + record.getMessage() + "\n";
         }
       };
 
@@ -1033,5 +1035,41 @@ public class Monopoly implements Runnable {
     if (logger != null) {
       logger.severe(s);
     }
+  }
+
+  /**
+   * Process a proposed trade between two players
+   * 
+   * @param bestTrade
+   *          The object that contains the two properties and cash to be traded.
+   */
+  public void proposeTrade(TradeProposal bestTrade)
+  {
+    AbstractPlayer owner1 = bestTrade.location.owner;
+    AbstractPlayer owner2 = bestTrade.location2.owner;
+    
+    if (owner2.answerProposedTrade(bestTrade)) {
+      PropertyTrader.tradeProperties(bestTrade.location, bestTrade.location2);
+      int cash = bestTrade.cashDiff;
+      try {
+        if (cash > 0) {
+          owner1.getCash(cash);
+          owner2.receiveCash(cash);
+        } else {
+          owner2.getCash(Math.abs(cash));
+          owner1.receiveCash(Math.abs(cash));
+        }
+      } catch (BankruptcyException ignored) {
+        // player will not accept trade if bankruptcy will occur
+      }
+    }
+  }
+
+  /**
+   * @return A list of all the players in this game
+   */
+  public AbstractPlayer[] getAllPlayers()
+  {
+    return players;
   }
 }

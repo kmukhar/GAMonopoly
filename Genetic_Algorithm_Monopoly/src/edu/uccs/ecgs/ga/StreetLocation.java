@@ -33,7 +33,7 @@ public class StreetLocation extends Location {
     rentHotel = getInteger(key + ".rent.hotel", properties);
 
     String grp = properties.getProperty(key + ".group");
-    group = PropertyGroups.valueOf(grp);
+    group = PropertyGroups.valueOf(grp.toUpperCase());
 
     _string = "Name           : " + name + "\n  index        : " + index
         + "\n  group        : " + group + "\n  type         : " + type

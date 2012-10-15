@@ -4,8 +4,8 @@ public class TradeProposal {
 
   public Location location;
   public Location location2;
-  private int cashDiff;
-  private int agentProfit;
+  public int cashDiff;
+  public int agentProfit;
 
   public TradeProposal(Location location, Location location2) {
     this.location = location;
@@ -27,5 +27,11 @@ public class TradeProposal {
   public void setProfit(int agentProfit)
   {
     this.agentProfit = agentProfit;
+  }
+  
+  @Override
+  public String toString() {
+    return "Trade Proposal:: Location1: " + location + "; Location2: " + location2 +
+        "; cash diff: " + cashDiff;
   }
 }
