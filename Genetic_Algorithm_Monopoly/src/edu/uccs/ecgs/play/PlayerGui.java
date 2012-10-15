@@ -14,11 +14,12 @@ public class PlayerGui extends JFrame {
     new PlayerGui();
   }
 
+  static String factoryKey = "edu.uccs.ecgs.play";
+
   static PlayerPanel pp1 = new PlayerPanel(0); 
   static PlayerPanel pp2 = new PlayerPanel(1); 
   static PlayerPanel pp3 = new PlayerPanel(2); 
   static PlayerPanel pp4 = new PlayerPanel(3); 
-  static String factoryKey = "edu.uccs.ecgs.play";
 
   public PlayerGui() {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
