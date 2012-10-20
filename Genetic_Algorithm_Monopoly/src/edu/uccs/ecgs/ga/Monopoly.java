@@ -232,7 +232,7 @@ public class Monopoly implements Runnable {
     
     Collections.sort(sortedPlayers, NetWorthComparator.get());
 
-    logFinest('\f' + "GAME OVER");
+    logInfo('\f' + "GAME OVER");
     assert totalNetWorth > 0;
 
     // In order from loser to winner, add score points to player
@@ -244,8 +244,8 @@ public class Monopoly implements Runnable {
     }
 
     for (AbstractPlayer p : sortedPlayers) {
-      logFinest("");
-      logFinest(p.toString());
+      logInfo("");
+      logInfo(p.toString());
     }    
   }
 
@@ -1049,6 +1049,12 @@ public class Monopoly implements Runnable {
     AbstractPlayer owner2 = bestTrade.location2.owner;
     
     if (owner2.answerProposedTrade(bestTrade)) {
+      
+      logInfo("\nOwner 1 before trade");
+      logInfo(owner1.toString());
+      logInfo("\nOwner 2 before trade");
+      logInfo(owner2.toString());
+      
       PropertyTrader.tradeProperties(bestTrade.location, bestTrade.location2);
       int cash = bestTrade.cashDiff;
       try {
@@ -1062,6 +1068,11 @@ public class Monopoly implements Runnable {
       } catch (BankruptcyException ignored) {
         // player will not accept trade if bankruptcy will occur
       }
+
+      logInfo("\nOwner 1 after trade");
+      logInfo(owner1.toString());
+      logInfo("\nOwner 2 after trade");
+      logInfo(owner2.toString());
     }
   }
 

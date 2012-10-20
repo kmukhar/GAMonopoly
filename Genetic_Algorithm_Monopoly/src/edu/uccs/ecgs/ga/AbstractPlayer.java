@@ -60,8 +60,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   protected ChromoTypes chromoType;
 
   PropertyNegotiator propertyTrader;
+  // in the paper, w1 and w2 are used to balance risk taking against risk avoidance
+  // w1 + w2 = 1.0
+  // a high w1 means the player tries to get gains
+  // a high w2 means the player tries to avoid losses
   public double w1 = 0.5;
   public double w2 = 0.5;
+  // if the profit exceeds this threshold, the player accepts the trade.
+  private int tradeThreshold = 100;
 
   /**
    * Constructor
@@ -89,8 +95,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * player's list of owned properties. No other changes are made to the
    * player's state or to the properties' state.
    */
-  public void clearAllProperties()
-  {
+  public void clearAllProperties() {
     if (owned != null) {
       owned.clear();
     }
@@ -104,8 +109,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True --> if the player's cash is greater than or equal to amount.<br>
    *         False --> otherwise.
    */
-  public boolean hasAtLeastCash(int amount)
-  {
+  public boolean hasAtLeastCash(int amount) {
     if (cash >= amount) {
       return true;
     }
@@ -119,8 +123,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param amount
    *          The amount of cash the player should have.
    */
-  public void initCash(int amount)
-  {
+  public void initCash(int amount) {
     cash = amount;
   }
 
@@ -128,8 +131,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Reset the doubles counter for this player; should only be called at the
    * start of the player's turn.
    */
-  public void resetDoubles()
-  {
+  public void resetDoubles() {
     rolledDoubles = false;
   }
 
@@ -138,8 +140,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * cash to 1500, removes all properties, resets location, resets bankruptcy
    * state, etc.
    */
-  private void resetAll()
-  {
+  private void resetAll() {
     logFinest("Player " + playerIndex + " entering resetAll()");
     cash = 1500;
     rolledDoubles = false;
@@ -167,13 +168,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Set player's state to inactive.
    */
-  public void setInactive()
-  {
+  public void setInactive() {
     setNewState(GameState.INACTIVE);
   }
 
-  public Actions getNextActionEnum(Events event)
-  {
+  public Actions getNextActionEnum(Events event) {
     playerState = playerState.processEvent(game, this, event);
     return nextAction;
   }
@@ -184,8 +183,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param gameState
    *          State in which player is.
    */
-  public void setNewState(GameState gameState)
-  {
+  public void setNewState(GameState gameState) {
     currentState = gameState;
   }
 
@@ -197,8 +195,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param rolledDoubles
    *          True if the player rolled doubles, false otherwise.
    */
-  public void setDoubles(boolean rolledDoubles)
-  {
+  public void setDoubles(boolean rolledDoubles) {
     this.rolledDoubles = rolledDoubles;
     if (inJail && !rolledDoubles) {
       --jailSentence;
@@ -215,8 +212,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param numSpaces
    *          The number of spaces to move.
    */
-  public void move(int numSpaces)
-  {
+  public void move(int numSpaces) {
     passedGo = false;
     locationIndex += numSpaces;
     if (locationIndex >= 40) {
@@ -243,8 +239,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * @return The player's current location index.
    */
-  public int getLocationIndex()
-  {
+  public int getLocationIndex() {
     return locationIndex;
   }
 
@@ -254,8 +249,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param location
    *          The location where the player is currently located.
    */
-  public void setCurrentLocation(Location location)
-  {
+  public void setCurrentLocation(Location location) {
     this.location = location;
 
     logFinest("Player " + playerIndex + " landed on " + location.name);
@@ -281,8 +275,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *         recent movement,<br>
    *         false --> otherwise.
    */
-  public boolean passedGo()
-  {
+  public boolean passedGo() {
     return passedGo;
   }
 
@@ -292,8 +285,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param amount
    *          The amount of cash to add the player's current amount of cash.
    */
-  public void receiveCash(int amount)
-  {
+  public void receiveCash(int amount) {
     cash += amount;
     logFinest("Player " + playerIndex + " received " + amount + " dollars.");
     logFinest("Player " + playerIndex + " has " + cash + " dollars.");
@@ -308,8 +300,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *           If player does not have the amount and cannot sell houses or
    *           hotels and cannot mortgage any properties to raise the amount.
    */
-  public void getCash(int amount) throws BankruptcyException
-  {
+  public void getCash(int amount) throws BankruptcyException {
     raiseCash(amount);
     cash = cash - amount;
     logFinest("Player " + playerIndex + " paid " + amount + " dollars.");
@@ -319,8 +310,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * @return The number of railroads that the player owns.
    */
-  public int getNumRailroads()
-  {
+  public int getNumRailroads() {
     int count = 0;
     for (Location property : owned.values()) {
       if (property.type.equals("railroad")) {
@@ -333,8 +323,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * @return The number of Utilities that the player owns.
    */
-  public int getNumUtilities()
-  {
+  public int getNumUtilities() {
     int count = 0;
     for (Location property : owned.values()) {
       if (property.type.equals("utility")) {
@@ -351,8 +340,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param location2
    *          The property to be added.
    */
-  public void addProperty(Location location2)
-  {
+  public void addProperty(Location location2) {
     owned.put(location2.index, location2);
     // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
@@ -366,24 +354,21 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          having index 0 and increasing sequentially counter-clockwise
    *          around the board.
    */
-  public void setLocationIndex(int index)
-  {
+  public void setLocationIndex(int index) {
     locationIndex = index;
   }
 
   /**
    * @return True if the player is in jail, false otherwise.
    */
-  public boolean inJail()
-  {
+  public boolean inJail() {
     return inJail;
   }
 
   /**
    * @return A reference to the Location where the player current is.
    */
-  public Location getCurrentLocation()
-  {
+  public Location getCurrentLocation() {
     return location;
   }
 
@@ -391,16 +376,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True --> if the player rolled doubles on most recent dice roll,<br>
    *         False --> otherwise.
    */
-  public boolean rolledDoubles()
-  {
+  public boolean rolledDoubles() {
     return rolledDoubles;
   }
 
   /**
    * @return True if the player has either Get Out Of Jail Free card.
    */
-  public boolean hasGetOutOfJailCard()
-  {
+  public boolean hasGetOutOfJailCard() {
     return chanceGOOJ != null || ccGOOJ != null;
   }
 
@@ -409,8 +392,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * collection; modifying other state related to being in jail is not performed
    * by this method.
    */
-  public void useGetOutOfJailCard()
-  {
+  public void useGetOutOfJailCard() {
     if (chanceGOOJ != null) {
       game.getCards().returnChanceGetOutOfJail();
       chanceGOOJ = null;
@@ -427,8 +409,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return The total worth of the player including cash, value of all houses
    *         and hotels, and value of all property owned by the player.
    */
-  public int getTotalWorth()
-  {
+  public int getTotalWorth() {
     int totalWorth = cash;
 
     for (Location location : owned.values()) {
@@ -456,8 +437,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param score
    *          The amount to add to the player's fitness.
    */
-  public void addToFitness(int score)
-  {
+  public void addToFitness(int score) {
     fitnessScore += score;
     assert fitnessScore >= 0;
   }
@@ -468,32 +448,28 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param score
    *          The new value for the fitness score.
    */
-  public void setFitness(int score)
-  {
+  public void setFitness(int score) {
     fitnessScore = score;
   }
 
   /**
    * Reset the fitness value to 0
    */
-  public void resetFitness()
-  {
+  public void resetFitness() {
     fitnessScore = 0;
   }
 
   /**
    * @return The player's current fitness score.
    */
-  public int getFitness()
-  {
+  public int getFitness() {
     return fitnessScore;
   }
 
   /**
    * @return the finishOrder
    */
-  public int getFinishOrder()
-  {
+  public int getFinishOrder() {
     return finishOrder;
   }
 
@@ -504,8 +480,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param finishOrder
    *          the finishOrder to set
    */
-  public void setFinishOrder(int finishOrder)
-  {
+  public void setFinishOrder(int finishOrder) {
     this.finishOrder = finishOrder;
   }
 
@@ -513,8 +488,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True --> if the player is bankrupt,<br>
    *         False --> otherwise.
    */
-  public boolean bankrupt()
-  {
+  public boolean bankrupt() {
     return isBankrupt;
   }
 
@@ -524,8 +498,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param chanceJailCard
    *          The card to add.
    */
-  public void setGetOutOfJail(Chance chanceJailCard)
-  {
+  public void setGetOutOfJail(Chance chanceJailCard) {
     chanceGOOJ = chanceJailCard;
   }
 
@@ -535,8 +508,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param ccJailCard
    *          The card to add.
    */
-  public void setGetOutOfJail(CommunityChest ccJailCard)
-  {
+  public void setGetOutOfJail(CommunityChest ccJailCard) {
     ccGOOJ = ccJailCard;
   }
 
@@ -544,8 +516,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return The number of houses that have been bought for all properties that
    *         are owned by this player
    */
-  public int getNumHouses()
-  {
+  public int getNumHouses() {
     int result = 0;
 
     for (Location loc : owned.values()) {
@@ -559,8 +530,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return The number of hotels that have been bought for all properties that
    *         are owned by this player.
    */
-  public int getNumHotels()
-  {
+  public int getNumHotels() {
     int result = 0;
 
     for (Location loc : owned.values()) {
@@ -585,8 +555,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True if the player has or can sell stuff to raise cash greater than
    *         amount, false otherwise.
    */
-  public boolean canRaiseCash(int amount)
-  {
+  public boolean canRaiseCash(int amount) {
     int totalWorth = cash;
 
     if (totalWorth >= amount) {
@@ -656,8 +625,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          The property being auctioned.
    * @return The amount of this player's bid.
    */
-  public int getBidForLocation(Location currentLocation)
-  {
+  public int getBidForLocation(Location currentLocation) {
     int bid = 0;
 
     if (cash < 50) {
@@ -700,8 +668,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * three times, getting a Go To Jail card, or landing on the Go To Jail
    * location.
    */
-  public void enteredJail()
-  {
+  public void enteredJail() {
     inJail = true;
     jailSentence = 3;
   }
@@ -713,16 +680,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return True if the player must pay bail and leave jail, false otherwise.
    */
-  public boolean jailSentenceCompleted()
-  {
+  public boolean jailSentenceCompleted() {
     return jailSentence == 0;
   }
 
   /**
    * Change player state based on having paid bail to leave jail.
    */
-  public void paidBail()
-  {
+  public void paidBail() {
     inJail = false;
     jailSentence = 0;
   }
@@ -738,8 +703,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return True if the player has at least one monopoly, false otherwise.
    */
-  public boolean hasMonopoly()
-  {
+  public boolean hasMonopoly() {
     boolean result = false;
     for (Location l : owned.values()) {
       if (l.partOfMonopoly) {
@@ -760,8 +724,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @throws BankruptcyException
    *           If the player cannot raise enough cash to equal or exceed amount.
    */
-  public void raiseCash(int amount) throws BankruptcyException
-  {
+  public void raiseCash(int amount) throws BankruptcyException {
     logFinest("Player " + playerIndex + " has " + cash + " dollars");
     if (cash >= amount) {
       return;
@@ -860,8 +823,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     throw new BankruptcyException();
   }
 
-  public TreeMap<Integer, Location> getAllProperties()
-  {
+  public TreeMap<Integer, Location> getAllProperties() {
     return owned;
   }
 
@@ -876,8 +838,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @throws BankruptcyException
    */
   public void addProperties(TreeMap<Integer, Location> allProperties,
-                            boolean gameOver) throws BankruptcyException
-  {
+      boolean gameOver) throws BankruptcyException {
     // add all properties first
     for (Location l : allProperties.values()) {
       owned.put(l.index, l);
@@ -905,9 +866,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @throws BankruptcyException
    *           If the player receiving the properties cannot pay the interest.
    */
-  private void processMortgagedNewProperties(TreeMap<Integer, Location> newProperties)
-      throws BankruptcyException
-  {
+  private void processMortgagedNewProperties(
+      TreeMap<Integer, Location> newProperties) throws BankruptcyException {
     Vector<Location> mortgaged = new Vector<Location>();
 
     // want to handle mortgages of added properties in this order:
@@ -975,8 +935,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Create a list of all mortgaged properties and decide whether or not to pay
    * them off.
    */
-  public void payOffMortgages()
-  {
+  public void payOffMortgages() {
     Vector<Location> mortgaged = new Vector<Location>();
     for (Location lot : owned.values()) {
       if (lot.isMortgaged()) {
@@ -997,8 +956,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param mortgaged
    *          A list of mortgaged properties owned by the player.
    */
-  private void processMortgagedLots(Vector<Location> mortgaged)
-  {
+  private void processMortgagedLots(Vector<Location> mortgaged) {
     // only unmortgage when other monopolies have been fully developed
     //
     // TODO: Need to validate this FOR block. It appears that the original
@@ -1050,8 +1008,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          The property for which to pay off mortgage
    * @return True if the player can pay the mortgage, False otherwise
    */
-  private boolean canPayMortgage(Location lot)
-  {
+  private boolean canPayMortgage(Location lot) {
     int cost = (int) (1.1 * lot.getCost() / 2);
 
     // After paying cost, player should still have minimum cash, so player can
@@ -1066,8 +1023,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return The minimum amount of cash the player should have to avoid problems
    */
-  private int getMinimumCash()
-  {
+  private int getMinimumCash() {
     // Frayn: Keep a minimum of 200 pounds (dollars) in cash,
     int result = 200;
 
@@ -1104,8 +1060,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return The value of cash held by the player
    */
-  public int getAllCash()
-  {
+  public int getAllCash() {
     int amount = cash;
     cash = 0;
     return amount;
@@ -1114,16 +1069,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Set the bankrupt flag for this player
    */
-  public void setBankrupt()
-  {
+  public void setBankrupt() {
     isBankrupt = true;
   }
 
   /**
    * Sell all the hotels and houses owned by the player
    */
-  public void sellAllHousesAndHotels()
-  {
+  public void sellAllHousesAndHotels() {
     // Sell all hotels first
     for (Location l : owned.values()) {
       if (l.getNumHotels() > 0) {
@@ -1145,8 +1098,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Attempt to buy a house for a property
    */
-  public void processDevelopHouseEvent()
-  {
+  public void processDevelopHouseEvent() {
     // Bank has to have houses available
     if (game.getNumHouses() == 0) {
       logFinest("Bank has no more houses");
@@ -1251,14 +1203,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param group
    *          The group for which to balance the house distribution.
    */
-  private void balanceHouses(Vector<Location> monopolies, PropertyGroups group)
-  {
-    logInfo("Player " + playerIndex + " entered balance houses.");
+  private void balanceHouses(Vector<Location> monopolies, PropertyGroups group) {
+    logFinest("Player " + playerIndex + " entered balance houses.");
     for (Location l : monopolies) {
-      logInfo(l.toString());
+      logFinest(l.toString());
     }
-    logInfo("Group: " + group.toString());
-    logInfo(toString());
+    logFinest("Group: " + group.toString());
+    logFinest(toString());
 
     // a list of the street locations in group
     Vector<Location> lots = new Vector<Location>();
@@ -1280,13 +1231,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
     if (g != PropertyGroups.BROWN && g != PropertyGroups.DARK_BLUE) {
       if (lotSize != 3) {
-        logInfo("Bad lot size!!!");
+        logFinest("Bad lot size!!!");
       }
       assert lotSize == 3 : "Bad lot size!!!";
     }
     if (g == PropertyGroups.BROWN || g == PropertyGroups.DARK_BLUE) {
       if (lotSize != 2) {
-        logInfo("Bad lot size!!!");
+        logFinest("Bad lot size!!!");
       }
       assert lotSize == 2 : "Bad lot size!!!";
     }
@@ -1368,17 +1319,16 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
 
     for (Location location : lots) {
-      logInfo(location.name + " has " + location.getNumHouses() + " houses");
+      logFinest(location.name + " has " + location.getNumHouses() + " houses");
     }
-    logInfo(toString());
+    logFinest(toString());
   }
 
   /**
    * @return The index which indicates in which order the player went bankrupt
    *         in a game: 0 for first, 1 for second, 2 for third, etc.
    */
-  public Integer getBankruptIndex()
-  {
+  public Integer getBankruptIndex() {
     return Integer.valueOf(bankruptIndex);
   }
 
@@ -1390,8 +1340,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param index
    *          The value to set.
    */
-  public void setBankruptIndex(int index)
-  {
+  public void setBankruptIndex(int index) {
     bankruptIndex = index;
   }
 
@@ -1403,8 +1352,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Compare players based on fitness score.
    */
-  public int compareTo(AbstractPlayer arg0)
-  {
+  public int compareTo(AbstractPlayer arg0) {
     return Integer.valueOf(fitnessScore).compareTo(
         Integer.valueOf(arg0.fitnessScore));
   }
@@ -1415,8 +1363,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param index
    *          The ID or index of the player
    */
-  public void setIndex(int index)
-  {
+  public void setIndex(int index) {
     playerIndex = index;
   }
 
@@ -1431,10 +1378,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *         with the other parent player.
    */
   public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2,
-                                                  int index);
+      int index);
 
-  public String toString()
-  {
+  public String toString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
     result.append(separator).append("Player ").append(playerIndex)
@@ -1470,8 +1416,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @param game
    */
-  public void joinGame(Monopoly game)
-  {
+  public void joinGame(Monopoly game) {
     this.game = game;
     propertyTrader = new PropertyNegotiator(this, game.gamekey);
     resetAll();
@@ -1485,8 +1430,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param s
    *          The string to log
    */
-  public void logInfo(String s)
-  {
+  public void logInfo(String s) {
     if (game != null) {
       game.logInfo(s);
     }
@@ -1498,8 +1442,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param s
    *          The string to log
    */
-  public void logFinest(String s)
-  {
+  public void logFinest(String s) {
     if (game != null) {
       game.logFinest(s);
     }
@@ -1508,16 +1451,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * @return The number of properties owned by the player
    */
-  public int getNumProperties()
-  {
+  public int getNumProperties() {
     return owned.size();
   }
 
   /**
    * @return The number of monopolies controlled by this player
    */
-  public int getNumMonopolies()
-  {
+  public int getNumMonopolies() {
     int result = 0;
     PropertyGroups lastGroup = PropertyGroups.SPECIAL;
 
@@ -1531,13 +1472,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     return result;
   }
 
-  public void setGameNetWorth(int totalNetWorth)
-  {
+  public void setGameNetWorth(int totalNetWorth) {
     gameNetWorth = totalNetWorth;
   }
 
-  public int getGameNetWorth()
-  {
+  public int getGameNetWorth() {
     return gameNetWorth;
   }
 
@@ -1550,8 +1489,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True if the player owns another property in the same group as
    *         location
    */
-  public boolean needs(Location location2)
-  {
+  public boolean needs(Location location2) {
     PropertyGroups group = location2.getGroup();
     for (Location location : owned.values())
       if (location.getGroup() == group)
@@ -1560,8 +1498,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     return false;
   }
 
-  public int evaluateTrade(TradeProposal trade)
-  {
+  public int evaluateTrade(TradeProposal trade) {
     int base = propertyTrader.evaluateOwnersHoldings();
     int newVal = propertyTrader.evaluateOwnersHoldings(trade);
 
@@ -1571,8 +1508,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * A method to make trading decisions and act on those decisions.
    */
-  public void processTradeDecisionEvent()
-  {
+  public void processTradeDecisionEvent() {
     // only try to trade if this player owns two or more properties
     if (owned.size() > 1) {
       TradeProposal bestTrade = propertyTrader.findBestTrade();
@@ -1584,16 +1520,31 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
   }
 
-  public boolean answerProposedTrade(TradeProposal bestTrade)
-  {
+  public boolean answerProposedTrade(TradeProposal bestTrade) {
+    logInfo("Player " + playerIndex + " is evaluating trade "
+        + bestTrade.toString());
+
+    // if the player has to geive too much money, the reject the trade
     if (cash + bestTrade.cashDiff < getMinimumCash()) {
-      game.logInfo("Trade would reduce cash of player " + this.playerIndex
+      logInfo("Trade would reduce cash of player " + this.playerIndex
           + " below minimum; trade refused");
       return false;
     }
 
-    // TODO Auto-generated method stub
-    return false;
+    // If the estimated profit from the trade is less than threshold, then
+    // reject the trade.
+    int baseValue = propertyTrader.evaluateOwnersHoldings();
+    int newValue = propertyTrader.evaluateOwnersHoldings(bestTrade);
+    
+    int profit = newValue - baseValue + bestTrade.cashDiff;
+    
+    if (profit < tradeThreshold) {
+      logInfo("Trade does not exceed profit threshold; trade refused ");
+      return false;
+    }
+
+    logInfo("Player " + playerIndex + ": trade accepted");
+    return true;
   }
 
   /**
@@ -1602,8 +1553,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return An AbstractPlayer array that contains all the players in a game
    */
-  public AbstractPlayer[] getAllPlayers()
-  {
+  public AbstractPlayer[] getAllPlayers() {
     return game.getAllPlayers();
   }
 }

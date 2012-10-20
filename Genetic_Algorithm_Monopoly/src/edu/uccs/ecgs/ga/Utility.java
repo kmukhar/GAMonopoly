@@ -21,9 +21,13 @@ public class Utility
   {
     File f = null;
 
+    String datapath = System.getProperty("datapath");
+    if (datapath == null)
+      datapath = "";
+
     if (Main.useGui) {
       if (rootDir == null || rootDir.equals("")) {
-        JFileChooser fc = new JFileChooser("D:/Documents and Data/Kevin/git/GAMonopoly/Genetic_Algorithm_Monopoly/data");
+        JFileChooser fc = new JFileChooser(datapath);
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Select directory to save data files");
         int returnVal = JFileChooser.CANCEL_OPTION;

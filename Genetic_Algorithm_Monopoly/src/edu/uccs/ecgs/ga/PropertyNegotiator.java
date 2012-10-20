@@ -556,39 +556,42 @@ public class PropertyNegotiator {
     int base = evaluateOwnersHoldings();
 
     if (proposals.size() > 0) {
-      owner.game.logInfo("All proposals: ");
+      owner.logInfo("All proposals: ");
       for (TradeProposal proposal : proposals) {
-        owner.game.logInfo("    " + proposal);
+        owner.logInfo("    " + proposal);
       }
 
-      owner.game.logInfo("Base value of owner is " + base);
+      owner.logInfo("Base value of owner is " + base);
     }
 
     int gain = Integer.MIN_VALUE;
 
     for (TradeProposal trade : proposals) {
       int newVal = evaluateOwnersHoldings(trade);
-      owner.game.logInfo("\nNew val after trading " + trade.location + " for "
+      owner.logInfo("\nNew val after trading " + trade.location + " for "
           + trade.location2 + " is " + newVal);
 
       int ownerProfit = newVal - base;
-      owner.game.logInfo("Owner profit is " + ownerProfit);
+      owner.logInfo("Owner profit is " + ownerProfit);
       
       ownerProfit = owner.evaluateTrade(trade);
-      owner.game.logInfo("Owner profit is " + ownerProfit);
+      owner.logInfo("Owner profit is " + ownerProfit);
 
       int agentProfit = trade.location2.getOwner().evaluateTrade(trade);
-      owner.game.logInfo("Agent profit is " + agentProfit);
+      owner.logInfo("Agent profit is " + agentProfit);
       
       int cashDiff = ownerProfit - agentProfit;
-      owner.game.logInfo("Cash difference is " + cashDiff);
+      owner.logInfo("Cash difference is " + cashDiff);
 
       int addCashToTrade = cashDiff/2;
+      
+      owner.logInfo("Sweetener for trade is 1/2 cash diff: " + addCashToTrade);
+
       int ownerAdjProfit = ownerProfit - addCashToTrade;
       int agentAdjProfit = agentProfit + addCashToTrade;
       
-      owner.game.logInfo("Owner adjusted profit is " + ownerAdjProfit);
-      owner.game.logInfo("Agent adjusted profit is " + agentAdjProfit);
+      owner.logInfo("Owner adjusted profit is " + ownerAdjProfit);
+      owner.logInfo("Agent adjusted profit is " + agentAdjProfit);
 
       // if this is a better gain...
       if (ownerAdjProfit > gain) {
@@ -599,12 +602,12 @@ public class PropertyNegotiator {
           bestTrade = trade;
           bestTrade.setCash(addCashToTrade);
           bestTrade.setProfit(ownerAdjProfit);
-          owner.game.logInfo("Best trade is " + trade);
+          owner.logInfo("Best trade is " + trade);
         } else {
-          owner.game.logInfo("Owner does not have enough cash; no change to best trade");
+          owner.logInfo("Owner does not have enough cash; no change to best trade");
         }
       } else {
-        owner.game.logInfo("Not better than current best trade; no change to best trade");
+        owner.logInfo("Not better than current best trade; no change to best trade");
       }
     }
 

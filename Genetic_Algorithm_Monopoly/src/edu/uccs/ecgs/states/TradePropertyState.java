@@ -18,7 +18,7 @@ public class TradePropertyState extends PlayerState {
     switch (event) {
     
     case TRADE_DECISION_EVENT:
-      game.logInfo("\n\n\nStarting process trade decision event");
+      game.logInfo("\nStarting process trade decision event");
       player.processTradeDecisionEvent();
 
       player.nextAction = Actions.DONE;

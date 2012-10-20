@@ -119,7 +119,6 @@ public class Main {
    */
   public static int dumpPeriod = 100;
 
-  // TODO create other labels
   public static final String loadFromDiskLabel = "Load players from disk";
   public static final String randomSeedLabel = "Use random seed for games";
   public static final String dumpPeriodLabel = "Dump Player Data every n generations";
@@ -372,6 +371,8 @@ public class Main {
       numThreads = Integer.parseInt(value);
     } else if (key.equalsIgnoreCase("dumpPeriod")) {
       dumpPeriod = Integer.parseInt(value);
+    } else {
+      System.setProperty(key, value);
     }
   }
 
