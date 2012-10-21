@@ -89,7 +89,7 @@ public class RGAPlayer extends CGPlayer {
       return false;
     }
 
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     int idx1 = pf.getIndexFromProperties(Edges.WEST, this);
     int idx2 = pf.getIndexFromProperties(Edges.NORTH, this);
 

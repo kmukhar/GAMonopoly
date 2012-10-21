@@ -6,12 +6,13 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 
+import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.PopulationPropagator;
 
 public class LoadButtonListener implements ActionListener {
 
 	private PlayerPanel playerPanel;
-	private final JFileChooser fc = new JFileChooser();
+	private final JFileChooser fc = new JFileChooser("D:/Documents and Data/Kevin/git/GAMonopoly/Genetic_Algorithm_Monopoly/data/RGA/finish_order/Generation_00000");
 
 	public LoadButtonListener(PlayerPanel p) {
 		playerPanel = p;
@@ -22,19 +23,12 @@ public class LoadButtonListener implements ActionListener {
 		int returnVal = fc.showOpenDialog(playerPanel);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
+
 			int index = Integer.parseInt(file.getName().substring(6, 10));
-			playerPanel.player = PopulationPropagator.loadPlayer(
+			AbstractPlayer player = PopulationPropagator.loadPlayer(
 			    file, index);
-			playerPanel.idField.setText("" + playerPanel.player.playerIndex);
-			playerPanel.idField.setEditable(false);
-			playerPanel.cashField.setText("" + playerPanel.player.cash);
-			playerPanel.cashField.setEditable(true);
-			playerPanel.cashField.addFocusListener(new CashFieldFocusListener(
-			    playerPanel));
-			playerPanel.cashField.addActionListener(new CashFieldActionListener(
-			    playerPanel));
-			// TODO playerPanel.addPlayer();
-			playerPanel.disableLoadButton();
+			
+			playerPanel.setPlayer(player);
 		}
 	}
 }

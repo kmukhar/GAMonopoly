@@ -85,7 +85,7 @@ public abstract class CGPlayer extends AbstractPlayer {
    */
   @Override
   public boolean buyProperty(Location aLocation) {
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     GroupOwners flag = pf.getOwnerInformationForGroup(aLocation, this);
 
     switch (flag) {

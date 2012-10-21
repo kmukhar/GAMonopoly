@@ -30,6 +30,11 @@ public class PlayerGui extends JFrame {
     gbc.weightx = 1.0;
     gbc.insets = new Insets(2,2,2,2);
 
+    pp1.setFactoryKey(factoryKey);
+    pp2.setFactoryKey(factoryKey);
+    pp3.setFactoryKey(factoryKey);
+    pp4.setFactoryKey(factoryKey);
+
     getContentPane().add(pp1,gbc);
     getContentPane().add(pp2,gbc);
     getContentPane().add(pp3,gbc);

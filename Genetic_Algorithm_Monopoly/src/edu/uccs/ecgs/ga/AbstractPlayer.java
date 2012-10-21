@@ -68,6 +68,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public double w2 = 0.5;
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
+  protected String gameKey;
 
   /**
    * Constructor
@@ -231,7 +232,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       locationIndex += 40;
     }
 
-    Location location = PropertyFactory.getPropertyFactory(game.gamekey)
+    Location location = PropertyFactory.getPropertyFactory(this.gameKey)
         .getLocationAt(locationIndex);
     setCurrentLocation(location);
   }
@@ -343,7 +344,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void addProperty(Location location2) {
     owned.put(location2.index, location2);
     // mark all the properties that are part of monopolies
-    PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
+    PropertyFactory.getPropertyFactory(this.gameKey).checkForMonopoly();
   }
 
   /**
@@ -846,7 +847,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
 
     // mark all the properties that are part of monopolies
-    PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
+    PropertyFactory.getPropertyFactory(this.gameKey).checkForMonopoly();
 
     // if the game isn't over, then the gaining player needs to pay the
     // 10% fee on any mortgaged properties, and possible unmortgage the
@@ -964,7 +965,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // be fully developed with 3 houses or a hotel before the player pays off
     // the mortgage for other properties.
     for (Location location : owned.values()) {
-      if (location.isMortgaged() || location.groupIsMortgaged(game.gamekey)) {
+      if (location.isMortgaged() || location.groupIsMortgaged(this.gameKey)) {
         continue;
       }
 
@@ -1039,7 +1040,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
     // plus 5% of the number of houses or hotels. (assume frayn meant 5% of
     // cost)
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(this.gameKey);
     for (int i = 0; i < 40; i++) {
       Location l = pf.getLocationAt(i);
       if (l.getNumHouses() > 0 && l.owner != this) {
@@ -1132,7 +1133,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // do not add that property to the vector.
     Vector<Location> monopolies = new Vector<Location>();
     for (Location location : owned.values()) {
-      if (PropertyFactory.getPropertyFactory(game.gamekey).groupIsMortgaged(
+      if (PropertyFactory.getPropertyFactory(this.gameKey).groupIsMortgaged(
           location.getGroup())) {
         // skip this property since the group is mortgaged
         continue;
@@ -1418,9 +1419,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void joinGame(Monopoly game) {
     this.game = game;
-    propertyTrader = new PropertyNegotiator(this, game.gamekey);
+    setGameKey(game.gamekey);
+
+    propertyTrader = new PropertyNegotiator(this, this.gameKey);
     resetAll();
-    location = PropertyFactory.getPropertyFactory(game.gamekey).getLocationAt(
+    location = PropertyFactory.getPropertyFactory(this.gameKey).getLocationAt(
         locationIndex);
   }
 
@@ -1555,5 +1558,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public AbstractPlayer[] getAllPlayers() {
     return game.getAllPlayers();
+  }
+
+  public void setGameKey(String factoryKey)
+  {
+    gameKey = factoryKey;    
   }
 }

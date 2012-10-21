@@ -6,8 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
-import edu.uccs.ecgs.ga.Location;
-import edu.uccs.ecgs.ga.PropertyGroups;
+import edu.uccs.ecgs.ga.*;
 
 public class BuyButtonListener implements ActionListener {
   JComboBox<Location> list;
@@ -21,9 +20,10 @@ public class BuyButtonListener implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent actionevent) {
+    AbstractPlayer player = pp.getPlayer();
     Location lot = (Location) list.getSelectedItem();
     if (lot.getGroup() != PropertyGroups.SPECIAL) {
-      if (pp.player.buyProperty(lot)) {
+      if (player.buyProperty(lot)) {
         JOptionPane.showMessageDialog(null, "Player decides to buy property",
             "Buy Property Decision", JOptionPane.INFORMATION_MESSAGE);
       } else {

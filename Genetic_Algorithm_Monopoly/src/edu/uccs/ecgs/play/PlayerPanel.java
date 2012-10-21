@@ -23,7 +23,7 @@ import edu.uccs.ecgs.ga.PropertyFactory;
 
 @SuppressWarnings("serial")
 public class PlayerPanel extends JPanel implements ListSelectionListener {
-  public AbstractPlayer player;
+  private AbstractPlayer player;
   int index = 0;
   
   JButton loadButton = new JButton("Load Player");
@@ -48,6 +48,7 @@ public class PlayerPanel extends JPanel implements ListSelectionListener {
   JTable table = new JTable();
   MTableModel m = new MTableModel();
   JScrollPane scrollPane = new JScrollPane(table);
+  private String factoryKey;
 
   @SuppressWarnings("unchecked")
   public PlayerPanel(int index) {
@@ -209,5 +210,29 @@ public class PlayerPanel extends JPanel implements ListSelectionListener {
 
   public void disableBuyButton() {
     buyButton.setEnabled(false);
+  }
+
+  public void setFactoryKey(String factoryKey)
+  {
+    this.factoryKey = factoryKey;
+  }
+
+  public void setPlayer(AbstractPlayer player2)
+  {
+    this.player = player2;
+    player.setGameKey(factoryKey);
+
+    idField.setText("" + player.playerIndex);
+    idField.setEditable(false);
+    cashField.setText("" + player.cash);
+    cashField.setEditable(true);
+    cashField.addFocusListener(new CashFieldFocusListener(this));
+    cashField.addActionListener(new CashFieldActionListener(this));
+    disableLoadButton();
+  }
+
+  public AbstractPlayer getPlayer()
+  {
+    return player;
   }
 }

@@ -144,4 +144,24 @@ public class StreetLocation extends Location {
     }
     return rent;
   }
+
+  @Override
+  public String getFormattedString()
+  {
+    StringBuilder result = new StringBuilder();
+    result.append("Title Deed\n").append(name).append(".\n\n");
+    result.append("Rent\t\t$").append(rentUnimproved).append(".\n");
+    result.append("With 1 House\t$").append(rentOneHouse).append(".\n");
+    result.append("With 2 Houses\t$").append(rentTwoHouses).append(".\n");
+    result.append("With 3 Houses\t$").append(rentThreeHouses).append(".\n");
+    result.append("With 4 Houses\t$").append(rentFourHouses).append(".\n");
+    result.append("With Hotel\t\t$").append(rentHotel).append(".\n");
+    result.append("Mortgage Value\t$").append(cost/2).append(".\n");
+    result.append("Houses cost $").append(houseCost).append(" each.\n");
+    result.append("Hotels, $").append(hotelCost).append(" plus 4 houses.\n\n");
+    result.append("If a player owns ALL the Lots of any Color-Group, the\n");
+    result.append("rent is Doubled on Unimproved Lots in that Group.\n");
+    
+    return result.toString();
+  }
 }

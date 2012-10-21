@@ -106,10 +106,16 @@ public abstract class Location implements Comparable<Location> {
     return Integer.parseInt(properties.getProperty(aKey));
   }
 
+  @Override
   public String toString()
   {
     return getGroup().toString() + "/" + name;
   }
+
+  /**
+   * @return A String formatted like the property card in the physical game.
+   */
+  public abstract String getFormattedString();
 
   /**
    * @return Information about the location.

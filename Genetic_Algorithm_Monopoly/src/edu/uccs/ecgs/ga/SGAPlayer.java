@@ -122,7 +122,7 @@ public class SGAPlayer extends AbstractPlayer {
       return false;
     }
 
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     int idx1 = pf.getIndexFromMonopolies(this, Edges.WEST);
     int idx2 = pf.getIndexFromMonopolies(this, Edges.NORTH);
     
@@ -139,7 +139,7 @@ public class SGAPlayer extends AbstractPlayer {
   
   @Override
   public boolean buyProperty(Location aLocation) {
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     GroupOwners flag = pf.getOwnerInformationForGroup(aLocation, this);
 
     switch (flag) {

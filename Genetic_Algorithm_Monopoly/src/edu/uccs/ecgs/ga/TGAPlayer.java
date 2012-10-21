@@ -90,7 +90,7 @@ public class TGAPlayer extends CGPlayer {
       return false;
     }
 
-    PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     int idx1 = pf.getIndexFromMonopolies(this, Edges.WEST);
     int idx2 = pf.getIndexFromMonopolies(this, Edges.NORTH);
 
