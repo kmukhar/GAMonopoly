@@ -64,7 +64,7 @@ public class PlayerGui extends JPanel {
       } else {
         int index = r.nextInt(dataNames.size());
         String path = dataNames.remove(index);
-        AbstractPlayer player = PlayerLoader.loadPlayer(path);
+        AbstractPlayer player = PlayerLoader.loadPlayer(path, i);
         players[i] = player;
       }
     }
