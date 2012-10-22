@@ -54,8 +54,9 @@ public enum Chance {
         }
       }
       advancePlayer(player, locationIndex);
-      if (player.location.owner != null && player.location.owner != player) {
-        player.location.arrivedFromChance = true;
+      Location playerLocation = player.getCurrentLocation();
+      if (playerLocation.owner != null && playerLocation.owner != player) {
+        playerLocation.arrivedFromChance = true;
       }
       break;
 

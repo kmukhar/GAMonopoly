@@ -8,11 +8,13 @@ import java.util.*;
 import javax.swing.*;
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
+import edu.uccs.ecgs.players.HumanPlayer;
 
 @SuppressWarnings("serial")
 public class PlayerGui extends JPanel {
   private static String playerName;
   private static int playerIndex;
+  private ArrayList<String> dataNames = new ArrayList<String>();
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -52,11 +54,18 @@ public class PlayerGui extends JPanel {
 
   private AbstractPlayer[] createPlayers()
   {
+    Random r = new Random();
     AbstractPlayer[] players = new AbstractPlayer[4];
 
     for (int i = 0; i < players.length; i++) {
-      if (i == index) {
-        HumanPlayer player = new HumanPlayer();
+      if (i == playerIndex) {
+        HumanPlayer player = new HumanPlayer(i, playerName);
+        players[i] = player;
+      } else {
+        int index = r.nextInt(dataNames.size());
+        String path = dataNames.remove(index);
+        AbstractPlayer player = PlayerLoader.loadPlayer(path);
+        players[i] = player;
       }
     }
 
@@ -154,6 +163,11 @@ public class PlayerGui extends JPanel {
 
   public PlayerGui() {
     super(new GridLayout(1, 2));
+
+    for (int i = 0; i < 10; i++) {
+      String baseName = "player000";
+      dataNames.add(baseName + i + ".dat");
+    }
 
     JTabbedPane tabbedPane = new JTabbedPane();
 

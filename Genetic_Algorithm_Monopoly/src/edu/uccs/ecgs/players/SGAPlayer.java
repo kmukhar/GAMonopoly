@@ -335,7 +335,8 @@ public class SGAPlayer extends AbstractPlayer {
   }
 
   @Override
-  protected Object clone() throws CloneNotSupportedException {
+  public Object clone() throws CloneNotSupportedException
+  {
     BitSet chrNoOwners1 = (BitSet) chrNoOwners.clone();
     BitSet chrPlayerOwns1 = (BitSet) chrPlayerOwns.clone();
     BitSet chrOpponentOwns1 = (BitSet) chrOpponentOwns.clone();

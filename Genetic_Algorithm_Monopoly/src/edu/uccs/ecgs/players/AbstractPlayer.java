@@ -315,7 +315,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public int getNumRailroads() {
     int count = 0;
     for (Location property : owned.values()) {
-      if (property.type.equals("railroad")) {
+      if (property.getGroup() == PropertyGroups.RAILROADS) {
         ++count;
       }
     }
@@ -328,7 +328,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public int getNumUtilities() {
     int count = 0;
     for (Location property : owned.values()) {
-      if (property.type.equals("utility")) {
+      if (property.getGroup() == PropertyGroups.UTILITIES) {
         ++count;
       }
     }
@@ -770,7 +770,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       int[] index = new int[] { 5, 35, 15, 25, 12, 28 };
       for (int i : index) {
         Location l = owned.get(i);
-        if (l != null && !l.isMortgaged) {
+        if (l != null && !l.isMortgaged()) {
           logFinest("Player will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
@@ -1411,7 +1411,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public abstract AbstractPlayer copyAndMutate();
 
   @Override
-  protected abstract Object clone() throws CloneNotSupportedException;
+  public abstract Object clone() throws CloneNotSupportedException;
 
   /**
    * Join the given game with this player.

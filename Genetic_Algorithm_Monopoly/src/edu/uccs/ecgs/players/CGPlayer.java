@@ -269,7 +269,7 @@ public abstract class CGPlayer extends AbstractPlayer {
   }
 
   @Override
-  protected Object clone() throws CloneNotSupportedException {
+  public Object clone() throws CloneNotSupportedException {
     double[] chrNoOwners1 = new double[lotLength];
     double[] chrPlayerOwns1 = new double[lotLength];
     double[] chrOpponentOwns1 = new double[lotLength];

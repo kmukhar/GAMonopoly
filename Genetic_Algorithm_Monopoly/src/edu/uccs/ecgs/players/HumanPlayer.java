@@ -1,17 +1,29 @@
-package edu.uccs.ecgs.play2;
+package edu.uccs.ecgs.players;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import javax.swing.JOptionPane;
 import edu.uccs.ecgs.ga.*;
-import edu.uccs.ecgs.players.AbstractPlayer;
-import edu.uccs.ecgs.players.ChromoTypes;
 
 public class HumanPlayer extends AbstractPlayer {
+
+  private String name;
 
   public HumanPlayer(int index, ChromoTypes chromoType) {
     super(index, chromoType);
     // TODO Auto-generated constructor stub
+  }
+
+  public HumanPlayer(int index) {
+    super(index, ChromoTypes.HUM);
+  }
+
+  public HumanPlayer(int index, DataInputStream dis) {
+    super(index, ChromoTypes.HUM);
+  }
+  
+  public HumanPlayer(int index, String name) {
+    super(index, ChromoTypes.HUM);
+    this.name = name;
   }
 
   @Override
@@ -56,7 +68,7 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   @Override
-  protected Object clone() throws CloneNotSupportedException
+  public Object clone() throws CloneNotSupportedException
   {
     return null;
   }

@@ -16,6 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import edu.uccs.ecgs.players.AbstractPlayer;
+import edu.uccs.ecgs.players.PlayerFactory;
 
 /**
  * The Genetic Algorithm Engine. Create and manage the population of players.
