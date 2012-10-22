@@ -1,7 +1,8 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import edu.uccs.ecgs.ga.*;
 
 
 /**

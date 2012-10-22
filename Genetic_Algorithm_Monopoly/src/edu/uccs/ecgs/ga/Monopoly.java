@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.states.Events;
 
 public class Monopoly implements Runnable {

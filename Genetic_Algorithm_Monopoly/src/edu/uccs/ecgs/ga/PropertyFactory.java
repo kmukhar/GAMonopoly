@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 /**
  * A class to manage the properties in a game of Monopoly

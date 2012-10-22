@@ -2,7 +2,6 @@ package edu.uccs.ecgs.states;
 
 import java.util.Random;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.Actions;
 import edu.uccs.ecgs.ga.Dice;
 import edu.uccs.ecgs.ga.Location;
@@ -10,6 +9,7 @@ import edu.uccs.ecgs.ga.Main;
 import edu.uccs.ecgs.ga.Monopoly;
 import edu.uccs.ecgs.ga.PropertyFactory;
 import edu.uccs.ecgs.ga.PropertyGroups;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class PlayerState {
 

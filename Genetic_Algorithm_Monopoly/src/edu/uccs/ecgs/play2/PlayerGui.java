@@ -2,18 +2,27 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.io.*;
+import java.util.*;
 import javax.swing.*;
-import edu.uccs.ecgs.ga.Location;
-import edu.uccs.ecgs.ga.PropertyFactory;
+import edu.uccs.ecgs.ga.*;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
 public class PlayerGui extends JPanel {
+  private static String playerName;
+  private static int playerIndex;
+
   /**
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event dispatch thread.
    */
   private static void createAndShowGUI()
   {
+    showInitialDialog();
+    getNameAndIndex();
+
     // Create and set up the window.
     JFrame frame = new JFrame("Monopoly Simulator");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -30,7 +39,99 @@ public class PlayerGui extends JPanel {
 
     // Display the window.
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+    
+    gui.playGame();
+  }
+
+  private void playGame()
+  {
+    AbstractPlayer[] players = createPlayers();
+  }
+
+  private AbstractPlayer[] createPlayers()
+  {
+    AbstractPlayer[] players = new AbstractPlayer[4];
+
+    for (int i = 0; i < players.length; i++) {
+      if (i == index) {
+        HumanPlayer player = new HumanPlayer();
+      }
+    }
+
+    return players;
+  }
+
+  private static void showInitialDialog()
+  {
+    Calendar endCal = GregorianCalendar.getInstance();
+    // set end date for research to 15 Dec 2012 
+    endCal.set(2012, 11, 15, 12, 0, 0);
+    
+    Calendar nowCal = GregorianCalendar.getInstance();
+    String path = "About.html";
+    if (nowCal.after(endCal)) {
+      path = "About2.html";
+    }
+    
+    JLabel label = new JLabel();
+    InputStream is = PlayerGui.class.getResourceAsStream(path);
+    InputStreamReader isr = new InputStreamReader(is);
+    BufferedReader br = new BufferedReader(isr); 
+
+    StringBuilder aboutMsg = new StringBuilder();
+    
+    String line = null;
+    try {
+      line = br.readLine();
+      while (line != null) {
+        aboutMsg.append(line);
+        line = br.readLine();
+      }
+    } catch (IOException e) {
+      aboutMsg = new StringBuilder();
+      aboutMsg.append("Monopoly Simulator");
+    } finally {
+      try {
+        br.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    label.setText(aboutMsg.toString());
+
+    int result = JOptionPane.showConfirmDialog(null, label,
+        "About this program", JOptionPane.OK_CANCEL_OPTION,
+        JOptionPane.INFORMATION_MESSAGE);
+    
+    if (result == JOptionPane.CANCEL_OPTION) {
+      System.exit(0);
+    }
+  }
+
+  private static void getNameAndIndex()
+  {
+    final NameAndIndexDialog dialog = new NameAndIndexDialog(
+        new javax.swing.JFrame(), true);
+    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
+      @Override
+      public void windowClosing(WindowEvent e)
+      {
+        // do nothing
+      }
+
+      @Override
+      public void windowClosed(java.awt.event.WindowEvent e)
+      {
+        PlayerGui.playerName = dialog.getName();
+        PlayerGui.playerIndex = dialog.getIndex();
+      }
+    });
+    dialog.setLocationRelativeTo(null);
+    dialog.setVisible(true);
   }
 
   public static void main(String[] args)

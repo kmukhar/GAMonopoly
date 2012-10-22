@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import edu.uccs.ecgs.players.ChromoTypes;
 
 public class Main {
 
@@ -72,7 +73,7 @@ public class Main {
 
   /**
    * Which chromosome types to use for a player. See
-   * {@link edu.uccs.ecgs.ga.ChromoTypes} for valid values. Each type is
+   * {@link edu.uccs.ecgs.players.ChromoTypes} for valid values. Each type is
    * implemented by a concrete class which is used in
    * {@link edu.uccs.ecgs.ga.PlayerFactory#getPlayer(int index, ChromoTypes chromoType)}
    * .

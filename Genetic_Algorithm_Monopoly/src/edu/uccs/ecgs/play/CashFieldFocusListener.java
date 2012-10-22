@@ -3,7 +3,7 @@ package edu.uccs.ecgs.play;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JTextField;
-import edu.uccs.ecgs.ga.AbstractPlayer;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class CashFieldFocusListener implements FocusListener {
   PlayerPanel pp;

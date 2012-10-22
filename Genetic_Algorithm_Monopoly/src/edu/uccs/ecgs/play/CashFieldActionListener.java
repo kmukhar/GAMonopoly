@@ -3,7 +3,7 @@ package edu.uccs.ecgs.play;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JTextField;
-import edu.uccs.ecgs.ga.AbstractPlayer;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class CashFieldActionListener implements ActionListener {
   PlayerPanel pp;

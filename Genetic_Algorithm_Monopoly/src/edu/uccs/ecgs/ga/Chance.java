@@ -1,5 +1,7 @@
 package edu.uccs.ecgs.ga;
 
+import edu.uccs.ecgs.players.AbstractPlayer;
+
 
 public enum Chance {
 

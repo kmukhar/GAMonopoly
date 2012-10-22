@@ -6,10 +6,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.ga.PropertyFactory;
 import edu.uccs.ecgs.ga.PropertyGroups;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class AddLotActionListener implements ActionListener {
   JComboBox<Location> comboBox;

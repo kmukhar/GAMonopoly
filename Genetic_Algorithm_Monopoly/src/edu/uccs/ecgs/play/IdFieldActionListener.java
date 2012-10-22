@@ -2,8 +2,8 @@ package edu.uccs.ecgs.play;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import edu.uccs.ecgs.ga.AbstractPlayer;
-import edu.uccs.ecgs.ga.RGAPlayer;
+import edu.uccs.ecgs.players.AbstractPlayer;
+import edu.uccs.ecgs.players.RGAPlayer;
 
 public class IdFieldActionListener implements ActionListener {
   PlayerPanel pp;

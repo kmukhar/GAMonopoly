@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.ga;
 
 import java.util.Properties;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 
 public class SpecialLocation extends Location {

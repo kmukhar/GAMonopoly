@@ -1,8 +1,10 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import edu.uccs.ecgs.ga.Edges;
+import edu.uccs.ecgs.ga.PropertyFactory;
 
 //player that uses a genome with continuous values in the chromosome
 //same as RGA but jail chromosome is only 4x4 (RGA is 64x64)

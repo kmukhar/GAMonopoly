@@ -2,6 +2,7 @@ package edu.uccs.ecgs.ga;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 /**
  * A class to assist in negotiating properties in the game of Monopoly. The

@@ -1,10 +1,10 @@
 package edu.uccs.ecgs.states;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.Actions;
 import edu.uccs.ecgs.ga.BankruptcyException;
 import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.ga.Monopoly;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class PayRentState extends PlayerState {
 

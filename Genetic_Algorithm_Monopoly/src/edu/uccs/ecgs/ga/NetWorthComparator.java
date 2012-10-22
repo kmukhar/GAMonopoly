@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.ga;
 
 import java.util.Comparator;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class NetWorthComparator implements Comparator<AbstractPlayer> {
   private static NetWorthComparator _ref = new NetWorthComparator();

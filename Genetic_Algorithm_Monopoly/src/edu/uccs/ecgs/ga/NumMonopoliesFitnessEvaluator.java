@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.ga;
 
 import java.util.Vector;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 /**
  * Compute fitness based on the number of monopolies a player owns. This

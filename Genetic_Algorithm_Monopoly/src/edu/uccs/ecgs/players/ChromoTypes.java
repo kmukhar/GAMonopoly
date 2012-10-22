@@ -1,7 +1,8 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import edu.uccs.ecgs.play2.HumanPlayer;
 
 public enum ChromoTypes {
   RGA, SGA, TGA;

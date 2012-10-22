@@ -1,4 +1,4 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 /**
  * A factory for creating player instances based on the chromosome type.

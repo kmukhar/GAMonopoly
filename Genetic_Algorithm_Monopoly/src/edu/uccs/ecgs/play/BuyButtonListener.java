@@ -7,6 +7,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 import edu.uccs.ecgs.ga.*;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class BuyButtonListener implements ActionListener {
   JComboBox<Location> list;

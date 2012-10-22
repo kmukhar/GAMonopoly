@@ -1,4 +1,4 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 public interface Player {
 	void getRent(int amount);

@@ -1,9 +1,10 @@
-package edu.uccs.ecgs.ga;
+package edu.uccs.ecgs.players;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import edu.uccs.ecgs.ga.*;
 
 
 public class SGAPlayer extends AbstractPlayer {

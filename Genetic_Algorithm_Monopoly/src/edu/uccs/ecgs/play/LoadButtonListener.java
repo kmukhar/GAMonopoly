@@ -6,8 +6,8 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.PopulationPropagator;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class LoadButtonListener implements ActionListener {
 

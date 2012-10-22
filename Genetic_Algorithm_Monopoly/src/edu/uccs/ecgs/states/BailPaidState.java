@@ -1,7 +1,7 @@
 package edu.uccs.ecgs.states;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.Monopoly;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class BailPaidState extends PlayerState {
 

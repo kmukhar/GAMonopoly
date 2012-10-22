@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.Vector;
+import edu.uccs.ecgs.players.AbstractPlayer;
+import edu.uccs.ecgs.players.ChromoTypes;
 
 
 public class PopulationPropagator {

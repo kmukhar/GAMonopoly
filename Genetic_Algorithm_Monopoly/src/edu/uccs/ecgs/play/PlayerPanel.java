@@ -17,9 +17,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import edu.uccs.ecgs.ga.AbstractPlayer;
 import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.ga.PropertyFactory;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
 public class PlayerPanel extends JPanel implements ListSelectionListener {

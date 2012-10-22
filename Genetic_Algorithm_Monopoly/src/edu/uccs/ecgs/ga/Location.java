@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.ga;
 
 import java.util.Properties;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 /**
  * Class the implements a location (property or special location) in the game.
