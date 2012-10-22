@@ -50,11 +50,15 @@ public class PlayerGui extends JPanel {
   private void playGame()
   {
     AbstractPlayer[] players = createPlayers();
+    Main main = new Main();
+    Main.paused = false;
+    Monopoly game = new Monopoly(main, 0, 0, 0, players);
+    game.run();
   }
 
   private AbstractPlayer[] createPlayers()
   {
-    Random r = new Random();
+    Random r = new Random(System.currentTimeMillis());
     AbstractPlayer[] players = new AbstractPlayer[4];
 
     for (int i = 0; i < players.length; i++) {
@@ -164,7 +168,7 @@ public class PlayerGui extends JPanel {
   public PlayerGui() {
     super(new GridLayout(1, 2));
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 4; i++) {
       String baseName = "player000";
       dataNames.add(baseName + i + ".dat");
     }

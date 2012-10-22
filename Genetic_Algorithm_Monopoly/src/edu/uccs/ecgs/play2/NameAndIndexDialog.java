@@ -52,7 +52,7 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
         jRadioButton1.setText("First");
-        jRadioButton1.setActionCommand("1");
+        jRadioButton1.setActionCommand("0");
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonActionPerformed(evt);
@@ -61,7 +61,7 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Second");
-        jRadioButton2.setActionCommand("2");
+        jRadioButton2.setActionCommand("1");
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonActionPerformed(evt);
@@ -70,7 +70,7 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
 
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText("Third");
-        jRadioButton3.setActionCommand("3");
+        jRadioButton3.setActionCommand("2");
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonActionPerformed(evt);
@@ -79,7 +79,7 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
 
         buttonGroup1.add(jRadioButton4);
         jRadioButton4.setText("Fourth");
-        jRadioButton4.setActionCommand("4");
+        jRadioButton4.setActionCommand("3");
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonActionPerformed(evt);
