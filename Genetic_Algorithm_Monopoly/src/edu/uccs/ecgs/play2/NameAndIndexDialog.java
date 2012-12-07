@@ -8,6 +8,7 @@ package edu.uccs.ecgs.play2;
  *
  * @author Kevin
  */
+@SuppressWarnings("serial")
 public class NameAndIndexDialog extends javax.swing.JDialog {
 
     /**
