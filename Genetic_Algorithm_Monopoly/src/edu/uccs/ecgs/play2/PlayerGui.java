@@ -32,6 +32,15 @@ public class PlayerGui extends JPanel {
     frame.setLayout(new BorderLayout());
     // Add content to the window.
     PlayerGui gui = new PlayerGui();
+
+    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      @Override
+      public void windowClosing(java.awt.event.WindowEvent e)
+      {
+        System.exit(0);
+      }
+    });
+
     frame.add(gui, BorderLayout.CENTER);
 
     frame.add(gui.getSouthBorder(), BorderLayout.SOUTH);
@@ -44,7 +53,7 @@ public class PlayerGui extends JPanel {
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
     
-    gui.playGame();
+//    gui.playGame();
   }
 
   private void playGame()
@@ -79,7 +88,7 @@ public class PlayerGui extends JPanel {
   private static void showInitialDialog()
   {
     Calendar endCal = GregorianCalendar.getInstance();
-    // set end date for research to 15 Dec 2012 
+    // set end date for research to 30 Mar 2013 
     endCal.set(2013, 2, 30, 12, 0, 0);
     
     Calendar nowCal = GregorianCalendar.getInstance();
@@ -149,16 +158,32 @@ public class PlayerGui extends JPanel {
 
   public static void main(String[] args)
   {
-    // Schedule a job for the event dispatch thread:
-    // creating and showing this application's GUI.
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run()
-      {
-        // Turn off metal's use of bold fonts
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
-        createAndShowGUI();
+    /* Set the Nimbus look and feel */
+
+    /*
+     * If Nimbus (introduced in Java SE 6) is not available, stay with the
+     * default look and feel. For details see
+     * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+     */
+    try {
+      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager
+          .getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          break;
+        }
       }
-    });
+    } catch (Exception ex) {
+      java.util.logging.Logger.getLogger(PlayerGui.class.getName())
+          .log(java.util.logging.Level.SEVERE, null, ex);
+    }
+
+    /* Create and display the dialog */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+          createAndShowGUI();        
+        }
+    });    
   }
 
   static String factoryKey = "edu.uccs.ecgs.play";
@@ -166,7 +191,7 @@ public class PlayerGui extends JPanel {
       .getPropertyFactory(factoryKey);
 
   public PlayerGui() {
-    super(new GridLayout(1, 2));
+    setLayout(new BorderLayout());
 
     for (int i = 0; i < 4; i++) {
       String baseName = "player000";
@@ -176,25 +201,27 @@ public class PlayerGui extends JPanel {
     JTabbedPane tabbedPane = new JTabbedPane();
 
     JComponent panel1 = makeTextPanel("Panel #1");
-    tabbedPane.addTab("Tab 1", panel1);
+    tabbedPane.addTab("Player 1", panel1);
     tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
     JComponent panel2 = makeTextPanel("Panel #2");
-    tabbedPane.addTab("Tab 2", panel2);
+    tabbedPane.addTab("Player 2", panel2);
     tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
     JComponent panel3 = makeTextPanel("Panel #3");
-    tabbedPane.addTab("Tab 3", panel3);
+    tabbedPane.addTab("Player 3", panel3);
     tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
-    JComponent panel4 = makeTextPanel("Panel #4 (has a preferred size of 410 x 50).");
-    panel4.setPreferredSize(new Dimension(180, 50));
-    tabbedPane.addTab("Tab 4", panel4);
+    JComponent panel4 = makeTextPanel("Panel #4");
+    //panel4.setPreferredSize(new Dimension(180, 50));
+    tabbedPane.addTab("Player 4", panel4);
     tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
 
     // Add the tabbed pane to this panel.
-    add(tabbedPane);
-
+    JPanel gamePanel = new JPanel();
+    gamePanel.setLayout(new GridLayout(1,2));
+    gamePanel.add(tabbedPane);
+    
     // The following line enables to use scrolling tabs.
     tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     
@@ -213,8 +240,17 @@ public class PlayerGui extends JPanel {
     columnHead.setPreferredSize(new Dimension(180,22));
     scrollPane.setColumnHeaderView(columnHead);
 
-    add(scrollPane);
-  }
+    gamePanel.add(scrollPane);
+
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.add(new JButton("Start"));
+    buttonPanel.add(new JButton("Pause"));
+    buttonPanel.add(new JButton("Resign"));
+
+    add(buttonPanel, BorderLayout.NORTH);
+    add(gamePanel, BorderLayout.CENTER);
+
+}
 
   protected JComponent makeTextPanel(String text)
   {
