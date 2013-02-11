@@ -149,7 +149,7 @@ public class StreetLocation extends Location {
   public String getFormattedString()
   {
     StringBuilder result = new StringBuilder();
-    result.append("Title Deed\n").append(name).append(".\n\n");
+    result.append(name).append(".\n\n");
     result.append("Rent\t\t$").append(rentUnimproved).append(".\n");
     result.append("With 1 House\t$").append(rentOneHouse).append(".\n");
     result.append("With 2 Houses\t$").append(rentTwoHouses).append(".\n");

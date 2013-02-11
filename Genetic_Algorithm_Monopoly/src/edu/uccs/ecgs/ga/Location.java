@@ -119,6 +119,15 @@ public abstract class Location implements Comparable<Location> {
   public abstract String getFormattedString();
 
   /**
+   * @return A String formatted to be the title of the card in the physical 
+   * game.
+   */
+  public String getFormattedTitle()
+  {
+    return "Title Deed";
+  }
+
+  /**
    * @return Information about the location.
    */
   public String getInfo()

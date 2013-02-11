@@ -55,27 +55,24 @@ public class SpecialLocation extends Location {
 
     switch(index) {
     case 0:
-      result.append("GO\n\nCollect $200 salary as you pass.");
+      result.append("Collect $200 salary as you pass.");
       break;
     case 2:
     case 17:
     case 33:
-      result.append("Community Chest\n\n");
       result.append("Take the top card from the community chance deck,\n");
       result.append("follow the instructions and return the card to the deck.");
       break;
     case 4:
-      result.append("Income Tax\n\nPay 10% or $200.");
+      result.append("Pay 10% or $200.");
       break;
     case 7:
     case 22:
     case 36:
-      result.append("Chance\n\n");
       result.append("Take the top card from the community chance deck,\n");
       result.append("follow the instructions and return the card to the deck.");
       break;
     case 10:
-      result.append("Jail\n\n");
       result.append("You land in Jail when...\n");
       result.append("(1) Your token lands on the space marked \"Go to Jail\",\n");
       result.append("(2) You draw a card marked \"Go to Jail\" or\n");
@@ -115,16 +112,43 @@ public class SpecialLocation extends Location {
       result.append("Free Parking");
       break;
     case 30:
-      result.append("Go to Jail\n\n");
       result.append("Go directly to Jail - do not pass Go, \n");
       result.append("do not collect $200.");
       break;
     case 38:
-      result.append("Luxury Tax\n\n");
       result.append("Pay $75");
       break;
     }
 
     return result.toString();
+  }
+
+  @Override
+  public String getFormattedTitle()
+  {
+    switch(index) {
+    case 0:
+      return "Go";
+    case 2:
+    case 17:
+    case 33:
+      return "Community Chest";
+    case 4:
+      return "Income Tax";
+    case 7:
+    case 22:
+    case 36:
+      return "Chance";
+    case 10:
+      return "Jail";      
+    case 20:
+      return "Free Parking";
+    case 30:
+      return "Go to Jail";
+    case 38:
+      return "Luxury Tax";
+    default:
+      return "";
+    }
   }
 }

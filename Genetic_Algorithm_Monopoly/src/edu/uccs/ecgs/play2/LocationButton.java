@@ -12,11 +12,7 @@ public class LocationButton extends JButton implements ActionListener {
 
   private Location location;
 
-  public LocationButton(Location location) {
-    super(location.name);
-    this.location = location;
-    this.setPreferredSize(new Dimension(60, 60));
-    
+  static {
     System.setProperty("BROWN", "0x8b4513");
     System.setProperty("LIGHT_BLUE", "0x00ced1");
     System.setProperty("PURPLE", "0xa020f0");
@@ -25,7 +21,13 @@ public class LocationButton extends JButton implements ActionListener {
     System.setProperty("YELLOW", "0xffff00");
     System.setProperty("GREEN", "0x00FF00");
     System.setProperty("DARK_BLUE", "0x0000ff");
-    
+  }
+
+  public LocationButton(Location location) {
+    super(location.name);
+    this.location = location;
+    this.setPreferredSize(new Dimension(60, 60));
+
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
       setMargin(new Insets(1, 10, 1, 1));
@@ -44,15 +46,18 @@ public class LocationButton extends JButton implements ActionListener {
   {
     JTextPane msgpane = new JTextPane();
     msgpane.setText(location.getFormattedString());
-    JOptionPane op = new JOptionPane();
-    msgpane.setBackground(op.getBackground());
-    JOptionPane.showMessageDialog(null, msgpane);
+    JDialog dialog = new JOptionPane(msgpane).createDialog("");
+    msgpane.setBackground(dialog.getRootPane().getBackground());
+    dialog.setTitle(location.getFormattedTitle());
+    dialog.setVisible(true);
   }
 
-  /** Returns an ImageIcon, or null if the path was invalid. */
+  /**
+   * Returns an ImageIcon for a railroad, utility, or special location; returns
+   * null if the location is a street.
+   */
   protected static ImageIcon createImageIcon(Location location)
   {
-    PropertyGroups group = location.getGroup();
     String path = "";
     switch (location.index) {
     case 0:

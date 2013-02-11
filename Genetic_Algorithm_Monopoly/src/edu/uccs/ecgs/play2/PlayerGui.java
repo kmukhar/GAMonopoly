@@ -149,7 +149,9 @@ public class PlayerGui extends JPanel {
       public void windowClosed(java.awt.event.WindowEvent e)
       {
         PlayerGui.playerName = dialog.getName();
+        System.out.println(playerName);
         PlayerGui.playerIndex = dialog.getIndex();
+        System.out.println(playerIndex);
       }
     });
     dialog.setLocationRelativeTo(null);
