@@ -6,7 +6,6 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
-import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 
 /**

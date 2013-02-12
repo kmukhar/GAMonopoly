@@ -1,8 +1,7 @@
 package edu.uccs.ecgs.play2;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -15,6 +14,9 @@ public class PlayerGui extends JPanel {
   private static String playerName;
   private static int playerIndex;
   private ArrayList<String> dataNames = new ArrayList<String>();
+  private JButton startButton;
+  private JButton pauseButton;
+  private JButton resignButton;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -245,14 +247,19 @@ public class PlayerGui extends JPanel {
     gamePanel.add(scrollPane);
 
     JPanel buttonPanel = new JPanel();
-    buttonPanel.add(new JButton("Start"));
-    buttonPanel.add(new JButton("Pause"));
-    buttonPanel.add(new JButton("Resign"));
+    createStartButton();
+    buttonPanel.add(startButton);
+
+    createPauseButton();
+    buttonPanel.add(pauseButton);
+    
+    createResignButton();
+    buttonPanel.add(resignButton);
 
     add(buttonPanel, BorderLayout.NORTH);
     add(gamePanel, BorderLayout.CENTER);
 
-}
+  }
 
   protected JComponent makeTextPanel(String text)
   {
@@ -318,5 +325,48 @@ public class PlayerGui extends JPanel {
     }
 
     return east;
+  }
+
+  /**
+   * 
+   */
+  private void createResignButton()
+  {
+    resignButton = new JButton("Resign");
+    resignButton.addActionListener(new ActionListener(){
+      @Override
+      public void actionPerformed(ActionEvent arg0)
+      {
+        // TODO Auto-generated method stub
+      }});
+  }
+
+  /**
+   * 
+   */
+  private void createPauseButton()
+  {
+    pauseButton = new JButton("Pause");
+    pauseButton.addActionListener(new ActionListener(){
+      @Override
+      public void actionPerformed(ActionEvent arg0)
+      {
+        // TODO Auto-generated method stub
+      }});
+  }
+
+  /**
+   * 
+   */
+  private void createStartButton()
+  {
+    startButton = new JButton("Start");
+    startButton.addActionListener(new ActionListener(){
+      @Override
+      public void actionPerformed(ActionEvent arg0)
+      {
+        // TODO Auto-generated method stub
+        
+      }});
   }
 }
