@@ -1385,13 +1385,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public String toString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-    result.append(separator).append("Player ").append(playerIndex)
+    result.append("Player ").append(playerIndex+1)
         .append(separator).append("  Total cash  : ").append(cash)
         .append(separator).append("  Net worth   : ").append(getTotalWorth())
-        .append(separator).append("  Fitness     : ").append(fitnessScore)
+//        .append(separator).append("  Fitness     : ").append(fitnessScore)
         .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
         .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
-        .append(separator);
+        .append(separator).append(separator);
 
     if (!owned.isEmpty()) {
       result.append("  Properties owned: ").append(separator);
