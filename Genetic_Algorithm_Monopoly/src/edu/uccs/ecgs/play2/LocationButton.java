@@ -11,30 +11,18 @@ public class LocationButton extends JButton implements ActionListener {
 
   private Location location;
 
-  static {
-    System.setProperty("BROWN", "0x8b4513");
-    System.setProperty("LIGHT_BLUE", "0x00ced1");
-    System.setProperty("PURPLE", "0xa020f0");
-    System.setProperty("ORANGE", "0xffa500");
-    System.setProperty("RED", "0xff0000");
-    System.setProperty("YELLOW", "0xffff00");
-    System.setProperty("GREEN", "0x00FF00");
-    System.setProperty("DARK_BLUE", "0x0000ff");
-  }
-
-  public LocationButton(Location location) {
-    super(location.name);
+  public LocationButton(Location location) {    
     this.location = location;
     this.setPreferredSize(new Dimension(60, 60));
 
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
-      setMargin(new Insets(1, 10, 1, 1));
       this.setIcon(icon);
     } else {
-      String groupName = location.getGroup().name();
-      Color color = Color.getColor(groupName);
+      Color color = location.getGroup().getColor();
+      setMargin(new Insets(1, -8, 1, 1));
       this.setBackground(color);
+      this.setText("<html><body><center><p>"+location.name+"</p></center></body></html>");
     }
 
     this.addActionListener(this);

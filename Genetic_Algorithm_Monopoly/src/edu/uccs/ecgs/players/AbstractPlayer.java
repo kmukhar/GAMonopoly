@@ -93,6 +93,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   /**
+   * @return A String that gives the name of the player in the form
+   * "Player n" where n is the playerIndex.
+   */
+  public String getName() {
+    return "Player " + playerIndex;
+  }
+
+  /**
    * Remove all properties from the player. This method simply clears the
    * player's list of owned properties. No other changes are made to the
    * player's state or to the properties' state.
@@ -1385,7 +1393,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public String toString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-    result.append("Player ").append(playerIndex+1)
+//    result.append("Player ").append(playerIndex+1)
+    result.append(getName())
         .append(separator).append("  Total cash  : ").append(cash)
         .append(separator).append("  Net worth   : ").append(getTotalWorth())
 //        .append(separator).append("  Fitness     : ").append(fitnessScore)

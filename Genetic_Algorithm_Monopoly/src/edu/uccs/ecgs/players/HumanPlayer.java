@@ -26,6 +26,16 @@ public class HumanPlayer extends AbstractPlayer {
     this.name = name;
   }
 
+  /**
+   * @return the player's name in the form "Player s" where s is the player's
+   * name.
+   */
+  @Override
+  public String getName()
+  {
+    return name;
+  }
+
   @Override
   public boolean payBailP()
   {

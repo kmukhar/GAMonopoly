@@ -14,12 +14,14 @@ import edu.uccs.ecgs.players.HumanPlayer;
 public class PlayerGui extends JPanel {
   private static String playerName;
   private static int playerIndex;
+  private static NameAndIndexDialog dialog;
   private ArrayList<String> dataNames = new ArrayList<String>();
   private JButton startButton;
   private JButton pauseButton;
   private JButton resignButton;
 
   private PlayerPanel[] playerPanels;
+  private AbstractPlayer[] players;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -35,6 +37,7 @@ public class PlayerGui extends JPanel {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     frame.setLayout(new BorderLayout());
+    
     // Add content to the window.
     PlayerGui gui = new PlayerGui();
 
@@ -63,7 +66,6 @@ public class PlayerGui extends JPanel {
 
   private void playGame()
   {
-    AbstractPlayer[] players = createPlayers();
     Main main = new Main();
     Main.paused = false;
     Monopoly game = new Monopoly(main, 0, 0, 0, players);
@@ -73,7 +75,15 @@ public class PlayerGui extends JPanel {
   private AbstractPlayer[] createPlayers()
   {
     Random r = new Random(System.currentTimeMillis());
+
+    playerName = dialog.getName();
+    playerIndex = dialog.getIndex();
+
     AbstractPlayer[] players = new AbstractPlayer[4];
+    for (int i = 0; i < 4; i++) {
+      String baseName = "player000";
+      dataNames.add(baseName + i + ".dat");
+    }
 
     for (int i = 0; i < players.length; i++) {
       AbstractPlayer player;
@@ -86,8 +96,6 @@ public class PlayerGui extends JPanel {
         player = PlayerLoader.loadPlayer(path, i);
         players[i] = player;
       }
-      playerPanels[i].setPlayer(player);
-      playerPanels[i].updatePlayerStatus();
     }
     return players;
   }
@@ -142,25 +150,8 @@ public class PlayerGui extends JPanel {
 
   private static void getNameAndIndex()
   {
-    final NameAndIndexDialog dialog = new NameAndIndexDialog(
+    dialog = new NameAndIndexDialog(
         new javax.swing.JFrame(), true);
-    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-      @Override
-      public void windowClosing(WindowEvent e)
-      {
-        // do nothing
-      }
-
-      @Override
-      public void windowClosed(java.awt.event.WindowEvent e)
-      {
-        PlayerGui.playerName = dialog.getName();
-        System.out.println(playerName);
-        PlayerGui.playerIndex = dialog.getIndex();
-        System.out.println(playerIndex);
-      }
-    });
     dialog.setLocationRelativeTo(null);
     dialog.setVisible(true);
   }
@@ -202,33 +193,25 @@ public class PlayerGui extends JPanel {
   public PlayerGui() {
     setLayout(new BorderLayout());
 
-    for (int i = 0; i < 4; i++) {
-      String baseName = "player000";
-      dataNames.add(baseName + i + ".dat");
-    }
+    players = createPlayers();
 
     JTabbedPane tabbedPane = new JTabbedPane();
 
     playerPanels = new PlayerPanel[4];
-    
-    PlayerPanel panel1 = makeTextPanel("Panel #1");
-    playerPanels[0] = panel1;
-    tabbedPane.addTab("Player 1", playerPanels[0]);
+    int tabWidth=48;
+
+    for (int i = 0; i < playerPanels.length; i++) {
+      PlayerPanel panel = makeTextPanel();
+      playerPanels[i] = panel;
+      tabbedPane.addTab("<html><body><table width='" + tabWidth + "'>"
+          + players[i].getName() + "</table></body></html>", panel);
+      playerPanels[i].setPlayer(players[i]);
+      playerPanels[i].updatePlayerStatus();
+    }
+
     tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-
-    PlayerPanel panel2 = makeTextPanel("Panel #2");
-    playerPanels[1] = panel2;
-    tabbedPane.addTab("Player 2", playerPanels[1]);
     tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
-
-    PlayerPanel panel3 = makeTextPanel("Panel #3");
-    playerPanels[2] = panel3;
-    tabbedPane.addTab("Player 3", playerPanels[2]);
     tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
-
-    PlayerPanel panel4 = makeTextPanel("Panel #4");
-    playerPanels[3] = panel4;
-    tabbedPane.addTab("Player 4", playerPanels[3]);
     tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
 
     // Add the tabbed pane to this panel.
@@ -271,7 +254,7 @@ public class PlayerGui extends JPanel {
 
   }
 
-  protected PlayerPanel makeTextPanel(String text)
+  protected PlayerPanel makeTextPanel()
   {
     PlayerPanel panel = new PlayerPanel();
     return panel;

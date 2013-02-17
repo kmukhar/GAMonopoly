@@ -1,11 +1,37 @@
 package edu.uccs.ecgs.ga;
 
+import java.awt.Color;
+
 public enum PropertyGroups {
   BROWN, LIGHT_BLUE, PURPLE, RED, ORANGE, YELLOW, GREEN, DARK_BLUE, RAILROADS, UTILITIES, SPECIAL;
+
+  static {
+    System.setProperty("BROWN", "0x8b4513");
+    System.setProperty("LIGHT_BLUE", "0x00ced1");
+    System.setProperty("PURPLE", "0xa020f0");
+    System.setProperty("ORANGE", "0xffa500");
+    System.setProperty("RED", "0xff0000");
+    System.setProperty("YELLOW", "0xffff00");
+    System.setProperty("GREEN", "0x00FF00");
+    System.setProperty("DARK_BLUE", "0x0000ff");
+  }
 
   public String toString()
   {
     return name().substring(0, 1) + name().substring(1).toLowerCase();
+  }
+
+  public Color getColor()
+  {
+    switch (this) {
+    case RAILROADS:
+    case UTILITIES:
+    case SPECIAL:
+      return null;
+    default:
+      break;
+    }
+    return Color.getColor(name());
   }
 
   /**
