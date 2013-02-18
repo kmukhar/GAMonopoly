@@ -11,7 +11,7 @@ public enum CommunityChest {
   HOLIDAY_FUND;
 
   public void processCard(AbstractPlayer player, Monopoly game) throws BankruptcyException {
-    game.logFinest("Processing Community Chest Card '" + toString()
+    game.logInfo("Processing Community Chest Card '" + toString()
         + "' for player " + player.playerIndex);
 
     switch (this) {

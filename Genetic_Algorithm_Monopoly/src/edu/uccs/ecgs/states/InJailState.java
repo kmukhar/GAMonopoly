@@ -68,11 +68,11 @@ public class InJailState extends PlayerState {
       //use a Get Out Of Jail Card first, if they have one
       if (player.hasGetOutOfJailCard()) {
         player.useGetOutOfJailCard();
-        game.logFinest("Player used Get Out of Jail Free card");
+        game.logInfo("Player used Get Out of Jail Free card");
       } else {
         //actually pay bail
         try {
-          game.logFinest("Player will pay $50 to get out of jail");
+          game.logInfo("Player will pay $50 to get out of jail");
           player.getCash(50);
         } catch (BankruptcyException e) {
           //e.printStackTrace();

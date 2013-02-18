@@ -1,8 +1,10 @@
 package edu.uccs.ecgs.ga;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.logging.*;
 
 import javax.swing.JFileChooser;
 import edu.uccs.ecgs.players.ChromoTypes;
@@ -10,14 +12,14 @@ import edu.uccs.ecgs.players.ChromoTypes;
 public class Utility
 {
   private static String rootDir;
-  private String rootDir2;
+  private static String rootDir2;
 
   public synchronized Path getDirForGen(int generation)
   {
     return getDirForGen(null, null, generation);
   }
 
-  public synchronized Path getDirForGen(ChromoTypes chromoType,
+  public static synchronized Path getDirForGen(ChromoTypes chromoType,
       FitEvalTypes fitEval, int generation)
   {
     File f = null;
@@ -80,4 +82,100 @@ public class Utility
 
     return path;
   }
+
+  /**
+   * Create a formatter and set logging on or off depending on state of
+   * {@link Main#debug}. If Main.debug is true, then logging is
+   * turned on; if debug is false, logging is turned off.
+   */
+  public static Logger initLogger(int generation, int match, int game,
+                                  String gamekey)
+  {
+    Logger logger = null;
+    if (Main.debug != Level.OFF) {
+      logger = Logger.getLogger(gamekey);
+      logger.setLevel(Main.debug);
+
+      logFileSetup(logger, generation, match, game);
+    }
+    return logger;
+  }
+
+  /**
+   * Create the log file based on generation, match, and game number, and add
+   * the formatter to the logger.
+   */
+  public static void logFileSetup(Logger logger, int generation, int match,
+                                  int game)
+  {
+    Path dir = getDirForGen(Main.chromoType,
+        Main.fitnessEvaluator, generation);
+
+    dir = dir.resolve(getMatchString(match).toString());
+    File file = dir.toFile();
+    if (!file.exists()) {
+      file.mkdir();
+    }
+
+    StringBuilder fileName = new StringBuilder();
+    fileName.append(getGameString(game)).append(".rtf");
+
+    try {
+      FileHandler fh = new FileHandler(dir.resolve(fileName.toString())
+          .toString(), false);
+      logger.addHandler(fh);
+
+      Formatter formatter = new Formatter() {
+        @Override
+        public String format(LogRecord record) {
+          return record.getMessage() + "\n";
+          //TODO
+//          return Monopoly.this.generation + ":" + Monopoly.this.match
+//              + ":" + Monopoly.this.game + ":"
+//              + Thread.currentThread().getName() + ":"
+//              + dateFormat.format(Calendar.getInstance().getTime()) + ": "
+//              + record.getMessage() + "\n";
+        }
+      };
+
+      fh.setFormatter(formatter);
+
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+
+  /**
+   * @return A string of the form "Match_nnn" where nnn is the match number.
+   */
+  private static StringBuilder getMatchString(int match) {
+    StringBuilder result = new StringBuilder("" + match);
+
+    while (result.length() < 3) {
+      result.insert(0, 0);
+    }
+
+    result.insert(0, "Match_");
+
+    return result;
+  }
+
+  /**
+   * @return A string of the form "Game_nnn" where nnn is the game number.
+   */
+  private static String getGameString(int game) {
+    StringBuilder result = new StringBuilder("" + game);
+
+    while (result.length() < 3) {
+      result.insert(0, 0);
+    }
+
+    result.insert(0, "Game_");
+
+    return result.toString();
+  }
+
 }

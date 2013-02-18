@@ -15,6 +15,7 @@ import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.players.PlayerFactory;
 
@@ -99,7 +100,7 @@ public class GAEngine implements Runnable {
     if (program.loadFromDisk == LoadTypes.NO_LOAD) {
       // Create new population of players
       for (int i = 0; i < Main.maxPlayers; i++) {
-        AbstractPlayer player = PlayerFactory.getPlayer(i, program.chromoType);
+        AbstractPlayer player = PlayerFactory.getPlayer(i, Main.chromoType);
         player.initCash(1500);
         playerPool.add(player);
       }
@@ -168,7 +169,7 @@ public class GAEngine implements Runnable {
         fitEval = FitEvalTypes.valueOf(evaluator).get();
       } else {
         // otherwise use the specified evaluator
-        fitEval = program.fitnessEvaluator.get();
+        fitEval = Main.fitnessEvaluator.get();
       }
 
       validateNumMatches(fitEval);
@@ -182,8 +183,11 @@ public class GAEngine implements Runnable {
         games = new ArrayList<Monopoly>();
 
         while (!playerPool.isEmpty()) {
-          Monopoly game = new Monopoly(program, generation, matches,
-              gameNumber, getFourPlayers());
+          Monopoly game = new Monopoly(generation, matches, gameNumber,
+              getFourPlayers());
+          Logger logger = Utility.initLogger(generation, matches, gameNumber,
+              game.gamekey);
+          game.setLogger(logger);
 
           games.add(game);
           gameExecutor.execute(game);
@@ -324,8 +328,8 @@ public class GAEngine implements Runnable {
 
     fitness.addAll(playerPool);
 
-    Path dir = program.getDirForGen(program.chromoType,
-        program.fitnessEvaluator, generation);
+    Path dir = Utility.getDirForGen(Main.chromoType,
+        Main.fitnessEvaluator, generation);
 
     // dump the score counts
     BufferedWriter bw = null;
@@ -440,8 +444,8 @@ public class GAEngine implements Runnable {
       fn1.insert(0, "player");
       fn1.append(".dat");
 
-      Path dir = program.getDirForGen(program.chromoType,
-          program.fitnessEvaluator, generation);
+      Path dir = Utility.getDirForGen(Main.chromoType,
+          Main.fitnessEvaluator, generation);
 
       DataOutputStream dos = null;
       try {
@@ -473,5 +477,14 @@ public class GAEngine implements Runnable {
     for (Monopoly game : games) {
       game.resume();
     }
+  }
+  
+  /**
+   * Send pause signal to all games.
+   */
+  public void pause() {
+    for (Monopoly game : games) {
+      game.pause();
+    }    
   }
 }

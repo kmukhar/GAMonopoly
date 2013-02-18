@@ -178,7 +178,7 @@ public class AtNewLocationState extends PlayerState {
           return developPropertyState;
         }
       } else if (location.name.equals("Go To Jail")) {
-        game.logFinest("Player " + player.playerIndex + " landed on Go To Jail.");
+        game.logInfo("Player " + player.playerIndex + " landed on Go To Jail.");
 
         PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
         player.enteredJail();

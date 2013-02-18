@@ -2,7 +2,6 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;

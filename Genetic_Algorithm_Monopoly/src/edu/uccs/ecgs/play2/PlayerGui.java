@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.*;
 import javax.swing.*;
 
 import edu.uccs.ecgs.ga.*;
@@ -17,11 +18,15 @@ public class PlayerGui extends JPanel {
   private static NameAndIndexDialog dialog;
   private ArrayList<String> dataNames = new ArrayList<String>();
   private JButton startButton;
-  private JButton pauseButton;
+//  private JButton pauseButton;
   private JButton resignButton;
+  private JButton nextButton;
 
   private PlayerPanel[] playerPanels;
   private AbstractPlayer[] players;
+  private Main main;
+  private Monopoly game;
+  private JTextArea gameInfo;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -66,10 +71,11 @@ public class PlayerGui extends JPanel {
 
   private void playGame()
   {
-    Main main = new Main();
-    Main.paused = false;
-    Monopoly game = new Monopoly(main, 0, 0, 0, players);
-//    game.run();
+    main = new Main();
+    main.pause();
+    Main.maxTurns = 500; // set a high number so the game can run to finish
+    game = new Monopoly(0, 0, 0, players);
+    game.setLogger(createTextAreaLogger());
   }
 
   private AbstractPlayer[] createPlayers()
@@ -201,7 +207,7 @@ public class PlayerGui extends JPanel {
     int tabWidth=48;
 
     for (int i = 0; i < playerPanels.length; i++) {
-      PlayerPanel panel = makeTextPanel();
+      PlayerPanel panel = makePlayerPanel();
       playerPanels[i] = panel;
       tabbedPane.addTab("<html><body><table width='" + tabWidth + "'>"
           + players[i].getName() + "</table></body></html>", panel);
@@ -222,12 +228,12 @@ public class PlayerGui extends JPanel {
     // The following line enables to use scrolling tabs.
     tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     
-    JTextArea textArea = new JTextArea();
-    textArea.setEditable(false);
-    textArea.setLineWrap(true);
-    textArea.setWrapStyleWord(true);
+    gameInfo = new JTextArea();
+    gameInfo.setEditable(false);
+    gameInfo.setLineWrap(true);
+    gameInfo.setWrapStyleWord(true);
 
-    JScrollPane scrollPane = new JScrollPane(textArea);
+    JScrollPane scrollPane = new JScrollPane(gameInfo);
     scrollPane.setPreferredSize(new Dimension(180,50));
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -243,9 +249,12 @@ public class PlayerGui extends JPanel {
     createStartButton();
     buttonPanel.add(startButton);
 
-    createPauseButton();
-    buttonPanel.add(pauseButton);
-    
+//    createPauseButton();
+//    buttonPanel.add(pauseButton);
+
+    createNextButton();
+    buttonPanel.add(nextButton);
+
     createResignButton();
     buttonPanel.add(resignButton);
 
@@ -254,7 +263,7 @@ public class PlayerGui extends JPanel {
 
   }
 
-  protected PlayerPanel makeTextPanel()
+  protected PlayerPanel makePlayerPanel()
   {
     PlayerPanel panel = new PlayerPanel();
     return panel;
@@ -322,6 +331,7 @@ public class PlayerGui extends JPanel {
   private void createResignButton()
   {
     resignButton = new JButton("Resign");
+    resignButton.setEnabled(false);
     resignButton.addActionListener(new ActionListener(){
       @Override
       public void actionPerformed(ActionEvent arg0)
@@ -335,13 +345,38 @@ public class PlayerGui extends JPanel {
    */
   private void createPauseButton()
   {
-    pauseButton = new JButton("Pause");
-    pauseButton.addActionListener(new ActionListener(){
+//    pauseButton = new JButton("Pause");
+//    pauseButton.setEnabled(false);
+//    pauseButton.addActionListener(new ActionListener(){
+//      @Override
+//      public void actionPerformed(ActionEvent arg0)
+//      {
+//        if (pauseButton.getText().equalsIgnoreCase("pause")) {
+//          main.pause();
+//          pauseButton.setText("Resume");
+//        } else {
+//          pauseButton.setText("Pause");
+//          main.resume();
+//          game.resume();
+//        }
+//      }});
+  }
+
+  /**
+   * 
+   */
+  private void createNextButton()
+  {
+    nextButton = new JButton("Next");
+    nextButton.setEnabled(false);
+    nextButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
-        // TODO Auto-generated method stub
-      }});
+        main.resume();
+        game.resume();
+      }
+    });
   }
 
   /**
@@ -354,8 +389,24 @@ public class PlayerGui extends JPanel {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
-        // TODO Auto-generated method stub
-        
+        startButton.setEnabled(false);
+//        pauseButton.setEnabled(true);
+        nextButton.setEnabled(true);
+        Thread t = new Thread(game); //TODO
+        t.start();
       }});
+  }
+
+  /**
+   * 
+   * @return
+   */
+  private Logger createTextAreaLogger()
+  {
+    Logger logger = Logger.getLogger("edu.uccs.ecgs");
+    logger.setLevel(Level.INFO);
+    Handler h = new TextAreaHandler(gameInfo);
+    logger.addHandler(h);
+    return logger;
   }
 }

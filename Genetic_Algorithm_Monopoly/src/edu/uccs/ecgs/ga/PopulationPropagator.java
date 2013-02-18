@@ -143,10 +143,11 @@ public class PopulationPropagator {
   public Vector<AbstractPlayer> loadPlayers(int generation) {
     int playerCount = 0;
 
-    Vector<AbstractPlayer> newPopulation = new Vector<AbstractPlayer>(Main.maxPlayers);
+    Vector<AbstractPlayer> newPopulation = 
+        new Vector<AbstractPlayer>(Main.maxPlayers);
 
-    Path dir = program.getDirForGen(program.chromoType, program.fitnessEvaluator,
-        generation);
+    Path dir = Utility.getDirForGen(Main.chromoType,
+        Main.fitnessEvaluator, generation);
 
     File theDirectory = dir.toFile();
     String[] files = theDirectory.list();

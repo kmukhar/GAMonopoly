@@ -59,6 +59,54 @@ public class HumanPlayer extends AbstractPlayer {
     return result == JOptionPane.YES_OPTION;
   }
 
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#getBidForLocation(edu.uccs.ecgs.ga.Location)
+   */
+  @Override
+  public int getBidForLocation(Location currentLocation)
+  {
+    int bid = 0;
+    while (true) {
+      String result = JOptionPane.showInputDialog(null, "<html><body>"
+          + currentLocation.name + " is being auctioned.<p>"
+          + "What is the maximum you want to bid for this property?"
+          + "</body></html>", "Bid for property", JOptionPane.QUESTION_MESSAGE);
+      try {
+        bid = Integer.parseInt(result);
+        break;
+      } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "<html><body>"
+            + "Your bid does not appear to be valid.<p>"
+            + "Please enter a whole number between 0 "
+            + "and your total amount of cash.<p>"
+            + "Bid 0 to decline the auction" + "</body></html>", "Bid error",
+            JOptionPane.ERROR_MESSAGE);
+      }
+    }
+
+    return bid;
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#evaluateTrade(edu.uccs.ecgs.ga.TradeProposal)
+   */
+  @Override
+  public int evaluateTrade(TradeProposal trade)
+  {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#answerProposedTrade(edu.uccs.ecgs.ga.TradeProposal)
+   */
+  @Override
+  public boolean answerProposedTrade(TradeProposal bestTrade)
+  {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
   @Override
   public void dumpGenome(DataOutputStream out) throws IOException {}
 

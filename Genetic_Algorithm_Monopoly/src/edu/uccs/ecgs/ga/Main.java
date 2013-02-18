@@ -1,7 +1,6 @@
 package edu.uccs.ecgs.ga;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -51,7 +50,7 @@ public class Main {
   /**
    * The fitness evaluator type to use for the algorithm.
    */
-  public FitEvalTypes fitnessEvaluator = FitEvalTypes.NUM_WINS;
+  public static FitEvalTypes fitnessEvaluator = FitEvalTypes.NUM_WINS;
 
   /**
 	 * Should existing players be loaded from data files
@@ -69,7 +68,7 @@ public class Main {
   /**
    * Whether or not to output debug information.
    */
-  public Level debug = Level.OFF;
+  public static Level debug = Level.OFF;
 
   /**
    * Which chromosome types to use for a player. See
@@ -78,7 +77,7 @@ public class Main {
    * {@link edu.uccs.ecgs.ga.PlayerFactory#getPlayer(int index, ChromoTypes chromoType)}
    * .
    */
-  public ChromoTypes chromoType = ChromoTypes.TGA;
+  public static ChromoTypes chromoType = ChromoTypes.TGA;
 
   /**
    * Rate at which to mutate the genome.
@@ -103,11 +102,7 @@ public class Main {
 
   private Gui gui = null;
 
-  private Utility utility;
-
   public static boolean useGui = false;
-
-  public static boolean paused = true;
 
   public static boolean started = false;
 
@@ -196,7 +191,6 @@ public class Main {
   public void startSimulation()
   {
     started = true;
-    paused = false;
     gaEngine = new GAEngine(this);
 
     Thread t = new Thread(gaEngine);
@@ -224,7 +218,8 @@ public class Main {
    */
   public void pause()
   {
-    paused = true;
+    if (gaEngine != null)
+      gaEngine.pause();
   }
 
   /**
@@ -232,8 +227,8 @@ public class Main {
    */
   public void resume()
   {
-    paused = false;
-    gaEngine.resume();
+    if (gaEngine != null)
+      gaEngine.resume();
   }
 
   /**
@@ -408,12 +403,5 @@ public class Main {
   }
 
   public Main() {
-    utility = new Utility();
-  }
-
-  public Path getDirForGen(ChromoTypes chromoType,
-      FitEvalTypes fitEval, int generation)
-  {
-    return utility.getDirForGen(chromoType, fitEval, generation);
   }
 }

@@ -27,7 +27,7 @@ public class BuyPropertyState extends PlayerState {
 
       assert player.canRaiseCash(location.getCost()) : "Player cannot raise cash: " + location.getCost();
       
-      game.logFinest("Player " + player.playerIndex + " has decided to buy "
+      game.logInfo("Player " + player.playerIndex + " has decided to buy "
           + location.name + " for " + location.getCost() + " dollars.");
       
       try {
@@ -36,7 +36,7 @@ public class BuyPropertyState extends PlayerState {
         player.addProperty(location);
         PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
         if (location.partOfMonopoly) {
-          game.logFinest("Player " + player.playerIndex
+          game.logInfo("Player " + player.playerIndex
               + " acquired monopoly with " + location.name);
         }
       } catch (BankruptcyException e) {

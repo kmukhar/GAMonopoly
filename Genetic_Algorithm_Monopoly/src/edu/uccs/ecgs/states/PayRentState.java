@@ -24,14 +24,14 @@ public class PayRentState extends PlayerState {
 
       if (location.owner != player) {
         if (location.isMortgaged()) {
-            game.logFinest("Lot is mortgaged, rent: 0");
+            game.logInfo("Lot is mortgaged, rent: 0");
             location.resetRentMultiplier();
         } else {
           int amount = location.getRent(game.getDice().getLastRoll());
           assert amount >= 0 : "Invalid rent: " + location.name + "; rent: "
               + amount;
 
-          game.logFinest("Rent for " + location.toString() + ": " + amount);
+          game.logInfo("Rent for " + location.toString() + ": " + amount);
           
           if (amount > 0) {
             try {

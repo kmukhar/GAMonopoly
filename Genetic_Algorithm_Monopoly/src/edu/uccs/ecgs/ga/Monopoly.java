@@ -1,16 +1,9 @@
 package edu.uccs.ecgs.ga;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.states.Events;
@@ -18,8 +11,6 @@ import edu.uccs.ecgs.states.Events;
 public class Monopoly implements Runnable {
 
   private Logger logger;
-  Formatter formatter;
-  FileHandler fh;
 
   boolean done = false;
 
@@ -49,7 +40,7 @@ public class Monopoly implements Runnable {
 
   public String gamekey;
   private long seed;
-  private Main program;
+  private boolean paused = false;
 
   /**
    * Constructor
@@ -58,15 +49,15 @@ public class Monopoly implements Runnable {
    * @param gameNumber Game number for this game.
    * @param players Array of players for this game.
    */
-  public Monopoly(Main main, int generation, int match, int gameNumber,
+  public Monopoly(int generation, int match, int gameNumber,
       AbstractPlayer[] players) {
-    this.program = main;
     this.generation = generation;
     this.match = match;
     this.game = gameNumber;
     this.players = players;
 
-    gamekey = "edu.uccs.ecgs.ga." + this.generation + "." + this.match + "." + game;
+    gamekey = "edu.uccs.ecgs.ga." + this.generation + "." + this.match + "."
+        + game;
 
     r = new Random();
     seed = 1241797664697L;
@@ -102,8 +93,6 @@ public class Monopoly implements Runnable {
    * Play the game
    */
   private void playGame() {
-    initLogger();
-
     done = false;
 
     logFinest("Started game " + this.generation + "." + this.match + "." + this.game + " with players: ");
@@ -121,15 +110,19 @@ public class Monopoly implements Runnable {
 
     while (!done) {
 
+      paused = true;
+      
       synchronized (this) {
-        if (Main.paused) {
+        if (paused) {
           try {
+            System.out.println("Game is pausing");
             wait();
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
         }
       }
+      System.out.println("Game resumed");
 
       ++turnCounter;
       if (turnCounter == Main.maxTurns * Main.numPlayers) {
@@ -139,9 +132,10 @@ public class Monopoly implements Runnable {
       AbstractPlayer player = getNextPlayer();
       player.resetDoubles();
 
-      logFinest("");
-      logFinest("Turn: " + turnCounter);
-      logFinest("Player " + player.playerIndex);
+      logInfo("");
+      logInfo("Turn: " + turnCounter);
+      // logInfo("Player " + player.playerIndex);
+      logInfo(player.getName());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;
       Actions action = Actions.NULL;
@@ -279,96 +273,6 @@ public class Monopoly implements Runnable {
   }
 
   /**
-   * Create a formatter and set logging on or off depending on state of
-   * {@link Main#debug}. If Main.debug is true, then logging is
-   * turned on; if debug is false, logging is turned off.
-   */
-  public void initLogger() {
-    if (program.debug != Level.OFF) {
-      logger = Logger.getLogger(gamekey);
-      logger.setLevel(program.debug);
-
-      formatter = new Formatter() {
-        @Override
-        public String format(LogRecord record) {
-          return record.getMessage() + "\n";
-          //TODO
-//          return Monopoly.this.generation + ":" + Monopoly.this.match
-//              + ":" + Monopoly.this.game + ":"
-//              + Thread.currentThread().getName() + ":"
-//              + dateFormat.format(Calendar.getInstance().getTime()) + ": "
-//              + record.getMessage() + "\n";
-        }
-      };
-
-      logFileSetup();
-    }
-  }
-
-  /**
-   * Create the log file based on generation, match, and game number, and add
-   * the formatter to the logger.
-   */
-  public void logFileSetup() {
-    Path dir = program.getDirForGen(program.chromoType,
-        program.fitnessEvaluator, generation);
-
-    dir = dir.resolve(getMatchString().toString());
-    File file = dir.toFile();
-    if (!file.exists()) {
-      file.mkdir();
-    }
-
-    StringBuilder fileName = new StringBuilder();
-    fileName.append(getGameString()).append(".rtf");
-
-    try {
-      fh = new FileHandler(dir.resolve(fileName.toString()).toString(), false);
-      logger.addHandler(fh);
-      fh.setFormatter(formatter);
-
-    } catch (SecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Create a string of the form "Match_nnn" where nnn is the match number.
-   * 
-   * @return A string of the form "Match_nnn" where nnn is the match number.
-   */
-  private StringBuilder getMatchString() {
-    StringBuilder result = new StringBuilder("" + match);
-
-    while (result.length() < 3) {
-      result.insert(0, 0);
-    }
-
-    result.insert(0, "Match_");
-
-    return result;
-  }
-
-  /**
-   * Create a string of the form "Game_nnn" where nnn is the game number.
-   * 
-   * @return A string of the form "Game_nnn" where nnn is the game number.
-   */
-  private String getGameString() {
-    StringBuilder result = new StringBuilder("" + game);
-
-    while (result.length() < 3) {
-      result.insert(0, 0);
-    }
-
-    result.insert(0, "Game_");
-
-    return result.toString();
-  }
-
-  /**
    * Sell a house from the given location. The proceeds from the sale are given
    * to the player that owns the property (identified by location.owner).
    * 
@@ -380,7 +284,8 @@ public class Monopoly implements Runnable {
     location.owner.receiveCash(location.getHouseCost() / 2);
     ++numHouses;
     
-    logFinest("Sold house at " + location.toString() + "; property now has " + location.getNumHouses() + " houses");
+    logInfo("Sold house at " + location.toString() + "; property now has "
+        + location.getNumHouses() + " houses");
     
     assert numHouses < 33 : "Invalid number of houses: " + numHouses;
   }
@@ -433,7 +338,7 @@ public class Monopoly implements Runnable {
     default:
       // more than 4 houses
       location.removeHotel();
-      logFinest("Sold hotel at " + location.toString() + "; property now has 4 houses");
+      logInfo("Sold hotel at " + location.toString() + "; property now has 4 houses");
       player.receiveCash(location.getHotelCost() / 2);
       ++numHotels;
       assert numHotels <= 12 : "Invalid number of hotels: " + numHotels;
@@ -628,7 +533,7 @@ public class Monopoly implements Runnable {
         ++count;
 
         loc.removeHotel();
-        logFinest("Sold hotel at " + loc.toString());
+        logInfo("Sold hotel at " + loc.toString());
         ++numHotels;
         assert numHotels < 13 : "Invalid number hotels: " + numHotels;
 
@@ -670,7 +575,7 @@ public class Monopoly implements Runnable {
    */
   public void buyHouse(AbstractPlayer player, Location location) {
     if (numHouses == 0) {
-      logFinest("Player " + player.playerIndex
+      logInfo("Player " + player.playerIndex
           + " wanted to buy house, but none are available");
       return;
     }
@@ -685,7 +590,7 @@ public class Monopoly implements Runnable {
       player.getCash(location.getHouseCost());
       location.addHouse();
       --numHouses;
-      logFinest("Bought house for property group " + location.getGroup());
+      logInfo("Bought house for property group " + location.getGroup());
       assert numHouses >= 0 : "Invalid number of houses: " + numHouses;
       logFinest("Bank now has " + numHouses + " houses");
     } catch (BankruptcyException ignored) {
@@ -712,7 +617,7 @@ public class Monopoly implements Runnable {
       location.addHotel();
       --numHotels;
       player.getCash(location.getHotelCost());
-      logFinest("Bought hotel at " + location.toString());
+      logInfo("Bought hotel at " + location.toString());
       assert numHotels >= 0 : "Invalid number of hotels: " + numHotels;
 
       // add the houses back to the bank
@@ -743,7 +648,7 @@ public class Monopoly implements Runnable {
   public void processBankruptcy(AbstractPlayer player,
       AbstractPlayer gainingPlayer) {
 
-    logFinest("Player " + player.playerIndex + " is bankrupt");
+    logInfo("Player " + player.playerIndex + " is bankrupt");
     player.setBankruptIndex(bankruptCount);
     ++bankruptCount;
 
@@ -753,9 +658,9 @@ public class Monopoly implements Runnable {
     }
 
     if (gainingPlayer != null) {
-      logFinest("Gaining player is " + gainingPlayer.playerIndex);
+      logInfo("Gaining player is " + gainingPlayer.playerIndex);
     } else {
-      logFinest("Gaining player is bank");
+      logInfo("Gaining player is bank");
     }
 
     // return any get out of jail cards to the stack
@@ -807,7 +712,7 @@ public class Monopoly implements Runnable {
     String msg = "";
 
     for (Location location : lotsToAuction.values()) {
-      logFinest("Bank is auctioning " + location.name);
+      logInfo("Bank is auctioning " + location.name);
 
       int highBid = 0;
       AbstractPlayer highBidPlayer = null;
@@ -815,7 +720,7 @@ public class Monopoly implements Runnable {
 
       for (AbstractPlayer p : players) {
         int bid = p.getBidForLocation(location);
-        logFinest("Player " + p.playerIndex + " has " + p.cash
+        logInfo("Player " + p.playerIndex + " has " + p.cash
             + " dollars and bids " + bid);
 
         if (bid > highBid) {
@@ -855,15 +760,15 @@ public class Monopoly implements Runnable {
       }
     }
 
-    logFinest("Auction has ended " + msg);
+    logInfo("Auction has ended " + msg);
     boolean printHead = true;
     for (Location location : lotsToAuction.values()) {
       if (location.owner == null) {
         if (printHead) {
-          logFinest("The following lots were not bought at auction:");
+          logInfo("The following lots were not bought at auction:");
           printHead = false;
         }
-        logFinest(location.name);
+        logInfo(location.name);
       }
     }
   }
@@ -879,13 +784,13 @@ public class Monopoly implements Runnable {
       int amount) throws BankruptcyException 
   {
     aPlayer.getCash(amount);
-    logFinest("Player " + aPlayer.playerIndex + " won auction for "
+    logInfo("Player " + aPlayer.playerIndex + " won auction for "
         + aLocation.name);
     aLocation.setOwner(aPlayer);
     aPlayer.addProperty(aLocation);
     PropertyFactory.getPropertyFactory(gamekey).checkForMonopoly();
     if (aLocation.partOfMonopoly) {
-      logFinest("Player " + aPlayer.playerIndex + " acquired monopoly with "
+      logInfo("Player " + aPlayer.playerIndex + " acquired monopoly with "
           + aLocation.name);
     }
   }
@@ -902,18 +807,26 @@ public class Monopoly implements Runnable {
    * Unpause the game.
    */
   public synchronized void resume() {
+    paused = false;
     notify();
+  }
+
+  public void pause() {
+    paused  = true;
   }
 
   /**
    * Release the logger resources and PropertyFactory resource for this game.
    */
   public void endGame() {
-    if (fh != null) {
-      fh.flush();
-      fh.close();
-      logger.removeHandler(fh);
-      fh = null;
+    if (logger != null) {
+      Handler[] handlers = logger.getHandlers();
+      for (Handler handler : handlers) {
+        handler.flush();
+        handler.close();
+        logger.removeHandler(handler);
+        handler = null;
+      }
     }
     PropertyFactory.releasePropertyFactory(gamekey);
     logger = null;
@@ -998,11 +911,10 @@ public class Monopoly implements Runnable {
    *          The values of each dice.
    */
   public void logDiceRoll(int[] roll) {
-    logFinest("Dice 1: " + roll[0]);
-    logFinest("Dice 2: " + roll[1]);
+    logInfo("Dice : " + roll[0]+"; " + roll[1]);
 
     if (roll[0] == roll[1]) {
-      logFinest("Doubles!!");
+      logInfo("Doubles!!");
     }
   }
 
@@ -1036,6 +948,10 @@ public class Monopoly implements Runnable {
     if (logger != null) {
       logger.severe(s);
     }
+  }
+
+  public void setLogger (Logger logger) {
+    this.logger = logger;
   }
 
   /**

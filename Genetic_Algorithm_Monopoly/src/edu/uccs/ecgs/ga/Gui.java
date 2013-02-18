@@ -28,13 +28,15 @@ public class Gui extends JFrame {
   public JTextField genNum = new JTextField(4);
 	private JTextField tfLoadGenNum;
 
+  private final static String PAUSE_GAMES = "Pause All Games";
+  private final static String RESUME_GAMES = "Resume All Games";
   public Gui(Main main) {
     this.program = main;
   }
   
   public void init(Object[][] fields) {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setTitle("Simulation with chromosome type " + program.chromoType);
+    setTitle("Simulation with chromosome type " + Main.chromoType);
 
     this.getContentPane().add(getSimPanel(fields));
     this.pack();
@@ -113,7 +115,7 @@ public class Gui extends JFrame {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         if (!Main.started) {
-          button.setText("Pause All Games");
+          button.setText(PAUSE_GAMES);
           Thread t = new Thread(new Runnable(){
             @Override
             public void run() {
@@ -121,14 +123,14 @@ public class Gui extends JFrame {
               startSimulation();
             }});
           t.start();
-        } else if (Main.paused) {
-          // button currently says Run Monopoly
-          button.setText("Pause All Games");
-          program.resume();
-        } else {
-          // button currently says Pause Monopoly
-          button.setText("Restart All Games");
+        } else if (button.getText().equalsIgnoreCase(PAUSE_GAMES)) {
+          // button currently says Pause All Games
+          button.setText(RESUME_GAMES);
           program.pause();
+        } else {
+          // button currently says Resume All Games
+          button.setText(PAUSE_GAMES);
+          program.resume();
         }
       }
     });
@@ -149,11 +151,11 @@ public class Gui extends JFrame {
     } else if (label.equalsIgnoreCase(Main.randomSeedLabel)) {
       ((JComboBox) choice).setSelectedItem(Main.useRandomSeed);      
     } else if (label.equalsIgnoreCase(Main.fitEvalLabel)){
-      ((JComboBox) choice).setSelectedItem(program.fitnessEvaluator);
+      ((JComboBox) choice).setSelectedItem(Main.fitnessEvaluator);
     } else if (label.equalsIgnoreCase(Main.debugLabel)) {
-      ((JComboBox) choice).setSelectedItem(program.debug.toString());
+      ((JComboBox) choice).setSelectedItem(Main.debug.toString());
     } else if (label.equalsIgnoreCase(Main.chromoLabel)) {
-      ((JComboBox) choice).setSelectedItem(program.chromoType);
+      ((JComboBox) choice).setSelectedItem(Main.chromoType);
     }
   }
 

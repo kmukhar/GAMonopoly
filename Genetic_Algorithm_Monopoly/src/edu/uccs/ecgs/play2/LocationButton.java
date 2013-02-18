@@ -13,7 +13,7 @@ public class LocationButton extends JButton implements ActionListener {
 
   public LocationButton(Location location) {    
     this.location = location;
-    this.setPreferredSize(new Dimension(60, 60));
+    this.setPreferredSize(new Dimension(75, 75));
 
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
