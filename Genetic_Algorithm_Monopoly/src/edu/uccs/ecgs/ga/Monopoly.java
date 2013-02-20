@@ -97,7 +97,7 @@ public class Monopoly implements Runnable {
 
     logFinest("Started game " + this.generation + "." + this.match + "." + this.game + " with players: ");
     for (AbstractPlayer p : players) {
-      logFinest("Player " + p.playerIndex);
+      logFinest(p.getName());
     }
 
     for (AbstractPlayer player : players) {
@@ -575,7 +575,7 @@ public class Monopoly implements Runnable {
    */
   public void buyHouse(AbstractPlayer player, Location location) {
     if (numHouses == 0) {
-      logInfo("Player " + player.playerIndex
+      logInfo(player.getName()
           + " wanted to buy house, but none are available");
       return;
     }
@@ -648,7 +648,7 @@ public class Monopoly implements Runnable {
   public void processBankruptcy(AbstractPlayer player,
       AbstractPlayer gainingPlayer) {
 
-    logInfo("Player " + player.playerIndex + " is bankrupt");
+    logInfo(player.getName() + " is bankrupt");
     player.setBankruptIndex(bankruptCount);
     ++bankruptCount;
 
@@ -658,7 +658,7 @@ public class Monopoly implements Runnable {
     }
 
     if (gainingPlayer != null) {
-      logInfo("Gaining player is " + gainingPlayer.playerIndex);
+      logInfo("Gaining player is " + gainingPlayer.getName());
     } else {
       logInfo("Gaining player is bank");
     }
@@ -712,7 +712,7 @@ public class Monopoly implements Runnable {
     String msg = "";
 
     for (Location location : lotsToAuction.values()) {
-      logInfo("Bank is auctioning " + location.name);
+      logInfo("\nAUCTION\nBank is auctioning " + location.name);
 
       int highBid = 0;
       AbstractPlayer highBidPlayer = null;
@@ -720,7 +720,7 @@ public class Monopoly implements Runnable {
 
       for (AbstractPlayer p : players) {
         int bid = p.getBidForLocation(location);
-        logInfo("Player " + p.playerIndex + " has " + p.cash
+        logInfo(p.getName() + " has " + p.cash
             + " dollars and bids " + bid);
 
         if (bid > highBid) {
@@ -747,8 +747,8 @@ public class Monopoly implements Runnable {
 
       assert finalBid > 0 : "Final bid is invalid: " + finalBid;
       assert highBidPlayer != null : "High bid player is null";
-      assert highBidPlayer.canRaiseCash(finalBid) : "Player "
-          + highBidPlayer.playerIndex + " cannot raise cash " + finalBid;
+      assert highBidPlayer.canRaiseCash(finalBid) : highBidPlayer.getName()
+          + " cannot raise cash " + finalBid;
 
       try {
         processAuctionResult(highBidPlayer, location, finalBid);
@@ -760,7 +760,7 @@ public class Monopoly implements Runnable {
       }
     }
 
-    logInfo("Auction has ended " + msg);
+    logInfo("Auction has ended " + msg + "\n");
     boolean printHead = true;
     for (Location location : lotsToAuction.values()) {
       if (location.owner == null) {
@@ -783,14 +783,14 @@ public class Monopoly implements Runnable {
   private void processAuctionResult(AbstractPlayer aPlayer, Location aLocation,
       int amount) throws BankruptcyException 
   {
+    logInfo("\n" + aPlayer.getName() + " wins " + aLocation.name
+        + " auction for " + amount + " dollars.");
     aPlayer.getCash(amount);
-    logInfo("Player " + aPlayer.playerIndex + " won auction for "
-        + aLocation.name);
     aLocation.setOwner(aPlayer);
     aPlayer.addProperty(aLocation);
     PropertyFactory.getPropertyFactory(gamekey).checkForMonopoly();
     if (aLocation.partOfMonopoly) {
-      logInfo("Player " + aPlayer.playerIndex + " acquired monopoly with "
+      logInfo(aPlayer.getName() + " acquired monopoly with "
           + aLocation.name);
     }
   }
