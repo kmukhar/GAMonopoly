@@ -18,7 +18,7 @@ public class BuyPropertyState extends PlayerState {
 
   @Override
   public PlayerState processEvent(Monopoly game, AbstractPlayer player, Events event) {
-    game.logFinest("Player " + player.playerIndex + "; state " + this.getClass().getSimpleName() +
+    game.logFinest(player.getName() + "; state " + this.getClass().getSimpleName() +
         "; event " + event.name());
     switch (event) {
     
@@ -27,7 +27,7 @@ public class BuyPropertyState extends PlayerState {
 
       assert player.canRaiseCash(location.getCost()) : "Player cannot raise cash: " + location.getCost();
       
-      game.logInfo("Player " + player.playerIndex + " has decided to buy "
+      game.logInfo(player.getName() + " has decided to buy "
           + location.name + " for " + location.getCost() + " dollars.");
       
       try {
@@ -36,7 +36,7 @@ public class BuyPropertyState extends PlayerState {
         player.addProperty(location);
         PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
         if (location.partOfMonopoly) {
-          game.logInfo("Player " + player.playerIndex
+          game.logInfo(player.getName()
               + " acquired monopoly with " + location.name);
         }
       } catch (BankruptcyException e) {

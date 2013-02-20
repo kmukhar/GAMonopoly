@@ -52,5 +52,6 @@ public class TextAreaHandler extends Handler {
   public void publish(LogRecord record)
   {
     textArea.append(getFormatter().format(record));
+    textArea.setCaretPosition(textArea.getText().length());
   }  
 }

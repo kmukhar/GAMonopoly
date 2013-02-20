@@ -13,7 +13,7 @@ public class DevelopPropertyState extends PlayerState {
 
   @Override
   public PlayerState processEvent(Monopoly game, AbstractPlayer player, Events event) {
-    game.logFinest("Player " + player.playerIndex + "; state " + this.getClass().getSimpleName() +
+    game.logFinest(player.getName() + "; state " + this.getClass().getSimpleName() +
         "; event " + event.name());
 
     switch (event) {

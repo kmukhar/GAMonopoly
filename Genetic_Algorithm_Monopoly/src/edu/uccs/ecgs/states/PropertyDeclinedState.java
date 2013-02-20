@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.states;
 
 import edu.uccs.ecgs.ga.Actions;
+import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.ga.Monopoly;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
@@ -13,11 +14,14 @@ public class PropertyDeclinedState extends PlayerState {
 
   @Override
   public PlayerState processEvent(Monopoly game, AbstractPlayer player, Events event) {
-    game.logFinest("Player " + player.playerIndex + "; state " + this.getClass().getSimpleName() +
+    game.logFinest(player.getName() + "; state " + this.getClass().getSimpleName() +
         "; event " + event.name());
     switch (event) {
 
     case DECLINE_PROPERTY_EVENT:
+      Location location = player.getCurrentLocation();
+      game.logInfo(player.getName() + " has decided NOT to buy "
+          + location.name + " for " + location.getCost() + " dollars.");
       player.nextAction = Actions.AUCTION_BID;
       auctionState.enter();
       return auctionState;

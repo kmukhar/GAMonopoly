@@ -222,7 +222,7 @@ public class PlayerPanel extends JPanel implements ListSelectionListener {
     this.player = player2;
     player.setGameKey(factoryKey);
 
-    idField.setText("" + player.playerIndex);
+    idField.setText(player.getName());
     idField.setEditable(false);
     cashField.setText("" + player.cash);
     cashField.setEditable(true);

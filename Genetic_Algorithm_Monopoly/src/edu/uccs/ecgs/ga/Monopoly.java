@@ -134,7 +134,6 @@ public class Monopoly implements Runnable {
 
       logInfo("");
       logInfo("Turn: " + turnCounter);
-      // logInfo("Player " + player.playerIndex);
       logInfo(player.getName());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;

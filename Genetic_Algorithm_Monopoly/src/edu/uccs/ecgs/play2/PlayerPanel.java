@@ -5,10 +5,12 @@ import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import edu.uccs.ecgs.players.AbstractPlayer;
 
-public class PlayerPanel extends JPanel {
+public class PlayerPanel extends JPanel implements ChangeListener {
 
   private JTextArea filler;
   private AbstractPlayer player;
@@ -24,9 +26,15 @@ public class PlayerPanel extends JPanel {
   
   public void setPlayer(AbstractPlayer player) {
     this.player = player;
+    player.addChangeListener(this);
   }
   
   public void updatePlayerStatus() {
     filler.setText(player.toString());
+  }
+
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    updatePlayerStatus();
   }
 }

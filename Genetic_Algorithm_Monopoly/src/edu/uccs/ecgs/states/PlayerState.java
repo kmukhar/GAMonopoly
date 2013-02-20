@@ -70,10 +70,8 @@ public class PlayerState {
       // send to jail
       PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
       location = pf.getLocationAt(10);
-      player.enteredJail();
-      player.setLocationIndex(location.index);
-      player.setCurrentLocation(location);
-      game.logInfo("Player " + player.playerIndex
+      player.goToJail(location);
+      game.logInfo(player.getName()
           + " rolled doubles 3 times in a row. Player sent to jail.");
       player.nextAction = Actions.MAKE_BUILD_DECISION;
 

@@ -60,6 +60,30 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#payIncomeTax()
+   */
+  @Override
+  public void payIncomeTax() throws BankruptcyException {
+    int totalWorth = getTotalWorth();
+    String percent = "10%";
+    String flat = "$200";
+    String defaultOption = flat;
+    if (totalWorth < 2000) 
+      defaultOption = percent;
+
+    int result = JOptionPane.showOptionDialog(null,
+        "<html><body>Your current net worth is " + totalWorth
+            + "<p>Do you want to pay 10% or $200</body></html>", "Income Tax",
+        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+        new String[] { percent, flat }, defaultOption);
+    if (result == 0) {
+      getCash(totalWorth/10);
+    } else {
+      getCash(200);
+    }
+  }
+
+  /* (non-Javadoc)
    * @see edu.uccs.ecgs.players.AbstractPlayer#getBidForLocation(edu.uccs.ecgs.ga.Location)
    */
   @Override
@@ -69,16 +93,19 @@ public class HumanPlayer extends AbstractPlayer {
     while (true) {
       String result = JOptionPane.showInputDialog(null, "<html><body>"
           + currentLocation.name + " is being auctioned.<p>"
-          + "What is the maximum you want to bid for this property?"
+          + "What is the maximum you want to bid for this property?<p>" 
+          + "(0 to " + cash + ")"
           + "</body></html>", "Bid for property", JOptionPane.QUESTION_MESSAGE);
       try {
         bid = Integer.parseInt(result);
+        if (bid < 0 || bid > cash)
+          throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "<html><body>"
             + "Your bid does not appear to be valid.<p>"
             + "Please enter a whole number between 0 "
-            + "and your total amount of cash.<p>"
+            + "and " + cash + ".<p>"
             + "Bid 0 to decline the auction" + "</body></html>", "Bid error",
             JOptionPane.ERROR_MESSAGE);
       }
@@ -105,6 +132,15 @@ public class HumanPlayer extends AbstractPlayer {
   {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#processTradeDecisionEvent()
+   */
+  @Override
+  public void processTradeDecisionEvent() {
+    // TODO Auto-generated method stub
+    super.processTradeDecisionEvent();
   }
 
   @Override

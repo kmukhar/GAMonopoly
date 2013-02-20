@@ -376,7 +376,7 @@ public class GAEngine implements Runnable {
       bw.newLine();
 
       for (AbstractPlayer player : fitness) {
-        bw.write(player.getFitness() + "," + player.playerIndex);
+        bw.write(player.getFitness() + "," + player.getName());
         bw.newLine();
       }
     } catch (IOException e) {

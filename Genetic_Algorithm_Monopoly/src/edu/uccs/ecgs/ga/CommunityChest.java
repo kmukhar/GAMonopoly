@@ -12,7 +12,7 @@ public enum CommunityChest {
 
   public void processCard(AbstractPlayer player, Monopoly game) throws BankruptcyException {
     game.logInfo("Processing Community Chest Card '" + toString()
-        + "' for player " + player.playerIndex);
+        + "' for " + player.getName());
 
     switch (this) {
     case ADVANCE_TO_GO:
@@ -34,10 +34,8 @@ public enum CommunityChest {
 
     case GO_TO_JAIL:
       PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
-      Location location = pf.getLocationAt(10);
-      player.enteredJail();
-      player.setLocationIndex(location.index);
-      player.setCurrentLocation(location);
+      Location jail = pf.getLocationAt(10);
+      player.goToJail(jail);
       break;
     
     case COLLECT_10_FROM_ALL:

@@ -16,8 +16,8 @@ public enum Chance {
     int spacesToAdvance = 0;
     Location location = null;
 
-    game.logInfo("Processing Chance Card '" + toString() + "' for player "
-        + player.playerIndex);
+    game.logInfo("Processing Chance Card '" + toString() + "' for "
+        + player.getName());
 
     switch (this) {
     case ADVANCE_TO_GO:
@@ -83,9 +83,7 @@ public enum Chance {
     case GO_TO_JAIL:
       PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
       location = pf.getLocationAt(10);
-      player.enteredJail();
-      player.setLocationIndex(location.index);
-      player.setCurrentLocation(location);
+      player.goToJail(location);
       break;
 
     case BANK_PAYS_50:

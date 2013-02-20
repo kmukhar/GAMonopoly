@@ -19,7 +19,7 @@ public class AtNewLocationState extends PlayerState {
 
   @Override
   public PlayerState processEvent(Monopoly game, AbstractPlayer player, Events event) {
-    game.logFinest("Player " + player.playerIndex + "; state " + this.getClass().getSimpleName() +
+    game.logFinest(player.getName() + "; state " + this.getClass().getSimpleName() +
         "; event " + event.name());
     Location location = player.getCurrentLocation();
 
@@ -142,12 +142,8 @@ public class AtNewLocationState extends PlayerState {
         }
       } else if (location.name.equals("Income Tax")) {
         try {
-          player.getCash(200);
-        } catch (BankruptcyException e) {
-          //e.printStackTrace();
-          game.processBankruptcy(player, null);
-          player.nextAction = Actions.DONE;
-          return inactiveState;
+          player.payIncomeTax();
+        } catch (BankruptcyException ignored) {
         }
 
         if (player.rolledDoubles()) {
@@ -178,12 +174,11 @@ public class AtNewLocationState extends PlayerState {
           return developPropertyState;
         }
       } else if (location.name.equals("Go To Jail")) {
-        game.logInfo("Player " + player.playerIndex + " landed on Go To Jail.");
+        game.logInfo(player.getName() + " landed on Go To Jail.");
 
         PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
-        player.enteredJail();
-        player.setLocationIndex(10);
-        player.setCurrentLocation(pf.getLocationAt(10));
+        Location jail = pf.getLocationAt(10);
+        player.goToJail(jail);
 
         player.nextAction = Actions.MAKE_BUILD_DECISION;
         developPropertyState.enter();

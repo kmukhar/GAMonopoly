@@ -3,6 +3,10 @@ package edu.uccs.ecgs.players;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.states.Events;
 import edu.uccs.ecgs.states.PlayerState;
@@ -70,6 +74,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
   protected String gameKey;
+  private ChangeListener changeListener;
 
   /**
    * Constructor
@@ -151,7 +156,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * state, etc.
    */
   private void resetAll() {
-    logFinest("Player " + playerIndex + " entering resetAll()");
+    logFinest(getName() + " entering resetAll()");
     cash = 1500;
     rolledDoubles = false;
     jailSentence = 0;
@@ -173,6 +178,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     bankruptIndex = 0;
 
     clearAllProperties();
+    fireChangeEvent();
   }
 
   /**
@@ -210,7 +216,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (inJail && !rolledDoubles) {
       --jailSentence;
 
-      logFinest("Player " + playerIndex + " jailSentence: " + jailSentence);
+      logFinest(getName() + " jailSentence: " + jailSentence);
       assert jailSentence >= 0 : "Illegal jailSentence value: " + jailSentence;
     }
   }
@@ -228,15 +234,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (locationIndex >= 40) {
       locationIndex -= 40;
       passedGo = true;
-      receiveCash(200);
-
-      if (locationIndex == 0) {
-        logInfo("Player " + playerIndex + " landed on Go");
-      } else {
-        logInfo("Player " + playerIndex + " passed Go");
-      }
     }
-
+    
     if (locationIndex < 0) {
       locationIndex += 40;
     }
@@ -244,6 +243,26 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     Location location = PropertyFactory.getPropertyFactory(this.gameKey)
         .getLocationAt(locationIndex);
     setCurrentLocation(location);
+
+    if (passedGo) {
+      if (locationIndex == 0) {
+        logInfo(getName() + " landed on Go");
+      } else {
+        logInfo(getName() + " passed Go");
+      }
+      receiveCash(200);
+    }
+    fireChangeEvent();
+  }
+
+  /**
+   * Go to jail. Go directly to Jail. Do not pass Go.
+   */
+  public void goToJail(Location jail) {
+    enteredJail();
+    setLocationIndex(jail.index);
+    setCurrentLocation(jail);
+    fireChangeEvent();
   }
 
   /**
@@ -259,23 +278,23 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param location
    *          The location where the player is currently located.
    */
-  public void setCurrentLocation(Location location) {
+  private void setCurrentLocation(Location location) {
     this.location = location;
 
-    logInfo("Player " + playerIndex + " landed on " + location.name);
+    logInfo(getName() + " moving to " + location.name);
     if (location.owner != null) {
-      logInfo(location.name + " is owned by " + location.owner.playerIndex);
+      logInfo(location.name + " is owned by " + location.owner.getName());
     }
 
     if (location.name.equals("Jail")) {
       if (inJail) {
-        logInfo("Player " + playerIndex + " is in Jail");
+        logInfo(getName() + " is in Jail");
         logFinest("Player sentence: " + jailSentence);
         logFinest("Player inJail flag: " + inJail);
         assert inJail : "Flag inJail is not valid";
         assert jailSentence == 3 : "JailSentence value is not correct";
       } else {
-        logInfo("Player " + playerIndex + " is Just Visiting");
+        logInfo(getName() + " is Just Visiting");
       }
     }
   }
@@ -297,8 +316,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void receiveCash(int amount) {
     cash += amount;
-    logInfo("Player " + playerIndex + " received " + amount + " dollars.");
-    logInfo("Player " + playerIndex + " has " + cash + " dollars.");
+    logInfo(getName() + " received " + amount + " dollars.");
+    logInfo(getName() + " has " + cash + " dollars.");
+    fireChangeEvent();
   }
 
   /**
@@ -313,8 +333,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void getCash(int amount) throws BankruptcyException {
     raiseCash(amount);
     cash = cash - amount;
-    logInfo("Player " + playerIndex + " paid " + amount + " dollars.");
-    logInfo("Player " + playerIndex + " has " + cash + " dollars.");
+    logInfo(getName() + " paid " + amount + " dollars.");
+    logInfo(getName() + " has " + cash + " dollars.");
+    fireChangeEvent();
   }
 
   /**
@@ -354,6 +375,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     owned.put(location2.index, location2);
     // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(this.gameKey).checkForMonopoly();
+    fireChangeEvent();
   }
 
   /**
@@ -678,7 +700,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * three times, getting a Go To Jail card, or landing on the Go To Jail
    * location.
    */
-  public void enteredJail() {
+  private void enteredJail() {
     inJail = true;
     jailSentence = 3;
   }
@@ -735,13 +757,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *           If the player cannot raise enough cash to equal or exceed amount.
    */
   public void raiseCash(int amount) throws BankruptcyException {
-    logInfo("Player " + playerIndex + " has " + cash + " dollars");
+    logFinest(getName() + " has " + cash + " dollars");
     if (cash >= amount) {
       return;
     }
 
     if (canRaiseCash(amount)) {
-      logInfo("Player " + playerIndex + " attempting to raise " + amount
+      logInfo(getName() + " attempting to raise " + amount
           + " dollars");
       for (Location l : owned.values()) {
         // mortgage single street properties first
@@ -749,7 +771,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
             && l.getGroup() != PropertyGroups.UTILITIES
             && l.getGroup() != PropertyGroups.RAILROADS) {
           // mortgage property if not part of monopoly
-          logInfo("Player will mortgage " + l.name);
+          logInfo(getName() + " will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
         }
@@ -762,7 +784,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (getNumUtilities() == 1) {
         for (Location l : owned.values()) {
           if (l.getGroup() == PropertyGroups.UTILITIES && !l.isMortgaged()) {
-            logInfo("Player will mortgage " + l.name);
+            logInfo(getName() + " will mortgage " + l.name);
             l.setMortgaged();
             receiveCash(l.getCost() / 2);
           }
@@ -779,7 +801,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       for (int i : index) {
         Location l = owned.get(i);
         if (l != null && !l.isMortgaged()) {
-          logInfo("Player will mortgage " + l.name);
+          logInfo(getName() + " will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
         }
@@ -791,6 +813,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       // sell hotels
       for (Location l : owned.values()) {
         if (l.getNumHotels() > 0) {
+          logInfo(getName() + " will sell hotel at " + l.name);
           game.sellHotel(this, l, owned.values());
         }
         if (cash >= amount) {
@@ -803,8 +826,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       while (maxHouses > 0) {
         for (Location l : owned.values()) {
           if (l.getNumHouses() == maxHouses) {
-            logInfo(l.name + " has " + l.getNumHouses() + " houses");
-            logInfo("Will sell house at " + l.name);
+            logFinest(l.name + " has " + l.getNumHouses() + " houses");
+            logInfo(getName() + " will sell house at " + l.name);
             game.sellHouse(l);
           }
         }
@@ -819,7 +842,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       // then mortgage any remaining unmortgaged lots
       for (Location l : owned.values()) {
         if (!l.isMortgaged()) {
-          logInfo("Player will mortgage " + l.name);
+          logInfo(getName() + " will mortgage " + l.name);
           l.setMortgaged();
           receiveCash(l.getCost() / 2);
         }
@@ -864,6 +887,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (!gameOver) {
       processMortgagedNewProperties(allProperties);
     }
+    fireChangeEvent();
   }
 
   /**
@@ -933,8 +957,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (lot.isMortgaged()) {
         // pay the interest of 10%
         int amountToPay = (int) (0.1 * lot.getCost() / 2);
-        // TODO
-        logFinest("Player " + playerIndex + " will only pay mortgage fee for "
+        logFinest(getName() + " will only pay mortgage fee for "
             + lot.name + "; fee is " + amountToPay);
 
         getCash(amountToPay);
@@ -992,12 +1015,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (canPayMortgage(lot)) {
         // pay off mortgage
         amountToPay = (int) (1.1 * lot.getCost() / 2);
-        logInfo("Player will pay off mortgage for " + lot.name + "; cost is "
+        logFinest("Player will pay off mortgage for " + lot.name + "; cost is "
             + amountToPay);
         try {
           getCash(amountToPay);
           lot.setMortgaged(false);
-          logInfo(lot.name + " is no longer mortgaged");
+          logFinest(lot.name + " is no longer mortgaged");
           ++count;
         } catch (BankruptcyException e) {
           // payMortgageP() should only return true if the player can raise the
@@ -1008,7 +1031,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         }
       }
     }
-    logInfo(count + " mortgaged lots were paid off; "
+    logFinest(count + " mortgaged lots were paid off; "
         + (mortgaged.size() - count) + " lots are still mortgaged");
   }
 
@@ -1074,6 +1097,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public int getAllCash() {
     int amount = cash;
     cash = 0;
+    fireChangeEvent();
     return amount;
   }
 
@@ -1104,6 +1128,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         game.sellHouse(l);
       }
     }
+    fireChangeEvent();
   }
 
   /**
@@ -1112,7 +1137,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void processDevelopHouseEvent() {
     // Bank has to have houses available
     if (game.getNumHouses() == 0) {
-      logInfo("Bank has no more houses");
+      logFinest("Bank has no more houses");
       return;
     }
 
@@ -1215,7 +1240,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          The group for which to balance the house distribution.
    */
   private void balanceHouses(Vector<Location> monopolies, PropertyGroups group) {
-    logFinest("Player " + playerIndex + " entered balance houses.");
+    logFinest(getName() + " entered balance houses.");
     for (Location l : monopolies) {
       logFinest(l.toString());
     }
@@ -1391,7 +1416,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2,
       int index);
 
-  @Override
   public String toString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
@@ -1536,12 +1560,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   public boolean answerProposedTrade(TradeProposal bestTrade) {
-    logInfo("Player " + playerIndex + " is evaluating trade "
+    logInfo(getName() + " is evaluating trade "
         + bestTrade.toString());
 
     // if the player has to geive too much money, the reject the trade
     if (cash + bestTrade.cashDiff < getMinimumCash()) {
-      logInfo("Trade would reduce cash of player " + this.playerIndex
+      logInfo("Trade would reduce cash of " + getName()
           + " below minimum; trade refused");
       return false;
     }
@@ -1558,7 +1582,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       return false;
     }
 
-    logInfo("Player " + playerIndex + ": trade accepted");
+    logInfo(getName() + ": trade accepted");
     return true;
   }
 
@@ -1575,5 +1599,25 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void setGameKey(String factoryKey)
   {
     gameKey = factoryKey;    
+  }
+
+  public void payIncomeTax() throws BankruptcyException {
+    int totalWorth = getTotalWorth();
+    if (totalWorth < 2000) {
+      logInfo(getName() + " chooses to pay 10%");
+      getCash(totalWorth / 10);
+    } else {
+      logInfo(getName() + " chooses to pay $200");
+      getCash(200);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    this.changeListener = cl;
+  }
+  
+  private void fireChangeEvent() {
+    if (changeListener != null) 
+      changeListener.stateChanged(new ChangeEvent(this));
   }
 }
