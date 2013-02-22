@@ -115,23 +115,27 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /* (non-Javadoc)
-   * @see edu.uccs.ecgs.players.AbstractPlayer#evaluateTrade(edu.uccs.ecgs.ga.TradeProposal)
-   */
-  @Override
-  public int evaluateTrade(TradeProposal trade)
-  {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
-  }
-
-  /* (non-Javadoc)
    * @see edu.uccs.ecgs.players.AbstractPlayer#answerProposedTrade(edu.uccs.ecgs.ga.TradeProposal)
    */
   @Override
   public boolean answerProposedTrade(TradeProposal bestTrade)
   {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    String accept = "Accept Trade";
+    String reject = "Reject Trade";
+    String defaultOption = reject;
+
+    int result = JOptionPane.showOptionDialog(null, "<html><body>"
+        + bestTrade.location.owner.getName() + " is proposing to trade "
+        + bestTrade.location + " for " + bestTrade.location2 + "<p><p>"
+        + "Do you want to Accept or Reject this trade</body></html>",
+        "Trade Proposed", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE, null, new String[] { accept, reject },
+        defaultOption);
+    if (result == 0) {
+      return true;
+    }
+    
+    return false;
   }
 
   /* (non-Javadoc)
