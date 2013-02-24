@@ -16,9 +16,11 @@ public class InJailState extends PlayerState {
   }
 
   @Override
-  public PlayerState processEvent(Monopoly game, AbstractPlayer player, Events event) {
-    game.logFinest(player.getName() + "; state " + this.getClass().getSimpleName() +
-        "; event " + event.name());
+  public PlayerState processEvent(Monopoly game, AbstractPlayer player,
+                                  Events event)
+  {
+    game.logFinest(player.getName() + "; state "
+        + this.getClass().getSimpleName() + "; event " + event.name());
     Dice dice = game.getDice();
     switch (event) {
     
@@ -68,11 +70,11 @@ public class InJailState extends PlayerState {
       //use a Get Out Of Jail Card first, if they have one
       if (player.hasGetOutOfJailCard()) {
         player.useGetOutOfJailCard();
-        game.logInfo("Player used Get Out of Jail Free card");
+        game.logInfo(player.getName() + " used Get Out of Jail Free card");
       } else {
         //actually pay bail
         try {
-          game.logInfo("Player will pay $50 to get out of jail");
+          game.logInfo(player.getName() + " pays $50 to get out of jail");
           player.getCash(50);
         } catch (BankruptcyException e) {
           //e.printStackTrace();

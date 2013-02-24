@@ -103,14 +103,18 @@ public class AtNewLocationState extends PlayerState {
 
         location = player.getCurrentLocation();
         if (!location.name.equals("Chance")) {
-          //location name has changed, so the player must have gotten an advance to someplace card
+          // location name has changed, so the player must have gotten an 
+          // advance to someplace card
           if (location.getGroup() == PropertyGroups.SPECIAL) {
             //we advanced or moved to another special location
+            
+            // First check if in Jail
             if (player.inJail()) {
               player.nextAction = Actions.MAKE_BUILD_DECISION;
               developPropertyState.enter();
               return developPropertyState;
             } else if (player.getLocationIndex() == 0) {
+              // If not jail, check if at Go
               if (player.rolledDoubles()) {
                 player.nextAction = Actions.ROLL_DICE;
                 return activeState;
@@ -120,13 +124,17 @@ public class AtNewLocationState extends PlayerState {
                 return developPropertyState;
               }
             } else {
+              // If not jail or Go, must be another chance or community chest
               player.nextAction = Actions.PROCESS_SPECIAL_ACTION;
             }
           } else if (location.owner != null) {
+            // If not a special location, must be a property, so check to see
+            // if player needs to pay rent
             player.nextAction = Actions.PAY_RENT;
             payRentState.enter();
             return payRentState;
           } else {
+            // Player is at an unowned property, so make buy decision
             player.nextAction = Actions.EVAL_PROPERTY;
           }
         } else {

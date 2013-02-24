@@ -462,4 +462,9 @@ public class PropertyFactory {
     }
     return false;
   }
+
+  public static Location getLocationAt(String gamekey, int index)
+  {
+    return getPropertyFactory(gamekey).getLocationAt(index);
+  }
 }

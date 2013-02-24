@@ -114,6 +114,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (owned != null) {
       owned.clear();
     }
+    fireChangeEvent();
   }
 
   /**
@@ -1106,6 +1107,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setBankrupt() {
     isBankrupt = true;
+    fireChangeEvent();
   }
 
   /**
@@ -1115,19 +1117,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // Sell all hotels first
     for (Location l : owned.values()) {
       if (l.getNumHotels() > 0) {
-        game.sellHotel(this, l, owned.values());
+        game.liquidateHotel(this, l);
       }
-      while (l.getNumHouses() > 0) {
-        game.sellHouse(l);
+      if (l.getNumHouses() > 0) {
+        game.liquidateHouses(this, l);
       }
     }
 
-    // And sell all houses
-    for (Location l : owned.values()) {
-      while (l.getNumHouses() > 0) {
-        game.sellHouse(l);
-      }
-    }
     fireChangeEvent();
   }
 
@@ -1564,8 +1560,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   public boolean answerProposedTrade(TradeProposal bestTrade) {
-    logInfo(getName() + " is evaluating trade\n"
-        + bestTrade.toString());
+    logInfo(getName() + " is evaluating trade proposal from "
+        + bestTrade.getProposer() + "\n" + bestTrade.toString());
 
     // if the player has to give too much money, the reject the trade
     if (cash + bestTrade.cashDiff < getMinimumCash()) {

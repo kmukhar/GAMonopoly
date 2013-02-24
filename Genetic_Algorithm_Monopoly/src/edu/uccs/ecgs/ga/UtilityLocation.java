@@ -34,6 +34,11 @@ public class UtilityLocation extends Location {
 
     if (arrivedFromChance) {
       setRentMultiplier(10);
+      // and if arrived from chance, roll the dice again
+      int[] newRoll = Dice.getDice().roll();
+      diceRoll = newRoll[0] + newRoll[1];
+      owner.logInfo("Arrived from Chance; roll for rent is " + newRoll[0] + "+"
+          + newRoll[1]);
     } else {
       setRentMultiplier(owner.getNumUtilities() == 1 ? 4 : 10);
     }

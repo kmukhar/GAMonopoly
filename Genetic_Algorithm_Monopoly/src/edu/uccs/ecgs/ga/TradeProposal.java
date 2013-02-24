@@ -35,12 +35,17 @@ public class TradeProposal {
     StringBuilder sb = new StringBuilder();
     sb.append("Trade Proposal\nLocation1: ").append(location);
     if (cashDiff > 0) 
-      sb.append(" and ").append(cashDiff).append(" dollars ");
+      sb.append(" and ").append(cashDiff).append(" dollars");
 
     sb.append(" for\nLocation2: ").append(location2);
     if (cashDiff < 0)
-      sb.append(" and ").append(cashDiff).append(" dollars ");
+      sb.append(" and ").append(Math.abs(cashDiff)).append(" dollars");
 
     return sb.toString();
+  }
+
+  public String getProposer()
+  {
+    return location.owner.getName();
   }
 }

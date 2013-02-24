@@ -88,6 +88,7 @@ public class RGAPlayer extends CGPlayer {
   @Override
   public boolean payBailP() {
     if (!hasAtLeastCash(50) && !canRaiseCash(50) && !hasGetOutOfJailCard()) {
+      logInfo(getName() + " will try to roll doubles");
       return false;
     }
 
@@ -95,7 +96,11 @@ public class RGAPlayer extends CGPlayer {
     int idx1 = pf.getIndexFromProperties(Edges.WEST, this);
     int idx2 = pf.getIndexFromProperties(Edges.NORTH, this);
 
-    return r.nextDouble() < chrJail[idx1][idx2];
+    boolean answer = r.nextDouble() < chrJail[idx1][idx2];
+    if (!answer) {
+      logInfo(getName() + " will try to roll doubles.");
+    }
+    return answer;
   }
 
   /**

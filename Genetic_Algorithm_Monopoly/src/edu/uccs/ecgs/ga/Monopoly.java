@@ -95,7 +95,8 @@ public class Monopoly implements Runnable {
   private void playGame() {
     done = false;
 
-    logFinest("Started game " + this.generation + "." + this.match + "." + this.game + " with players: ");
+    logFinest("Started game " + this.generation + "." + this.match + "."
+        + this.game + " with players: ");
     for (AbstractPlayer p : players) {
       logFinest(p.getName());
     }
@@ -135,6 +136,7 @@ public class Monopoly implements Runnable {
       logInfo("");
       logInfo("Turn: " + turnCounter);
       logInfo(player.getName());
+      logInfo("Current location is " + player.getCurrentLocation());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;
       Actions action = Actions.NULL;
@@ -290,6 +292,21 @@ public class Monopoly implements Runnable {
   }
 
   /**
+   * Player is bankrupt, so houses on location are liquidated
+   * @param abstractPlayer The player who is bankrupt
+   * @param l The property on which a hotel exists
+   */
+  public void liquidateHouses(AbstractPlayer abstractPlayer, Location l)
+  {
+    int cost = l.getHouseCost();
+    int numHousesAtLocation = l.getNumHouses();
+    int proceeds = numHouses * cost;
+    l.resetNumHouses();
+    numHouses += numHousesAtLocation;
+    abstractPlayer.receiveCash(proceeds);
+  }
+
+  /**
    * Sell a hotel from the given location. According to the rules of Monopoly,
    * the player must be able to put four houses on the location when the hotel
    * is sold. If 4 houses are not available, the player is forced to sell as
@@ -319,10 +336,9 @@ public class Monopoly implements Runnable {
    */
   public void sellHotel(AbstractPlayer player, Location location,
       Collection<Location> owned) {
-    int numHotelsInGroup = PropertyFactory.getPropertyFactory(gamekey)
-        .getNumHotelsInGroup(location);
-    int numHousesInGroup = PropertyFactory.getPropertyFactory(gamekey)
-        .getNumHousesInGroup(location);
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gamekey);
+    int numHotelsInGroup = pf.getNumHotelsInGroup(location);
+    int numHousesInGroup = pf.getNumHousesInGroup(location);
 
     int numHousesToSell1 = 0; // number of houses to sell on 1st property in
                               // group
@@ -463,6 +479,24 @@ public class Monopoly implements Runnable {
     sell(player, location, owned, numHousesToSell1, numHousesToSell2,
         numHousesToSell3);
     numHouses = 0;
+  }
+
+  /**
+   * Player is bankrupt, so hotels on location are liquidated
+   * @param abstractPlayer The player who is bankrupt
+   * @param l The property on which a hotel exists
+   */
+  public void liquidateHotel(AbstractPlayer abstractPlayer, Location l)
+  {
+    int cost = l.getHotelCost();
+    int numHotels = l.getNumHotels();
+    assert numHotels == 1 : "Location has more than one hotel!";
+    int proceeds = 5 * cost; // (hotel + 4 houses) * cost
+    // TODO Fix? The next few lines rely on knowing that removeHotel() adds 4 houses to location.
+    l.removeHotel();
+    ++numHotels;
+    l.resetNumHouses();
+    abstractPlayer.receiveCash(proceeds);
   }
 
   /**
@@ -678,7 +712,7 @@ public class Monopoly implements Runnable {
       if (!gameOver) {
         TreeMap<Integer, Location> lotsToAuction = new TreeMap<Integer, Location>();
         lotsToAuction.putAll(player.getAllProperties());
-        player.clearAllProperties();
+//        player.clearAllProperties();
         auctionLots(lotsToAuction);
       }
     } else {
@@ -689,6 +723,7 @@ public class Monopoly implements Runnable {
       // mortgaged properties are handled in the addProperties method
       try {
         gainingPlayer.addProperties(player.getAllProperties(), gameOver);
+//        player.clearAllProperties();
       } catch (BankruptcyException e) {
         //rarely, the player gaining the properties will not be able to raise
         //the case to pay the interest. The gainingPlayer goes bankrupt also.

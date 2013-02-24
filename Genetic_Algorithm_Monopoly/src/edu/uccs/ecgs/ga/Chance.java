@@ -35,12 +35,12 @@ public enum Chance {
       if (player.getLocationIndex() > 12 && player.getLocationIndex() < 28) {
         locationIndex = 28;
       }
-      location = PropertyFactory.getPropertyFactory(game.gamekey).getLocationAt(locationIndex);
-      game.logInfo("Advancing player to " + location.name);
+      location = PropertyFactory.getLocationAt(game.gamekey,locationIndex);
+      game.logFinest("Advancing player to " + location.name);
       advancePlayer(player, locationIndex);
-      game.logInfo("Rolling dice to determine rent...");
-      location.arrivedFromChance = true; // rent is 10x dice roll when coming from chance
-      game.logDiceRoll(game.getDice().roll());
+      if (location.owner != null)
+        // rent is 10x dice roll when coming from chance
+        location.arrivedFromChance = true;
 
       break;
 

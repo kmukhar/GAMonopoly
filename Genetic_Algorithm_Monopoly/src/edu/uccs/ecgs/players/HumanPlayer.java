@@ -125,10 +125,21 @@ public class HumanPlayer extends AbstractPlayer {
     String reject = "Reject Trade";
     String defaultOption = reject;
 
-    int result = JOptionPane.showOptionDialog(null, "<html><body>"
-        + bestTrade.location.owner.getName() + " is proposing to trade "
-        + bestTrade.location + " for " + bestTrade.location2 + "<p><p>"
-        + "Do you want to Accept or Reject this trade</body></html>",
+    int cash = bestTrade.cashDiff;
+    
+    StringBuilder sb = new StringBuilder();
+    sb.append("<html><body>").append(bestTrade.location.owner.getName())
+        .append(" is proposing to trade ").append(bestTrade.location);
+    if (cash > 0)
+      sb.append(" and ").append(cash).append(" dollars ");
+
+    sb.append(" for ").append(bestTrade.location2);
+    if (cash < 0)
+      sb.append(" and ").append(Math.abs(cash)).append(" dollars.")
+          .append("<p><p>")
+          .append("Do you want to Accept or Reject this trade</body></html>");
+    
+    int result = JOptionPane.showOptionDialog(null, sb.toString(),
         "Trade Proposed", JOptionPane.DEFAULT_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, new String[] { accept, reject },
         defaultOption);
@@ -147,7 +158,8 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public void processTradeDecisionEvent(ArrayList<Location> locations)
   {
-    TradeProposal bestTrade = null;
+    if (this.getNumProperties() == 0)
+      return;
 
     int result = JOptionPane.showConfirmDialog(null, "<html><body>"
         + "Do you want to trade any of your properties?</body></html>",
@@ -174,7 +186,8 @@ public class HumanPlayer extends AbstractPlayer {
           locations.toArray(), locations.get(0));
 
       int cash = getCashPartOfTrade();
-      bestTrade = new TradeProposal(locationToTrade, locationToGet);
+      TradeProposal bestTrade = new TradeProposal(locationToTrade,
+          locationToGet);
       bestTrade.setCash(cash);
 
       game.proposeTrade(bestTrade);

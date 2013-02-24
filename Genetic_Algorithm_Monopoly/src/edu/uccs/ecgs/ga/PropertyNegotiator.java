@@ -557,42 +557,42 @@ public class PropertyNegotiator {
     int base = evaluateOwnersHoldings();
 
     if (proposals.size() > 0) {
-      owner.logInfo("All proposals: ");
+      owner.logFinest("All proposals: ");
       for (TradeProposal proposal : proposals) {
-        owner.logInfo("    " + proposal);
+        owner.logFinest("    " + proposal);
       }
 
-      owner.logInfo("Base value of owner is " + base);
+      owner.logFinest("Base value of owner is " + base);
     }
 
     int gain = Integer.MIN_VALUE;
 
     for (TradeProposal trade : proposals) {
       int newVal = evaluateOwnersHoldings(trade);
-      owner.logInfo("\nNew val after trading " + trade.location + " for "
+      owner.logFinest("\nNew val after trading " + trade.location + " for "
           + trade.location2 + " is " + newVal);
 
       int ownerProfit = newVal - base;
-      owner.logInfo("Owner profit is " + ownerProfit);
+      owner.logFinest("Owner profit is " + ownerProfit);
       
       ownerProfit = owner.evaluateTrade(trade);
-      owner.logInfo("Owner profit is " + ownerProfit);
+      owner.logFinest("Owner profit is " + ownerProfit);
 
       int agentProfit = trade.location2.getOwner().evaluateTrade(trade);
-      owner.logInfo("Agent profit is " + agentProfit);
+      owner.logFinest("Agent profit is " + agentProfit);
       
       int cashDiff = ownerProfit - agentProfit;
-      owner.logInfo("Cash difference is " + cashDiff);
+      owner.logFinest("Cash difference is " + cashDiff);
 
       int addCashToTrade = cashDiff/2;
       
-      owner.logInfo("Sweetener for trade is 1/2 cash diff: " + addCashToTrade);
+      owner.logFinest("Sweetener for trade is 1/2 cash diff: " + addCashToTrade);
 
       int ownerAdjProfit = ownerProfit - addCashToTrade;
       int agentAdjProfit = agentProfit + addCashToTrade;
       
-      owner.logInfo("Owner adjusted profit is " + ownerAdjProfit);
-      owner.logInfo("Agent adjusted profit is " + agentAdjProfit);
+      owner.logFinest("Owner adjusted profit is " + ownerAdjProfit);
+      owner.logFinest("Agent adjusted profit is " + agentAdjProfit);
 
       // if this is a better gain...
       if (ownerAdjProfit > gain) {
@@ -603,12 +603,13 @@ public class PropertyNegotiator {
           bestTrade = trade;
           bestTrade.setCash(addCashToTrade);
           bestTrade.setProfit(ownerAdjProfit);
-          owner.logInfo("Best trade is " + trade);
+          owner.logFinest("Best trade is " + trade);
         } else {
-          owner.logInfo("Owner does not have enough cash; no change to best trade");
+          owner.logFinest("Owner does not have enough cash; "
+              + "no change to best trade");
         }
       } else {
-        owner.logInfo("Not better than current best trade; no change to best trade");
+        owner.logFinest("Not better than current best trade; no change to best trade");
       }
     }
 
