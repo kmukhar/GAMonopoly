@@ -102,11 +102,10 @@ public class StreetLocation extends Location {
   }
 
   @Override
-  public String toString()
+  public String getFullInfoString()
   {
-    return super.toString() + (isMortgaged() ? " (mortgaged)" : "") + " ("
-        + getNumHouses() + " houses/" + getNumHotels() + " hotels)";
-
+    return super.toString() + " (" + getNumHouses() + " houses/"
+        + getNumHotels() + " hotels)";
   }
 
   @Override

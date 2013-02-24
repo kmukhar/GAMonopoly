@@ -110,7 +110,12 @@ public abstract class Location implements Comparable<Location> {
   @Override
   public String toString()
   {
-    return getGroup().toString() + "/" + name;
+    return name;
+  }
+  
+  public String getFullInfoString () {
+    return getGroup().toString() + "/" + name
+        + (isMortgaged() ? " (mortgaged)" : "");
   }
 
   /**

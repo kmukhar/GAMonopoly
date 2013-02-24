@@ -798,7 +798,7 @@ public class Monopoly implements Runnable {
    * Get the number of houses in the bank.
    * @return The number of houses in the bank.
    */
-  public int getNumHouses() {
+  public int getNumHousesInBank() {
     return numHouses;
   }
 
@@ -966,10 +966,10 @@ public class Monopoly implements Runnable {
     
     if (owner2.answerProposedTrade(bestTrade)) {
       
-      logInfo("\nOwner 1 before trade");
-      logInfo(owner1.toString());
-      logInfo("\nOwner 2 before trade");
-      logInfo(owner2.toString());
+      logFinest("\nOwner 1 before trade");
+      logFinest(owner1.toString());
+      logFinest("\nOwner 2 before trade");
+      logFinest(owner2.toString());
       
       PropertyTrader.tradeProperties(bestTrade.location, bestTrade.location2);
       int cash = bestTrade.cashDiff;
@@ -985,13 +985,32 @@ public class Monopoly implements Runnable {
         // player will not accept trade if bankruptcy will occur
       }
 
-      logInfo("\nOwner 1 after trade");
-      logInfo(owner1.toString());
-      logInfo("\nOwner 2 after trade");
-      logInfo(owner2.toString());
+      logFinest("\nOwner 1 after trade");
+      logFinest(owner1.toString());
+      logFinest("\nOwner 2 after trade");
+      logFinest(owner2.toString());
     }
   }
 
+  /**
+   * Return a list of properties owned by players other than the given player.
+   */
+  public ArrayList<Location> getPropertiesOwnedByOthers(AbstractPlayer xPlayer)
+  {
+    ArrayList<Location> locations = new ArrayList<Location>();
+    
+    for (AbstractPlayer player : players) {
+      if (player != xPlayer) {
+        Collection<Location> owned = player.getAllProperties().values();
+        for (Location location : owned) {
+          if (location.getNumHotels() + location.getNumHouses() == 0)
+            locations.add(location);
+        }
+      }
+    }
+    return locations;
+  }
+  
   /**
    * @return A list of all the players in this game
    */

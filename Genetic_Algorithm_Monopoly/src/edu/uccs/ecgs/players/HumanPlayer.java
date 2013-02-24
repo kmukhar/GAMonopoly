@@ -1,6 +1,7 @@
 package edu.uccs.ecgs.players;
 
 import java.io.*;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import edu.uccs.ecgs.ga.*;
 
@@ -138,13 +139,84 @@ public class HumanPlayer extends AbstractPlayer {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#processTradeDecisionEvent()
    */
   @Override
-  public void processTradeDecisionEvent() {
-    // TODO Auto-generated method stub
-    super.processTradeDecisionEvent();
+  public void processTradeDecisionEvent(ArrayList<Location> locations)
+  {
+    TradeProposal bestTrade = null;
+
+    int result = JOptionPane.showConfirmDialog(null, "<html><body>"
+        + "Do you want to trade any of your properties?</body></html>",
+        "Trade Properties", JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE);
+    if (result == 0) {
+      ArrayList<Location> list = new ArrayList<Location>();
+      for (Location l : this.getAllProperties().values()) {
+        // assume that no player would ever trade away a property that
+        // has houses or hotels on it.
+        if (l.getNumHouses() + l.getNumHotels() == 0)
+          list.add(l);
+      }
+
+      Location locationToTrade = (Location) JOptionPane.showInputDialog(null,
+          "<html><body>" + " Which property of yours do you wish to trade?",
+          "Select your property", JOptionPane.QUESTION_MESSAGE, null,
+          list.toArray(), list.get(0));
+
+      Location locationToGet = (Location) JOptionPane.showInputDialog(null,
+          "<html><body>"
+              + " Which property of another player do you wish to trade for?",
+          "Select other player's property", JOptionPane.QUESTION_MESSAGE, null,
+          locations.toArray(), locations.get(0));
+
+      int cash = getCashPartOfTrade();
+      bestTrade = new TradeProposal(locationToTrade, locationToGet);
+      bestTrade.setCash(cash);
+
+      game.proposeTrade(bestTrade);
+    }
+  }
+
+  private int getCashPartOfTrade()
+  {
+    String give = "Give";
+    String receive = "Receive";
+    String none = "No Cash";
+    String defaultOption = none;
+
+    int result = JOptionPane.showOptionDialog(null, "<html><body>"
+        + "Do you want to give or receive cash with the trade?"
+        + "</body></html>", "Cash Portion of Trade",
+        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+        new String[] { give, receive, none }, defaultOption);
+
+    if (result == 2)
+      return 0;
+
+    int amount = 0;
+    while (true) {
+      String strCash = JOptionPane.showInputDialog(null, "<html><body>"
+          + "How much cash do you want to "
+          + (result == 0 ? "give" : "receive") + "?<p>" + "(0 to " + cash + ")"
+          + "</body></html>", "Bid for property", JOptionPane.QUESTION_MESSAGE);
+      try {
+        amount = Integer.parseInt(strCash);
+        if (amount < 0 || amount > cash)
+          throw new NumberFormatException();
+        break;
+      } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "<html><body>"
+            + "The cash amount does not appear to be valid.<p>"
+            + "Please enter a whole number between 0 " + "and " + cash + ".<p>"
+            + "</body></html>", "Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+
+    return amount;
   }
 
   @Override

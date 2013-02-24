@@ -36,8 +36,6 @@ public class PlayerState {
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }
-//    System.out.println("PlayerState seed   : " + seed);
-
     r.setSeed(seed);
   }
 

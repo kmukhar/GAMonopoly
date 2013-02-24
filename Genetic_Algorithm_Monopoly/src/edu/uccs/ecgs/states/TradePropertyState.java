@@ -1,7 +1,7 @@
 package edu.uccs.ecgs.states;
 
-import edu.uccs.ecgs.ga.Actions;
-import edu.uccs.ecgs.ga.Monopoly;
+import java.util.ArrayList;
+import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class TradePropertyState extends PlayerState {
@@ -19,7 +19,9 @@ public class TradePropertyState extends PlayerState {
     
     case TRADE_DECISION_EVENT:
       game.logFinest("\nStarting process trade decision event");
-      player.processTradeDecisionEvent();
+      ArrayList<Location> locations = game.getPropertiesOwnedByOthers(player);
+      if (!locations.isEmpty())
+        player.processTradeDecisionEvent(locations);
 
       player.nextAction = Actions.DONE;
       inactiveState.enter();

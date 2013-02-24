@@ -30,8 +30,17 @@ public class TradeProposal {
   }
   
   @Override
-  public String toString() {
-    return "Trade Proposal:: Location1: " + location + "; Location2: " + location2 +
-        "; cash diff: " + cashDiff;
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Trade Proposal\nLocation1: ").append(location);
+    if (cashDiff > 0) 
+      sb.append(" and ").append(cashDiff).append(" dollars ");
+
+    sb.append(" for\nLocation2: ").append(location2);
+    if (cashDiff < 0)
+      sb.append(" and ").append(cashDiff).append(" dollars ");
+
+    return sb.toString();
   }
 }

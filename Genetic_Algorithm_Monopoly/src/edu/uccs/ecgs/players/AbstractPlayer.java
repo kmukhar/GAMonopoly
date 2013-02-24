@@ -1136,7 +1136,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void processDevelopHouseEvent() {
     // Bank has to have houses available
-    if (game.getNumHouses() == 0) {
+    if (game.getNumHousesInBank() == 0) {
       logFinest("Bank has no more houses");
       return;
     }
@@ -1223,7 +1223,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
           game.buyHouse(this, location);
           balanceHouses(monopolies, location.getGroup());
 
-          if (game.getNumHouses() == 0) {
+          if (game.getNumHousesInBank() == 0) {
             return;
           }
         }
@@ -1431,7 +1431,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (!owned.isEmpty()) {
       result.append("  Properties owned: ").append(separator);
       for (Location location : owned.values()) {
-        result.append("    ").append(location.toString()).append(separator);
+        result.append("    ").append(location.getFullInfoString())
+            .append(separator);
       }
     }
 
@@ -1546,10 +1547,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   /**
    * A method to make trading decisions and act on those decisions.
+   * @param locations The properties owned by other players that this player
+   * can trade for.
    */
-  public void processTradeDecisionEvent() {
-    // only try to trade if this player owns two or more properties
-    if (owned.size() > 1) {
+  public void processTradeDecisionEvent(ArrayList<Location> locations) {
+    // only try to trade if this player owns at least one propertie
+    // and other players own at least one property
+    if (owned.size() > 0 && !locations.isEmpty()) {
       TradeProposal bestTrade = propertyTrader.findBestTrade();
 
       if (bestTrade != null) {
@@ -1560,13 +1564,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   public boolean answerProposedTrade(TradeProposal bestTrade) {
-    logInfo(getName() + " is evaluating trade "
+    logInfo(getName() + " is evaluating trade\n"
         + bestTrade.toString());
 
-    // if the player has to geive too much money, the reject the trade
+    // if the player has to give too much money, the reject the trade
     if (cash + bestTrade.cashDiff < getMinimumCash()) {
-      logInfo("Trade would reduce cash of " + getName()
-          + " below minimum; trade refused");
+      logFinest("Trade would reduce cash of " + getName()
+          + " below minimum");
+      logInfo("Trade refused");
       return false;
     }
 
@@ -1578,7 +1583,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     int profit = newValue - baseValue + bestTrade.cashDiff;
     
     if (profit < tradeThreshold) {
-      logInfo("Trade does not exceed profit threshold; trade refused ");
+      logFinest("Trade does not exceed profit threshold");
+      logInfo("Trade refused");
       return false;
     }
 
