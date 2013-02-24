@@ -97,7 +97,9 @@ public class RGAPlayer extends CGPlayer {
     int idx2 = pf.getIndexFromProperties(Edges.NORTH, this);
 
     boolean answer = r.nextDouble() < chrJail[idx1][idx2];
-    if (!answer) {
+    if (answer) {
+      logInfo(getName() + " will pay bail.");
+    } else {
       logInfo(getName() + " will try to roll doubles.");
     }
     return answer;

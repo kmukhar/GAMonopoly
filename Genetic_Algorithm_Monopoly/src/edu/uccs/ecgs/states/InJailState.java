@@ -74,7 +74,6 @@ public class InJailState extends PlayerState {
       } else {
         //actually pay bail
         try {
-          game.logInfo(player.getName() + " pays $50 to get out of jail");
           player.getCash(50);
         } catch (BankruptcyException e) {
           //e.printStackTrace();
