@@ -74,11 +74,11 @@ public class PlayerState {
       player.nextAction = Actions.MAKE_BUILD_DECISION;
 
     } else {
-      movePlayer (currentRoll, game, player);
+      movePlayer (currentRoll, player);
     }
   }
 
-  protected void movePlayer(int currentRoll, Monopoly game, AbstractPlayer player) {
+  protected void movePlayer(int currentRoll, AbstractPlayer player) {
     player.move(currentRoll);
     Location location = player.getCurrentLocation();
     

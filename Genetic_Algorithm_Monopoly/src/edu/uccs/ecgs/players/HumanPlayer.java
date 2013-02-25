@@ -2,6 +2,9 @@ package edu.uccs.ecgs.players;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.swing.JOptionPane;
 import edu.uccs.ecgs.ga.*;
 
@@ -40,8 +43,13 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public boolean payBailP()
   {
+    String message = "Do you want to pay bail to get out of Jail?";
+    if (this.hasGetOutOfJailCard()) {
+      message = "Do you want to use your Get Out Of Jail card?";
+    }
+    
     int result = JOptionPane.showConfirmDialog(null,
-        "Do you want to pay bail to get out of Jail?", "Pay Bail?",
+        message, "Pay Bail?",
         JOptionPane.YES_NO_OPTION);
     return result == JOptionPane.YES_OPTION;
   }
@@ -230,6 +238,85 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     return amount;
+  }
+
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#processDevelopHouseEvent()
+   */
+  @Override
+  public void processDevelopHouseEvent() {
+    // Player has to have a monopoly
+    if (!hasMonopoly()) {
+      logFinest("Player does not have monopoly");
+      return;
+    }
+
+    boolean done = false;
+    while (!done) {
+      if (game.getNumHousesInBank() == 0) {
+        logInfo("Bank has no more houses to sell");
+        done = true;
+        break;
+      }
+
+      // the min number of houses on the properties in a group
+      int[] groupMin = new int[PropertyGroups.values().length];
+      for (PropertyGroups group : PropertyGroups.values()) {
+        groupMin[group.ordinal()] = Integer.MAX_VALUE;
+      }
+      
+      // Create a list of all the properties that the player owns that are also
+      // part of monopolies
+      CopyOnWriteArrayList<Location> monopolies = new CopyOnWriteArrayList<Location>();
+      for (Location location : getAllProperties().values()) {
+        if (PropertyFactory.getPropertyFactory(this.gameKey).groupIsMortgaged(
+            location.getGroup())) {
+          // skip this property since the group is mortgaged
+          continue;
+        }
+
+        if (location.partOfMonopoly && location.getNumHotels() == 0) {
+          monopolies.add(location);
+          if (location.getNumHouses() < groupMin[location.getGroup().ordinal()]) {
+            groupMin[location.getGroup().ordinal()] = location.getNumHouses();
+          }
+          logFinest(location.toString()
+              + " added to list of monopolies in processDevelopHouseEvent");
+        }
+      }
+
+      // now remove any properties that have more than the min properties in a group
+      // houses and hotels must be balanced, so one can't build on a property that
+      // already has greater than the min number of houses. Also remove properties
+      // where the cost of a house is greater than the player's cash.
+      for (Location location : monopolies) {
+        int index = location.getGroup().ordinal();
+        if (location.getNumHouses() > groupMin[index]) {
+          monopolies.remove(location);
+        } else if (location.getHouseCost() > cash) {
+          monopolies.remove(location);
+        }
+      }
+
+      if (monopolies.size() == 0)
+        break;
+
+      int result = JOptionPane.showConfirmDialog(null, "<html><body>"
+                  + "Do you want to buy any houses or hotels for your properties?</body></html>",
+              "Buy Houses or Hotels", JOptionPane.YES_NO_OPTION,
+              JOptionPane.QUESTION_MESSAGE);
+      if (result == 1)
+        break;
+
+      int selected = JOptionPane.showOptionDialog(null, "<html><body>"
+          + "Which property do you want to buy a house for?</body></html>",
+          "Trade Proposed", JOptionPane.DEFAULT_OPTION,
+          JOptionPane.QUESTION_MESSAGE, null, monopolies.toArray(),
+          monopolies.get(0));
+
+      game.buyHouse(this, monopolies.get(selected));
+    }
   }
 
   @Override

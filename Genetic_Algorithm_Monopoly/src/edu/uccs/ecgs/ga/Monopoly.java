@@ -900,6 +900,7 @@ public class Monopoly implements Runnable {
    *          The player that receives the amount from other players.
    */
   public void collect10FromAll(AbstractPlayer player) {
+    // TODO Fix so debug output is cleaner
     for (AbstractPlayer p : players) {
       if (p != player && !p.bankrupt()) {
         try {

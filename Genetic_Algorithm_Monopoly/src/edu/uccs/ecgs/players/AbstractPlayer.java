@@ -720,7 +720,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Change player state based on having paid bail to leave jail.
    */
-  public void paidBail() {
+  public void leaveJail() {
     inJail = false;
     jailSentence = 0;
   }
@@ -1058,7 +1058,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * 
    * @return The minimum amount of cash the player should have to avoid problems
    */
-  private int getMinimumCash() {
+  protected int getMinimumCash() {
     // Frayn: Keep a minimum of 200 pounds (dollars) in cash,
     int result = 200;
 
@@ -1131,12 +1131,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Attempt to buy a house for a property
    */
   public void processDevelopHouseEvent() {
-    // Bank has to have houses available
-    if (game.getNumHousesInBank() == 0) {
-      logFinest("Bank has no more houses");
-      return;
-    }
-
     // Player has to have a monopoly
     if (!hasMonopoly()) {
       logFinest("Player does not have monopoly");

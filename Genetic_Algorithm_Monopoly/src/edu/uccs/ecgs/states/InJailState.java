@@ -33,8 +33,9 @@ public class InJailState extends PlayerState {
       //so do not call player.setDoubles()
 
       if (dice.rolledDoubles()) {
-        player.paidBail();
-        movePlayer(currentRoll, game, player);
+        player.leaveJail();
+        game.logInfo(player.getName() + " rolled doubles! Leaving jail now.");
+        movePlayer(currentRoll, player);
         assert player.nextAction != Actions.ROLL_DICE : "Invalid action: ";
         atNewLocationState.enter();
         return determineNextState(player);
@@ -42,6 +43,7 @@ public class InJailState extends PlayerState {
         //did not roll doubles
         player.setDoubles(false);
         if (player.jailSentenceCompleted()) {
+          game.logInfo(player.getName() + " has been in jail for 3 turns, must leave jail now.");
           if (player.hasGetOutOfJailCard()) {
             player.useGetOutOfJailCard();
           } else {
@@ -55,10 +57,12 @@ public class InJailState extends PlayerState {
               return inactiveState;
             }
           }
-          player.paidBail();
-          movePlayer(currentRoll, game, player);
+          player.leaveJail();
+          movePlayer(currentRoll, player);
           assert player.nextAction != Actions.ROLL_DICE : "Invalid action: ";
           return determineNextState(player);
+        } else {
+          game.logInfo(player.getName() + " did not roll doubles. Still in jail.");
         }
         player.nextAction = Actions.MAKE_BUILD_DECISION;
         developPropertyState.enter();
@@ -83,7 +87,7 @@ public class InJailState extends PlayerState {
         }
       }
 
-      player.paidBail();
+      player.leaveJail();
       player.nextAction = Actions.ROLL_DICE;
       bailPaidState.enter();
       return bailPaidState;
