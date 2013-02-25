@@ -436,6 +436,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       throw new IllegalArgumentException(
           "Illegal attempt to use Get Out Of Jail Card");
     }
+    fireChangeEvent();
   }
 
   /**
@@ -533,6 +534,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setGetOutOfJail(Chance chanceJailCard) {
     chanceGOOJ = chanceJailCard;
+    fireChangeEvent();
   }
 
   /**
@@ -543,6 +545,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setGetOutOfJail(CommunityChest ccJailCard) {
     ccGOOJ = ccJailCard;
+    fireChangeEvent();
   }
 
   /**
@@ -1424,6 +1427,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         result.append("    ").append(location.getFullInfoString())
             .append(separator);
       }
+    }
+    
+    if (hasGetOutOfJailCard()) {
+      result.append(separator);
+      if (ccGOOJ != null) 
+        result.append("Community Chest: ").append(ccGOOJ.toString()).append(separator);
+      if (this.chanceGOOJ != null)
+        result.append("Chance: ").append(chanceGOOJ.toString()).append(separator);
     }
 
     return result.toString();
