@@ -620,10 +620,10 @@ public class Monopoly implements Runnable {
       assert !PropertyFactory.getPropertyFactory(gamekey).groupIsMortgaged(location.getGroup()) : 
         "Player tried to buy house; Some property in " + location.getGroup() + " is mortgaged.";
 
-      player.getCash(location.getHouseCost());
       location.addHouse();
+      player.getCash(location.getHouseCost());
       --numHouses;
-      logInfo("Bought house for property group " + location.getGroup());
+      logInfo(player.getName() + " bought house for property group " + location.getGroup());
       assert numHouses >= 0 : "Invalid number of houses: " + numHouses;
       logFinest("Bank now has " + numHouses + " houses");
     } catch (BankruptcyException ignored) {
