@@ -187,12 +187,18 @@ public class HumanPlayer extends AbstractPlayer {
           "Select your property", JOptionPane.QUESTION_MESSAGE, null,
           list.toArray(), list.get(0));
 
+      if (locationToTrade == null)
+        return;
+      
       Location locationToGet = (Location) JOptionPane.showInputDialog(null,
           "<html><body>"
               + " Which property of another player do you wish to trade for?",
           "Select other player's property", JOptionPane.QUESTION_MESSAGE, null,
           locations.toArray(), locations.get(0));
 
+      if (locationToGet == null) 
+        return;
+      
       int cash = getCashPartOfTrade();
       TradeProposal bestTrade = new TradeProposal(locationToTrade,
           locationToGet);
