@@ -820,13 +820,7 @@ public class Monopoly implements Runnable {
     logInfo("\n" + aPlayer.getName() + " wins " + aLocation.name
         + " auction for " + amount + " dollars.");
     aPlayer.getCash(amount);
-    aLocation.setOwner(aPlayer);
     aPlayer.addProperty(aLocation);
-    PropertyFactory.getPropertyFactory(gamekey).checkForMonopoly();
-    if (aLocation.partOfMonopoly) {
-      logInfo(aPlayer.getName() + " acquired monopoly with "
-          + aLocation.name);
-    }
   }
 
   /**

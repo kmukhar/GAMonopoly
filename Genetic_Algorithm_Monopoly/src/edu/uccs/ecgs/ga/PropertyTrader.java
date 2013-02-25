@@ -5,25 +5,22 @@ import edu.uccs.ecgs.players.AbstractPlayer;
 public class PropertyTrader {
 
   /**
-   * Trade the given properties between the owner of this PropertyNegotiator and
-   * the player who owns "gaining"
+   * Trade the given properties between two players
    * 
-   * @param losing
-   *          The property that owner is trading away
-   * @param gaining
-   *          The property that owner is receiving
+   * @param location1
+   *          The property that owner1 is trading for location2
+   * @param location2
+   *          The property that owner2 is trading for location1
    */
-  public static void tradeProperties(Location losing, Location gaining)
+  public static void tradeProperties(Location location1, Location location2)
   {
-    AbstractPlayer owner = losing.owner;
-    AbstractPlayer otherPlayer = gaining.getOwner();
+    AbstractPlayer owner1 = location1.getOwner();
+    AbstractPlayer owner2 = location2.getOwner();
 
-    losing.setOwner(otherPlayer);
-    otherPlayer.getAllProperties().put(losing.index, losing);
-    otherPlayer.getAllProperties().remove(gaining.index);
-
-    gaining.setOwner(owner);
-    owner.getAllProperties().put(gaining.index, gaining);
-    owner.getAllProperties().remove(losing.index);
+    owner2.removeProperty(location2);
+    owner1.removeProperty(location1);
+    
+    owner2.addProperty(location1);
+    owner1.addProperty(location2);
   }
 }

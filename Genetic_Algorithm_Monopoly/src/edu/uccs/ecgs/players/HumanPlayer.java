@@ -2,7 +2,6 @@ package edu.uccs.ecgs.players;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JOptionPane;

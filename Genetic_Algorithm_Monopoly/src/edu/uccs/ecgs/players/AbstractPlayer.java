@@ -369,14 +369,28 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Add a property to the player's inventory, normally by buying a property or
    * receiving a property through another player's bankruptcy.
    * 
-   * @param location2
+   * @param location
    *          The property to be added.
    */
-  public void addProperty(Location location2) {
-    owned.put(location2.index, location2);
+  public void addProperty(Location location) {
+    owned.put(location.index, location);
+    location.setOwner(this);
+
     // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(this.gameKey).checkForMonopoly();
+    if (location.partOfMonopoly) {
+      logInfo(getName() + " acquired monopoly with " + location.name);
+    }
     fireChangeEvent();
+  }
+
+  /**
+   * Remove a property from the list of properties owned by this player.
+   * @param location The property to be removed from player
+   */
+  public void removeProperty(Location location) {
+    owned.remove(location.index);
+    location.setOwner(null);
   }
 
   /**
@@ -905,7 +919,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *           If the player receiving the properties cannot pay the interest.
    */
   private void processMortgagedNewProperties(
-      TreeMap<Integer, Location> newProperties) throws BankruptcyException {
+      TreeMap<Integer, Location> newProperties) throws BankruptcyException 
+  {
+    //TODO make logging better
     Vector<Location> mortgaged = new Vector<Location>();
 
     // want to handle mortgages of added properties in this order:

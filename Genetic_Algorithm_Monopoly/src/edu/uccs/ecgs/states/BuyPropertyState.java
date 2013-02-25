@@ -32,13 +32,7 @@ public class BuyPropertyState extends PlayerState {
       
       try {
         player.getCash(location.getCost());
-        location.setOwner(player);
         player.addProperty(location);
-        PropertyFactory.getPropertyFactory(game.gamekey).checkForMonopoly();
-        if (location.partOfMonopoly) {
-          game.logInfo(player.getName()
-              + " acquired monopoly with " + location.name);
-        }
       } catch (BankruptcyException e) {
         // player will not buy house unless they have enough cash
         // TODO Verify that this exception will not occur
