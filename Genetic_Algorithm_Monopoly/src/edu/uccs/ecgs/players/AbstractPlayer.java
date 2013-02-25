@@ -1133,14 +1133,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Sell all the hotels and houses owned by the player
    */
   public void sellAllHousesAndHotels() {
-    // Sell all hotels first
     for (Location l : owned.values()) {
       if (l.getNumHotels() > 0) {
         game.liquidateHotel(this, l);
       }
-      if (l.getNumHouses() > 0) {
-        game.liquidateHouses(this, l);
-      }
+
+      assert l.getNumHouses() > 0;
+      game.liquidateHouses(this, l);
     }
 
     fireChangeEvent();

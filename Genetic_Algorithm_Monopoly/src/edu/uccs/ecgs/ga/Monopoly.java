@@ -491,12 +491,9 @@ public class Monopoly implements Runnable {
     int cost = l.getHotelCost();
     int numHotels = l.getNumHotels();
     assert numHotels == 1 : "Location has more than one hotel!";
-    int proceeds = 5 * cost; // (hotel + 4 houses) * cost
-    // TODO Fix? The next few lines rely on knowing that removeHotel() adds 4 houses to location.
     l.removeHotel();
     ++numHotels;
-    l.resetNumHouses();
-    abstractPlayer.receiveCash(proceeds);
+    abstractPlayer.receiveCash(cost);
   }
 
   /**
