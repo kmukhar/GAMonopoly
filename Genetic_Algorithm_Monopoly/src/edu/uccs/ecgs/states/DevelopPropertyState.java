@@ -20,12 +20,11 @@ public class DevelopPropertyState extends PlayerState {
 
     case DEVELOP_DECISION_EVENT:
       // Bank has to have houses available
-      if (game.getNumHousesInBank() == 0) {
+      if (game.getNumHousesInBank() > 0) {
+        player.processDevelopHouseEvent();
+      } else {
         game.logFinest("Bank has no more houses");
-        return;
       }
-
-      player.processDevelopHouseEvent();
 
       player.nextAction = Actions.MAKE_MORTGAGE_DECISION;
       payoffMortgageState.enter();
