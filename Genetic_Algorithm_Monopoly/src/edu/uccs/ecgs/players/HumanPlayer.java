@@ -168,10 +168,11 @@ public class HumanPlayer extends AbstractPlayer {
     if (this.getNumProperties() == 0)
       return;
 
-    int result = JOptionPane.showConfirmDialog(null, "<html><body>"
+    int result = JOptionPane.showOptionDialog(null, "<html><body>"
         + "Do you want to trade any of your properties?</body></html>",
         "Trade Properties", JOptionPane.YES_NO_OPTION,
-        JOptionPane.QUESTION_MESSAGE);
+        JOptionPane.QUESTION_MESSAGE,null, new String[]{"Yes","No"}, "No");
+
     if (result == 0) {
       ArrayList<Location> list = new ArrayList<Location>();
       for (Location l : this.getAllProperties().values()) {
@@ -310,10 +311,12 @@ public class HumanPlayer extends AbstractPlayer {
       if (monopolies.size() == 0)
         break;
 
-      int result = JOptionPane.showConfirmDialog(null, "<html><body>"
+      int result = JOptionPane.showOptionDialog(null, "<html><body>"
                   + "Do you want to buy any houses or hotels for your properties?</body></html>",
-              "Buy Houses or Hotels", JOptionPane.YES_NO_OPTION,
-              JOptionPane.QUESTION_MESSAGE);
+              "Build Houses or Hotels?", JOptionPane.YES_NO_OPTION,
+              JOptionPane.QUESTION_MESSAGE, null, new String[] { "Yes", "No" },
+              "No");
+
       if (result == 1)
         break;
 
@@ -321,7 +324,7 @@ public class HumanPlayer extends AbstractPlayer {
           .showInputDialog(null, "<html><body>"
                   + "Which property do you want to buy a house for?<p<p>"
                   + "Click Cancel if you no longer want to buy a house or hotel.</body></html>",
-              "Build House/Hotel?", JOptionPane.QUESTION_MESSAGE, null,
+              "Select property to build on", JOptionPane.QUESTION_MESSAGE, null,
               monopolies.toArray(), monopolies.get(0));
 
       if (selected != null)
