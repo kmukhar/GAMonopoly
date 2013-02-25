@@ -35,5 +35,4 @@ public class DevelopPropertyState extends PlayerState {
       throw new IllegalArgumentException(msg);
     }
   }
-
 }
