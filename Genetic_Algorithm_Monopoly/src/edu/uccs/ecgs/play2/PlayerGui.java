@@ -367,8 +367,9 @@ public class PlayerGui extends JPanel {
    */
   private void createNextButton()
   {
-    nextButton = new JButton("Next");
+    nextButton = new JButton("Step");
     nextButton.setEnabled(false);
+    nextButton.setMnemonic(KeyEvent.VK_S);
     nextButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
@@ -385,12 +386,12 @@ public class PlayerGui extends JPanel {
   private void createStartButton()
   {
     startButton = new JButton("Start");
+    startButton.setMnemonic(KeyEvent.VK_S);
     startButton.addActionListener(new ActionListener(){
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
         startButton.setEnabled(false);
-//        pauseButton.setEnabled(true);
         nextButton.setEnabled(true);
         Thread t = new Thread(game); //TODO
         t.start();
