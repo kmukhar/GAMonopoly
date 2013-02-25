@@ -204,6 +204,9 @@ public class HumanPlayer extends AbstractPlayer {
           locationToGet);
       bestTrade.setCash(cash);
 
+      assert bestTrade.location != null;
+      assert bestTrade.location2 != null;
+
       game.proposeTrade(bestTrade);
     }
   }
@@ -315,13 +318,15 @@ public class HumanPlayer extends AbstractPlayer {
       if (result == 1)
         break;
 
-      int selected = JOptionPane.showOptionDialog(null, "<html><body>"
-          + "Which property do you want to buy a house for?</body></html>",
-          "Trade Proposed", JOptionPane.DEFAULT_OPTION,
-          JOptionPane.QUESTION_MESSAGE, null, monopolies.toArray(),
-          monopolies.get(0));
+      Object selected = JOptionPane
+          .showInputDialog(null, "<html><body>"
+                  + "Which property do you want to buy a house for?<p<p>"
+                  + "Click Cancel if you no longer want to buy a house or hotel.</body></html>",
+              "Build House/Hotel?", JOptionPane.QUESTION_MESSAGE, null,
+              monopolies.toArray(), monopolies.get(0));
 
-      game.buyHouse(this, monopolies.get(selected));
+      if (selected != null)
+        game.buyHouse(this, (Location) selected);
     }
   }
 
