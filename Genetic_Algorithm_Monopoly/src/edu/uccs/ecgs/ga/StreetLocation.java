@@ -104,8 +104,12 @@ public class StreetLocation extends Location {
   @Override
   public String getFullInfoString()
   {
-    return super.toString() + " (" + getNumHouses() + " houses/"
-        + getNumHotels() + " hotels)";
+    StringBuilder sb = new StringBuilder(super.toString());
+    if (getNumHouses() + getNumHotels() > 0)
+      sb.append(" (").append(getNumHouses()).append(" houses/")
+          .append(getNumHotels()).append(" hotels)");
+
+    return sb.toString();
   }
 
   @Override
