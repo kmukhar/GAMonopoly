@@ -890,21 +890,27 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void addProperties(TreeMap<Integer, Location> allProperties,
       boolean gameOver) throws BankruptcyException {
+    
+    TreeMap<Integer, Location> mortgaged = new TreeMap<Integer, Location>();
+
     // add all properties first
     for (Location l : allProperties.values()) {
       owned.put(l.index, l);
       l.owner = this;
+      if (l.isMortgaged())
+        mortgaged.put(l.index, l);
     }
 
     // mark all the properties that are part of monopolies
     PropertyFactory.getPropertyFactory(this.gameKey).checkForMonopoly();
 
     // if the game isn't over, then the gaining player needs to pay the
-    // 10% fee on any mortgaged properties, and possible unmortgage the
+    // 10% fee on any mortgaged properties, and possibly unmortgage the
     // properties
     if (!gameOver) {
-      processMortgagedNewProperties(allProperties);
+      processMortgagedNewProperties(mortgaged);
     }
+
     fireChangeEvent();
   }
 
@@ -912,6 +918,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * Go through all the new properties gained by this player, and for the ones
    * that are mortgaged, pay the fee and then determine whether or not to
    * unmortgage the property
+   * 
+   * When a bankrupt player gives all property over to creditor, the new owner
+   * must at once pay the Bank the amount of interest on the loan, which is 10%
+   * of the value of the property. The new owner who does this may then, at
+   * his/her option, pay the principal or hold the property until some later
+   * turn, then lift the mortgage. If he/she holds property in this way until a
+   * later turn, he/she must pay the interest again upon lifting the mortgage.
    * 
    * @param newProperties
    *          The mortgaged properties that the player is receiving.
@@ -921,68 +934,60 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private void processMortgagedNewProperties(
       TreeMap<Integer, Location> newProperties) throws BankruptcyException 
   {
-    //TODO make logging better
-    Vector<Location> mortgaged = new Vector<Location>();
+    Vector<Location> mortgaged = getSortedMortgages(newProperties);
+    Vector<Location> unlifted = new Vector<Location>();
 
-    // want to handle mortgages of added properties in this order:
-    // properties that are part of monopolies
-    for (Location lot : newProperties.values()) {
-      if (lot.partOfMonopoly && lot.isMortgaged()) {
-        mortgaged.add(lot);
+    if (mortgaged.size() == 0)
+      return;
+
+    // determine how many can be paid off
+    int payoff = 0;
+    int availableCash = cash - getMinimumCash();
+    do {
+      // compute total payoff cost
+      payoff = 0;
+      for (Location lot : mortgaged) {
+        payoff += 1.1 * lot.getCost() / 2;
       }
-    }
-
-    // utility monopolies
-    int countUtilities = getNumUtilities();
-
-    // add utilities if player has 2 utilities
-    if (countUtilities == 2) {
-      for (Location lot : newProperties.values()) {
-        if (lot.getGroup() == PropertyGroups.UTILITIES && lot.isMortgaged()) {
-          mortgaged.add(lot);
-        }
+      for (Location lot : unlifted) {
+        payoff += 0.1 * lot.getCost() / 2;
       }
-    }
 
-    // add railroads
-    for (Location lot : newProperties.values()) {
-      if (lot.getGroup() == PropertyGroups.RAILROADS && lot.isMortgaged()) {
-        mortgaged.add(lot);
+      // if not enough cash to payoff all, remove last entry from map
+      if (payoff > availableCash) {
+        Location lot = mortgaged.remove(mortgaged.size());
+        unlifted.add(lot);
       }
-    }
 
-    // add single utilities
-    if (countUtilities == 1) {
-      for (Location lot : newProperties.values()) {
-        if (lot.getGroup() == PropertyGroups.UTILITIES && lot.isMortgaged()) {
-          mortgaged.add(lot);
-        }
-      }
-    }
+    } while (payoff > availableCash && mortgaged.size() > 0);
 
-    // lots that are not part of monopolies
-    for (Location lot : newProperties.values()) {
-      if (!lot.partOfMonopoly && lot.getGroup() != PropertyGroups.RAILROADS
-          && lot.getGroup() != PropertyGroups.UTILITIES && lot.isMortgaged()) {
-        mortgaged.add(lot);
-      }
-    }
+    // at this point, there is a payoff amount, a set of lots to lift the
+    // mortgage from (may be empty), and a set of lots to just pay the
+    // interest on (may be empty)
 
-    // Decide whether to pay off any of the mortgaged properties, and if so,
-    // then pay them off
-    processMortgagedLots(mortgaged);
-
-    // If any lots are still mortgaged, need to pay the interest
-    for (Location lot : mortgaged) {
-      if (lot.isMortgaged()) {
-        // pay the interest of 10%
-        int amountToPay = (int) (0.1 * lot.getCost() / 2);
-        logFinest(getName() + " will only pay mortgage fee for "
-            + lot.name + "; fee is " + amountToPay);
-
-        getCash(amountToPay);
-      }
-    }
+    // TODO 
+    
+//    for (Location lot : lots) {
+//      int amountToPay = 0;
+//
+//      if (canPayMortgage(lot)) {
+//        // pay off mortgage
+//        amountToPay = (int) (1.1 * lot.getCost() / 2);
+//        logFinest("Player will pay off mortgage for " + lot.name + "; cost is "
+//            + amountToPay);
+//        try {
+//          getCash(amountToPay);
+//          lot.setMortgaged(false);
+//          logFinest(lot.name + " is no longer mortgaged");
+//        } catch (BankruptcyException e) {
+//          // canPayMortgage() should only return true if the player can raise
+//          // the cash to pay off the mortgage, thus getCash should not throw a
+//          // bankruptcy exception.
+//          Throwable t = new Throwable(game.toString(), e);
+//          t.printStackTrace();
+//        }
+//      }
+//    }
   }
 
   /**
@@ -990,69 +995,87 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * them off.
    */
   public void payOffMortgages() {
-    Vector<Location> mortgaged = new Vector<Location>();
-    for (Location lot : owned.values()) {
-      if (lot.isMortgaged()) {
-        logFinest(lot.name
-            + " is mortgaged; added to list of properties to unmortgage");
-        mortgaged.add(lot);
+    Vector<Location> lots = getSortedMortgages(owned);
+    
+    // now determine how many can be paid off
+    int payoff = 0;
+    int availableCash = cash - getMinimumCash();
+    do {
+      // compute total payoff cost
+      payoff = 0;
+      for (Location lot : lots) {
+        payoff += 1.1 * lot.getCost() / 2;
+      }
+
+      // if not enough cash to payoff all, remove last entry from map
+      if (payoff > availableCash)
+        lots.remove(lots.size());
+
+    } while (payoff > availableCash && lots.size() > 0);
+
+    assert payoff < cash;
+    if (lots.size() > 0) {
+      logInfo(getName() + " lifting mortgages.");
+      try {
+        getCash(payoff);
+      } catch (BankruptcyException ignored) {
+        // payoff < availableCash < cash, so this exception should not occur
+      }
+
+      for (Location lot : lots) {
+        lot.setMortgaged(false);
+        logInfo(lot.name + " is no longer mortgaged.");
       }
     }
-
-    processMortgagedLots(mortgaged);
   }
 
   /**
-   * Actually does the work of paying off the mortgages in the list created by
-   * {@link #payOffMortgages()} or
-   * {@link #processMortgagedNewProperties(TreeMap)}.
+   * Find all the Location objects in the lots argument, create a sorted
+   * Collection of all the locations that are mortgaged. Sorting is in 
+   * order of streets that are part of monopolies, utilities that are part of
+   * monopolies, railroads, single utilities, and streets that are not part of
+   * monopolies.
    * 
-   * @param mortgaged
-   *          A list of mortgaged properties owned by the player.
+   * @param lots The set of Locations objects to check
+   * @return A Sorted vector of Location objects
    */
-  private void processMortgagedLots(Vector<Location> mortgaged) {
-    // only unmortgage when other monopolies have been fully developed
-    //
-    // TODO: Need to validate this FOR block. It appears that the original
-    // intent here was that if a location was part of a monopoly, then it should
-    // be fully developed with 3 houses or a hotel before the player pays off
-    // the mortgage for other properties.
-    for (Location location : owned.values()) {
-      if (location.isMortgaged() || location.groupIsMortgaged(this.gameKey)) {
-        continue;
-      }
+  private Vector<Location> getSortedMortgages(TreeMap<Integer, Location> lots) {
+    TreeMap<Integer, Location> map = new TreeMap<Integer, Location>();
+    int mOffset = 0; // index offset for mortgaged streets in monopolies
+    int u2Offset = 40; // index offset for mortgaged utility monopolies
+    int rOffset = 80; // index offset for mortgaged railroads
+    int u1Offset = 120; // index offset for mortgaged single utilities
+    int sOffset = 160; // index offset for mortgaged streets 
 
-      if (location.partOfMonopoly && !location.isFullyBuilt()) {
-        return;
-      }
-    }
+    // go through all the lots, and if they are mortgaged, put them into a
+    // sorted map in order by street monopolies, utility monopolies, railroads,
+    // single utilities, and finally streets that are not part of monopolies
+    for (Location lot : lots.values()) {
+      int offset = rOffset;
 
-    int count = 0;
+      if (lot.isMortgaged()) {
+        logFinest(lot.name
+            + " is mortgaged; added to list of properties to unmortgage");
 
-    for (Location lot : mortgaged) {
-      int amountToPay = 0;
-
-      if (canPayMortgage(lot)) {
-        // pay off mortgage
-        amountToPay = (int) (1.1 * lot.getCost() / 2);
-        logFinest("Player will pay off mortgage for " + lot.name + "; cost is "
-            + amountToPay);
-        try {
-          getCash(amountToPay);
-          lot.setMortgaged(false);
-          logFinest(lot.name + " is no longer mortgaged");
-          ++count;
-        } catch (BankruptcyException e) {
-          // payMortgageP() should only return true if the player can raise the
-          // cash to pay off the mortgage, thus getCash should not throw a
-          // bankruptcy exception.
-          Throwable t = new Throwable(game.toString(), e);
-          t.printStackTrace();
+        if (lot instanceof StreetLocation) {
+          offset = sOffset;
+          if (lot.partOfMonopoly)
+            offset = mOffset;
         }
+
+        if (lot instanceof UtilityLocation) {
+          offset = u1Offset;
+          if (lot.partOfMonopoly)
+            offset = u2Offset;
+        }
+
+        map.put(lot.index + offset, lot);
       }
     }
-    logFinest(count + " mortgaged lots were paid off; "
-        + (mortgaged.size() - count) + " lots are still mortgaged");
+
+    Vector<Location> result = new Vector<Location>();
+    result.addAll(map.values());
+    return result;
   }
 
   /**
