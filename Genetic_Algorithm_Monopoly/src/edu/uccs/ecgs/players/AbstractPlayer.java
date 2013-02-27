@@ -940,6 +940,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (mortgaged.size() == 0)
       return;
 
+    logInfo(getName() + " received " + mortgaged.size()
+        + " mortgaged properties.");
+    logInfo(getName() + " owes interest on all new properties, "
+        + "and may choose to lift morgages.");
+    
     // determine how many can be paid off
     int payoff = 0;
     int availableCash = cash - getMinimumCash();
@@ -955,7 +960,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
       // if not enough cash to payoff all, remove last entry from map
       if (payoff > availableCash) {
-        Location lot = mortgaged.remove(mortgaged.size());
+        Location lot = mortgaged.remove(mortgaged.size() - 1);
         unlifted.add(lot);
       }
 
@@ -964,30 +969,30 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // at this point, there is a payoff amount, a set of lots to lift the
     // mortgage from (may be empty), and a set of lots to just pay the
     // interest on (may be empty)
-
-    // TODO 
     
-//    for (Location lot : lots) {
-//      int amountToPay = 0;
-//
-//      if (canPayMortgage(lot)) {
-//        // pay off mortgage
-//        amountToPay = (int) (1.1 * lot.getCost() / 2);
-//        logFinest("Player will pay off mortgage for " + lot.name + "; cost is "
-//            + amountToPay);
-//        try {
-//          getCash(amountToPay);
-//          lot.setMortgaged(false);
-//          logFinest(lot.name + " is no longer mortgaged");
-//        } catch (BankruptcyException e) {
-//          // canPayMortgage() should only return true if the player can raise
-//          // the cash to pay off the mortgage, thus getCash should not throw a
-//          // bankruptcy exception.
-//          Throwable t = new Throwable(game.toString(), e);
-//          t.printStackTrace();
-//        }
-//      }
-//    }
+    // Start by checking whether the player can pay the payoff amount
+    if (!canRaiseCash(payoff)) {
+      logInfo(getName() + " can't raise the cash to pay interest.");
+      throw new BankruptcyException();
+    }
+
+    // so either the player has enough cash, or can raise enough cash
+    if (unlifted.size() > 0) {
+      for (Location lot : unlifted) {
+        logInfo(getName() + " paid interest on " + lot.name + ".");
+      }
+    }
+    if (mortgaged.size() > 0) {
+      for (Location lot : mortgaged) {
+        lot.setMortgaged(false);
+        logInfo(getName() + " lifting mortgage on " + lot.name);
+      }
+      try {
+        getCash(payoff);
+      } catch (BankruptcyException ignored) {
+        // payoff < availableCash < cash, so this exception should not occur
+      }
+    }
   }
 
   /**
@@ -996,7 +1001,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void payOffMortgages() {
     Vector<Location> lots = getSortedMortgages(owned);
-    
+
+    if (lots.size() == 0) 
+      return;
+
     // now determine how many can be paid off
     int payoff = 0;
     int availableCash = cash - getMinimumCash();
@@ -1009,7 +1017,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
       // if not enough cash to payoff all, remove last entry from map
       if (payoff > availableCash)
-        lots.remove(lots.size());
+        lots.remove(lots.size() - 1);
 
     } while (payoff > availableCash && lots.size() > 0);
 
@@ -1079,22 +1087,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   /**
-   * make the decision of whether or not to pay the mortgage on the property
-   * 
-   * @param lot
-   *          The property for which to pay off mortgage
-   * @return True if the player can pay the mortgage, False otherwise
-   */
-  private boolean canPayMortgage(Location lot) {
-    int cost = (int) (1.1 * lot.getCost() / 2);
-
-    // After paying cost, player should still have minimum cash, so player can
-    // pay off mortgage if player's current cash is more than minimum
-    // cash + cost,
-    return cash >= getMinimumCash() + cost;
-  }
-
-  /**
    * Compute the minimum amount of cash the player should have on hand based on
    * current game conditions.
    * 
@@ -1161,8 +1153,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         game.liquidateHotel(this, l);
       }
 
-      assert l.getNumHouses() > 0;
-      game.liquidateHouses(this, l);
+      assert l.getNumHouses() >= 0;
+      if (l.getNumHouses() > 0)
+        game.liquidateHouses(this, l);
     }
 
     fireChangeEvent();
@@ -1185,10 +1178,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // Assume player will not try to raise cash for this. In most cases it
     // will not make sense for the player to sell houses or mortgage properties
     // to buy houses or hotels.
-    //
-    // TODO This might be implemented in the future: A player might want to sell
-    // houses from one property to buy them for another property if an opponent
-    // is far from the first property and close to the second property.
     if (cash < minCash) {
       logFinest("Player does not have minimum cash");
       return;

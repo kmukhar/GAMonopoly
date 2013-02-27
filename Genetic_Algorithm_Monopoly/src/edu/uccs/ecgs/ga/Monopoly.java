@@ -300,7 +300,7 @@ public class Monopoly implements Runnable {
   {
     int cost = l.getHouseCost();
     int numHousesAtLocation = l.getNumHouses();
-    int proceeds = numHouses * cost;
+    int proceeds = numHousesAtLocation * cost;
     l.resetNumHouses();
     numHouses += numHousesAtLocation;
     abstractPlayer.receiveCash(proceeds);
@@ -752,10 +752,16 @@ public class Monopoly implements Runnable {
       AbstractPlayer highBidPlayer = null;
       int secondHighestBid = 0;
 
+      TreeMap<Integer, AbstractPlayer> bids = 
+          new TreeMap<Integer, AbstractPlayer>();
       for (AbstractPlayer p : players) {
         int bid = p.getBidForLocation(location);
-        logInfo(p.getName() + " has " + p.cash
-            + " dollars and bids " + bid);
+        bids.put(bid, p);
+      }
+
+      for (Integer bid : bids.keySet()) {
+        AbstractPlayer p = bids.get(bid);
+        logInfo(p.getName() + " bids " + bid);
 
         if (bid > highBid) {
           secondHighestBid = highBid;
