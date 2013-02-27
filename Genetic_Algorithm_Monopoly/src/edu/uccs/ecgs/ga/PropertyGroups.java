@@ -92,4 +92,27 @@ public enum PropertyGroups {
 
     return numHouses;
   }
+
+  public int getHouseCost() {
+    switch (this) {
+    case BROWN:
+    case LIGHT_BLUE:
+      return 50;
+
+    case PURPLE:
+    case RED:
+      return 100;
+
+    case ORANGE:
+    case YELLOW:
+      return 150;
+
+    case GREEN:
+    case DARK_BLUE:
+      return 200;
+
+    default:
+      return 0;
+    }
+  }
 }

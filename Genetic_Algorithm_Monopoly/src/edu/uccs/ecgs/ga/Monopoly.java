@@ -602,12 +602,15 @@ public class Monopoly implements Runnable {
    *          must build evenly, so after buying a house for this location, the
    *          player may rebalance the houses among the properties in this
    *          location's group.
+   * @return The number of houses bought, either 0 or 1. Zero houses can be
+   *         bought if there are no more houses in the bank, or if the player
+   *         does not have enough money to buy a house.
    */
-  public void buyHouse(AbstractPlayer player, Location location) {
+  public int buyHouse(AbstractPlayer player, Location location) {
     if (numHouses == 0) {
-      logInfo(player.getName()
+      logFinest(player.getName()
           + " wanted to buy house, but none are available");
-      return;
+      return 0;
     }
 
     try {
@@ -619,18 +622,23 @@ public class Monopoly implements Runnable {
 
       location.addHouse();
       player.getCash(location.getHouseCost());
-      --numHouses;
       logInfo(player.getName() + " bought house for property group " + location.getGroup());
+      --numHouses;
       assert numHouses >= 0 : "Invalid number of houses: " + numHouses;
       logFinest("Bank now has " + numHouses + " houses");
+      return 1;
     } catch (BankruptcyException ignored) {
       // expect that any player that buys a house first verifies they
       // have enough cash
+      location.removeHouse();
+      ++numHouses;
       ignored.printStackTrace();
     } catch (AssertionError ae) {
       logFinest(player.toString());
       throw ae;
     }
+
+    return 0;
   }
 
   /**
@@ -641,9 +649,10 @@ public class Monopoly implements Runnable {
    * @param location
    *          The location which will receive the hotel.
    */
-  public void buyHotel(AbstractPlayer player, Location location) {
+  public int buyHotel(AbstractPlayer player, Location location) {
     try {
-      assert player.canRaiseCash(location.getHotelCost()) : "Player tried to buy house with insufficient cash";
+      assert player.canRaiseCash(location.getHotelCost()) : 
+        "Player tried to buy house with insufficient cash";
       location.addHotel();
       --numHotels;
       player.getCash(location.getHotelCost());
@@ -653,6 +662,7 @@ public class Monopoly implements Runnable {
       // add the houses back to the bank
       numHouses += 4;
       assert numHouses < 33 : "Invalid number of houses: " + numHouses;
+      return 1;
     } catch (BankruptcyException ignored) {
       // expect that any player that buys a house first verifies they
       // have enough cash
@@ -660,6 +670,7 @@ public class Monopoly implements Runnable {
       Throwable t = new Throwable(toString(), ignored);
       t.printStackTrace();
     }
+    return 0;
   }
 
   /**
