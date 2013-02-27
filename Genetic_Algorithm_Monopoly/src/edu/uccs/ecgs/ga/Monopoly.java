@@ -698,6 +698,10 @@ public class Monopoly implements Runnable {
       player.useGetOutOfJailCard();
     }
 
+    //TODO There appears to be a bug somewhere, when processing a
+    // bankruptcy, this method (or methods it calls) give the player
+    // enough cash to pay rent, so player should not be bankrupt, or
+    // process method has error
     logFinest("Bankrupt count: " + bankruptCount);
 
     player.sellAllHousesAndHotels();
@@ -709,7 +713,7 @@ public class Monopoly implements Runnable {
       if (!gameOver) {
         TreeMap<Integer, Location> lotsToAuction = new TreeMap<Integer, Location>();
         lotsToAuction.putAll(player.getAllProperties());
-//        player.clearAllProperties();
+        player.clearAllProperties();
         auctionLots(lotsToAuction);
       }
     } else {
@@ -720,7 +724,7 @@ public class Monopoly implements Runnable {
       // mortgaged properties are handled in the addProperties method
       try {
         gainingPlayer.addProperties(player.getAllProperties(), gameOver);
-//        player.clearAllProperties();
+        player.clearAllProperties();
       } catch (BankruptcyException e) {
         //rarely, the player gaining the properties will not be able to raise
         //the case to pay the interest. The gainingPlayer goes bankrupt also.
@@ -728,7 +732,6 @@ public class Monopoly implements Runnable {
       }
     }
 
-    player.clearAllProperties();
     player.setBankrupt();
     assert player.cash == 0;
   }

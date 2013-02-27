@@ -484,6 +484,7 @@ public class PropertyNegotiator {
       losing = trade.location2;
     }
     
+    //TODO Fix this
     // This seems dangerous to me, but this is the quick and dirty solution
     // we reset the owners as if a trade has been made, so we can evaluate
     // the result of the trade. At the end of the method these will be reset.

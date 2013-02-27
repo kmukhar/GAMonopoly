@@ -249,7 +249,6 @@ public class HumanPlayer extends AbstractPlayer {
     return amount;
   }
 
-
   /* (non-Javadoc)
    * @see edu.uccs.ecgs.players.AbstractPlayer#processDevelopHouseEvent()
    */
@@ -330,6 +329,16 @@ public class HumanPlayer extends AbstractPlayer {
       if (selected != null)
         game.buyHouse(this, (Location) selected);
     }
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#getCash(int)
+   */
+  @Override
+  public void getCash(int amount) throws BankruptcyException
+  {
+    // TODO Auto-generated method stub
+    super.getCash(amount);
   }
 
   @Override
