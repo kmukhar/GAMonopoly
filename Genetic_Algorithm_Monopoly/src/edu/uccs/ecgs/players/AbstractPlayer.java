@@ -780,6 +780,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       return;
     }
 
+    // TODO Fix this, issue 13
     if (canRaiseCash(amount)) {
       logInfo(getName() + " attempting to raise " + amount
           + " dollars");
