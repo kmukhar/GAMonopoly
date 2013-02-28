@@ -846,7 +846,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       while (maxHouses > 0) {
         for (Location l : owned.values()) {
           if (l.getNumHouses() == maxHouses) {
-            logFinest(l.name + " has " + l.getNumHouses() + " houses");
+            logFinest(l.name + " has " + l.getNumHouses()
+                + (l.getNumHouses() == 1 ? " house" : " houses"));
             logInfo(getName() + " will sell house at " + l.name);
             game.sellHouse(l);
           }
@@ -1205,30 +1206,47 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
     // Create a list of all the groups for which a player has a monopoly,
     // and for which no property in the group is mortgaged.
-    Vector<PropertyGroups> groups = new Vector<PropertyGroups>();
+    Vector<PropertyGroups> groups1 = new Vector<PropertyGroups>();
+    Vector<PropertyGroups> groups2 = new Vector<PropertyGroups>();
 
     // Good strategy says to build all properties up to 3 houses first, and 
     // then if all monopolies of player have 3 houses, then build hotels.
-    // need3Houses means some property in some group has less than 3 houses
-    boolean need3Houses = false;
 
+    // separate monopolies into 2 groups: those that have less than 3 houses
+    // and those that have 3 or more
     for (Location aLocation : owned.values()) {
-      // skip this property since the group is mortgaged
+      // skip this group since the group is mortgaged
       if (aLocation.groupIsMortgaged(gameKey))
         continue;
 
-      if (aLocation.partOfMonopoly) {
-        if (!need3Houses && aLocation.getNumHotels() == 0
-            && aLocation.getNumHouses() < 3)
-          need3Houses = true;
+      // skip the location if it has a hotel
+      if (aLocation.getNumHotels() > 0) 
+        continue;
 
-        if (!groups.contains(aLocation.getGroup())) {
-          groups.add(aLocation.getGroup());
-          logFinest(aLocation.getGroup().toString()
-              + " added to list of monopolies in processDevelopHouseEvent");
+      PropertyGroups group = aLocation.getGroup();
+
+      if (aLocation.partOfMonopoly) {
+        if (aLocation.getNumHouses() < 3 && aLocation.getNumHotels() == 0) {
+          if (!groups1.contains(group)) {
+            groups1.add(group);
+            logFinest(group.toString()
+                + " added to list of monopolies in processDevelopHouseEvent");
+          }
+          groups2.remove(group);
+          assert groups1.contains(group);
+          assert !groups2.contains(group);
+        } else if (aLocation.getNumHouses() >= 3) {
+          if (!groups1.contains(group) && !groups2.contains(group)) {
+            groups2.add(group);
+            assert !groups1.contains(group);
+            assert groups2.contains(group);
+          }
         }
       }
     }
+
+    if (groups1.size() == 0 && groups2.size() == 0)
+      return;
 
     for (int i = 0; i < groupOrder.length; i++) {
       int houseCost = groupOrder[i].getHouseCost();
@@ -1238,31 +1256,31 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
             + location.name);
         break;
       }
-      
-      for (PropertyGroups group : groups) {
+
+      Vector<PropertyGroups> groupsToDevelop = groups1;     
+      if (groups1.size() == 0) {
+        groupsToDevelop = groups2;
+      }
+
+      for (PropertyGroups group : groupsToDevelop) {
         // Process properties in group order, so if location is not part of
         // current group, then skip it for now
         if (group == groupOrder[i]) {
           logFinest("Checking " + group + " for build decision");
-          buyHousesForGroup(group, need3Houses);
+          buyHousesForGroup(group);
         }
       }
     }
+    logInfo(toString());
   }
 
   /**
-   * Buy Houses or Hotels for a group. If need three houses is true, method will
-   * try to buy until there are 3 houses on every location in the group. If
-   * need3Houses is false, then buy a 4th house or a hotel.
+   * Buy Houses or Hotels for a group. 
    * 
    * @param group
    *          The group to buy houses for.
-   * @param need3Houses
-   *          If true --> buy up to 3 houses for each property in the group.<br>
-   *          Otherwise --> buy a 4th house or a hotel for the properties in the
-   *          group.
    */
-  private void buyHousesForGroup(PropertyGroups group, boolean need3Houses) {
+  private void buyHousesForGroup(PropertyGroups group) {
     // Best strategy is to buy in a particular order, either 312 or 321 or 21,
     // depending on the group, but for simplicity, always buy in 321 order (3rd 
     // property, 2nd property, then 1st property, in index order).
@@ -1271,52 +1289,52 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     int numHousesBought = 0;
     int numHotelsBought = 0;
 
-    int count = 0;
-    while (!done) {
-      ++count;
-      
+    while (!done) {      
       int minHouses = Integer.MAX_VALUE;
-      int minHotels = Integer.MAX_VALUE;
       Vector<Location> lots = new Vector<Location>();
       for (Location lot : owned.values()) {
-        if (lot.getGroup() == group)
+        if (lot.getGroup() == group && lot.getNumHotels() == 0)
           lots.add(0, lot);
         else
           continue;
 
         if (lot.getNumHouses() < minHouses)
           minHouses = lot.getNumHouses();
-
-        if (lot.getNumHotels() < minHotels)
-          minHotels = lot.getNumHotels();
       }
 
-      if (need3Houses && minHouses == 3)
+      if (lots.size() == 0)
         break;
 
-      if (minHotels == 1) 
-        break;
-
-      if ((need3Houses && minHouses < 3) || (!need3Houses && minHouses == 3)) 
-      { 
+      if (minHouses < 4) 
+      {
         for (Location lot : lots) {
           if (lot.getNumHouses() == minHouses) {
             if (cash >= (getMinimumCash() + lot.getHouseCost())) {
               int numBought = game.buyHouse(this, lot);
               numHousesBought += numBought;
+              if (numBought == 0) {
+                done = true;
+                break;
+              }
             } else {
               done = true;
               break;
             }
           }
         }
-      } else if (!need3Houses && (minHouses == 4 || minHouses == 0)) {
+      } else {
         // buy a hotel
         for (Location lot : lots) {
-          if (lot.getNumHouses() == 4) {
+          if (lot.getNumHouses() == minHouses) {
+            assert lot.getNumHotels() == 0 : lot.getFullInfoString();
+            assert lot.getNumHouses() == 4 : lot.getFullInfoString();
             if (cash >= (getMinimumCash() + lot.getHotelCost())) {
               int numBought = game.buyHotel(this, lot);
               numHotelsBought += numBought;
+              if (numBought == 0) {
+                done = true;
+                break;
+              }
             } else {
               done = true;
               break;
@@ -1324,20 +1342,17 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
           }
         }
       }
-      // OTHER Conditions
-      // need3Houses && minHouses == 3   --> some other group needs houses
-      // need3Houses && minHouses > 3    --> should not happen
-      // !need3Houses && minHouses > 4   --> should not happen
-      // !need3Houses && minHouses 1,2,3 --> handled above
-      // (!need3Houses && minHouses > 0 && minHouses < 4))
     }
 
     if (numHousesBought > 0) 
       logInfo(getName() + " bought " + numHousesBought
-          + " houses for the property group " + group);
-    if (numHotelsBought > 0) 
+          + (numHousesBought == 1 ? " house" : " houses")
+          + " for the property group " + group);
+
+    if (numHotelsBought > 0)
       logInfo(getName() + " bought " + numHotelsBought
-          + " hotels for the property group " + group);
+          + (numHotelsBought == 1 ? " hotel" : " hotels")
+          + " for the property group " + group);
   }
 
   /**

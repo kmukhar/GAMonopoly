@@ -31,6 +31,8 @@ public class PlayerGui extends JPanel {
   private Monopoly game;
   private JTextArea gameInfo;
 
+  private Thread gameThread;
+
   /**
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event dispatch thread.
@@ -470,8 +472,8 @@ public class PlayerGui extends JPanel {
       {
         startButton.setEnabled(false);
         nextButton.setEnabled(true);
-        Thread t = new Thread(game); //TODO
-        t.start();
+        gameThread = new Thread(game);
+        gameThread.start();
       }});
   }
 

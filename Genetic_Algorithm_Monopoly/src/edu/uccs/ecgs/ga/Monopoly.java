@@ -281,6 +281,7 @@ public class Monopoly implements Runnable {
    *          The property to be sold.
    */
   public void sellHouse(Location location) {
+    assert location.getNumHouses() > 0 : location.getFullInfoString();
     location.removeHouse();
     location.owner.receiveCash(location.getHouseCost() / 2);
     ++numHouses;
