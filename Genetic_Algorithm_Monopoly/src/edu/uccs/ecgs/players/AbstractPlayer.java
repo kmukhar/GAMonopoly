@@ -825,14 +825,19 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         }
       }
 
-      // sell hotels
-      for (Location l : owned.values()) {
-        if (l.getNumHotels() > 0) {
-          logInfo(getName() + " will sell hotel at " + l.name);
-          game.sellHotel(this, l, owned.values());
-        }
-        if (cash >= amount) {
-          return;
+      // sell hotels in reverse build order
+      for (int i = groupOrder.length - 1; i <= 0; i--) {
+        for (Location l : owned.values()) {
+          if (l.getGroup() != groupOrder[i])
+            continue;
+
+          if (l.getNumHotels() > 0) {
+            logInfo(getName() + " will sell hotel at " + l.name);
+            game.sellHotel2(this, l, owned.values());
+          }
+          if (cash >= amount) {
+            return;
+          }
         }
       }
 
@@ -1035,7 +1040,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
     } while (payoff > availableCash && lots.size() > 0);
 
-    assert payoff < cash;
+    assert payoff < cash || lots.size() == 0;
+
     if (lots.size() > 0) {
       logInfo(getName() + " lifting mortgages.");
       try {
@@ -1265,7 +1271,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     int numHousesBought = 0;
     int numHotelsBought = 0;
 
+    int count = 0;
     while (!done) {
+      ++count;
+      
       int minHouses = Integer.MAX_VALUE;
       int minHotels = Integer.MAX_VALUE;
       Vector<Location> lots = new Vector<Location>();
@@ -1288,8 +1297,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (minHotels == 1) 
         break;
 
-      if ((need3Houses && minHouses < 3) || 
-          (!need3Houses && minHouses > 0 && minHouses < 4)) {
+      if ((need3Houses && minHouses < 3) || (!need3Houses && minHouses == 3)) 
+      { 
         for (Location lot : lots) {
           if (lot.getNumHouses() == minHouses) {
             if (cash >= (getMinimumCash() + lot.getHouseCost())) {
@@ -1320,6 +1329,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       // need3Houses && minHouses > 3    --> should not happen
       // !need3Houses && minHouses > 4   --> should not happen
       // !need3Houses && minHouses 1,2,3 --> handled above
+      // (!need3Houses && minHouses > 0 && minHouses < 4))
     }
 
     if (numHousesBought > 0) 
