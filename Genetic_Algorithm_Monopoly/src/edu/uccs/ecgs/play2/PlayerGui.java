@@ -289,7 +289,6 @@ public class PlayerGui extends JPanel {
       tabbedPane.addTab("<html><body><table width='" + tabWidth + "'>"
           + players[i].getName() + "</table></body></html>", panel);
       playerPanels[i].setPlayer(players[i]);
-      playerPanels[i].updatePlayerStatus();
     }
 
     tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);

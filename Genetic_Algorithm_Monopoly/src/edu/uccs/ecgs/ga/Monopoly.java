@@ -67,7 +67,7 @@ public class Monopoly implements Runnable {
     r.setSeed(seed);
 
     turnCounter = 0;
-    numHouses = 32;
+    setNumHouses(32);
     numHotels = 12;
 
     cards = Cards.getCards();
@@ -116,14 +116,12 @@ public class Monopoly implements Runnable {
       synchronized (this) {
         if (paused) {
           try {
-            System.out.println("Game is pausing");
             wait();
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
         }
       }
-      System.out.println("Game resumed");
 
       ++turnCounter;
       if (turnCounter == Main.maxTurns * Main.numPlayers) {
@@ -133,10 +131,9 @@ public class Monopoly implements Runnable {
       AbstractPlayer player = getNextPlayer();
       player.resetDoubles();
 
-      logInfo("");
+      logInfo("*********************************************************");
       logInfo("Turn: " + turnCounter);
-      logInfo(player.getName());
-      logInfo("Current location is " + player.getCurrentLocation());
+      logInfo(player.toString());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;
       Actions action = Actions.NULL;
@@ -214,6 +211,8 @@ public class Monopoly implements Runnable {
       if (bankruptCount == Main.numPlayers - 1) {
         done = true;
       }
+
+      logInfo(player.toString());
     }
 
     ArrayList<AbstractPlayer> sortedPlayers = new ArrayList<AbstractPlayer>();
@@ -284,7 +283,7 @@ public class Monopoly implements Runnable {
     assert location.getNumHouses() > 0 : location.getFullInfoString();
     location.removeHouse();
     location.owner.receiveCash(location.getHouseCost() / 2);
-    ++numHouses;
+    addHouse();
     
     logInfo("Sold house at " + location.toString() + "; property now has "
         + location.getNumHouses() + " houses");
@@ -303,12 +302,11 @@ public class Monopoly implements Runnable {
     int numHousesAtLocation = l.getNumHouses();
     int proceeds = numHousesAtLocation * cost;
     l.resetNumHouses();
-    numHouses += numHousesAtLocation;
+    addHouses(numHousesAtLocation);
     player.receiveCash(proceeds);
   }
 
-  public void sellHotel2(AbstractPlayer player, Location location,
-      Collection<Location> owned) 
+  public void sellHotel2(Location location, Collection<Location> owned) 
   {
     // get all the properties in the group
     ArrayList<Location> lots = new ArrayList<Location>();
@@ -325,7 +323,9 @@ public class Monopoly implements Runnable {
         lot.removeHotel();
         ++countHotels;
         ++numHotels;
-        numHouses -= 4;
+        for (int i = 0; i < 4; i++)
+          lot.addHouse();
+        numHouses -= 4; // don't call getHouse(), since we can go negative here
         assert lot.getNumHotels() == 0;
         assert lot.getNumHouses() == 4;
         break;
@@ -341,11 +341,12 @@ public class Monopoly implements Runnable {
           lot.removeHotel();
           ++countHotels;
           ++numHotels;
+          for (int i = 0; i < 4; i++)
+            lot.addHouse();
           numHouses -= 4;
-          break;
+          assert lot.getNumHouses() == 4;
         }
         assert lot.getNumHotels() == 0;
-        assert lot.getNumHouses() == 4;
       }
     }
 
@@ -359,205 +360,36 @@ public class Monopoly implements Runnable {
           break;
       }
     }
-    
-    assert numHouses == 0;
+
+    assert numHouses >= 0;
     int maxHouses = Integer.MIN_VALUE;
     int minHouses = Integer.MAX_VALUE;
     for (Location lot : lots) {
-      if (lot.getNumHouses() < minHouses)
+      if (lot.getNumHotels() > 0)
+        maxHouses = 5;
+      else if (lot.getNumHouses() < minHouses)
         minHouses = lot.getNumHouses();
+
       if (lot.getNumHouses() > maxHouses)
         maxHouses = lot.getNumHouses();
     }
-    
+
     int diff = maxHouses - minHouses;
     assert (diff == 0) || (diff == 1);
     
     int proceeds = countHotels * location.getHotelCost() / 2;
     proceeds += countHouses * location.getHouseCost() / 2;
 
+    AbstractPlayer player = location.owner;
     if (countHotels > 0)
-      logInfo(player.getName() + " sold " + countHotels + " hotels.");
+      logInfo(player.getName() + " sold " + countHotels
+          + (countHotels == 1 ? " hotel." : " hotels."));
     if (countHouses > 0)
-      logInfo(player.getName() + " sold " + countHouses + " houses.");
+      logInfo(player.getName() + " sold " + countHouses
+          + (countHouses == 1 ? " house." : " houses."));
 
     player.receiveCash(proceeds);
   }
-
-  /**
-   * Sell a hotel from the given location. According to the rules of Monopoly,
-   * the player must be able to put four houses on the location when the hotel
-   * is sold. If 4 houses are not available, the player is forced to sell as
-   * many hotels and (virtual) houses until the player can put any real houses
-   * on the property group in accordance with the rules.
-   * 
-   * For example, if 4 real houses are available, the player simply sells the
-   * hotel and puts 4 houses on the location.
-   * 
-   * However, if only 3 real houses are available and the player has more than
-   * one hotel (H) on the property group, the player is not allowed to put only
-   * 3 houses (h) on a location while one or two other locations in the group
-   * still have hotels (building must always be balanced). Thus, when selling a
-   * hotel, the only allowed configurations after selling are H/H/4h, H/4h/4h,
-   * 4h/4h/4h, or 3h/4h/4h. If the player has 3 or 2 hotels (H/H/H or H/H/4h)
-   * and only 3 houses are available, selling a hotel would result in H/H/3h or
-   * H/4h/3h, both of which are illegal since they are unbalanced. Thus the
-   * player is required to sell as many hotels and houses, until the number of
-   * houses and hotels on the location are balanced. So for example, if a player
-   * has H/H/H and only 3 houses remain unsold in the game, the player would be
-   * required to sell all the hotels and 9 virtual houses, and then place 1
-   * house on each location.
-   * 
-   * @param player
-   * @param location
-   * @param owned
-   */
-//  public void sellHotel(AbstractPlayer player, Location location,
-//      Collection<Location> owned) {
-//    PropertyFactory pf = PropertyFactory.getPropertyFactory(gamekey);
-//    int numHotelsInGroup = pf.getNumHotelsInGroup(location);
-//    int numHousesInGroup = pf.getNumHousesInGroup(location);
-//
-//    int numHousesToSell1 = 0; // number of houses to sell on 1st property in
-//                              // group
-//    int numHousesToSell2 = 0; // number of houses to sell on 2nd property in
-//                              // group
-//    int numHousesToSell3 = 0; // number of houses to sell on 3rd property in
-//                              // group
-//
-//    switch (numHouses) {
-//    case 4:
-//      // 4 houses
-//    default:
-//      // more than 4 houses
-//      location.removeHotel();
-//      logInfo("Sold hotel at " + location.toString() + "; property now has 4 houses");
-//      player.receiveCash(location.getHotelCost() / 2);
-//      ++numHotels;
-//      assert numHotels <= 12 : "Invalid number of hotels: " + numHotels;
-//      numHouses = numHouses - 4;
-//      // return rather than break because we don't want to call the sell method
-//      // at the end of the case block, since that method sells all hotels.
-//      return;
-//
-//    case 3:
-//      if (numHotelsInGroup == 3) {
-//        // must sell all hotels and 9 houses and then arrange houses as 1/1/1
-//        numHousesToSell1 = 3;
-//        numHousesToSell2 = 3;
-//        numHousesToSell3 = 3;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 4) {
-//        // location must be 3 property group
-//        // must sell both hotels and then arrange houses as 2/2/3
-//        numHousesToSell1 = 2;
-//        numHousesToSell2 = 2;
-//        numHousesToSell3 = 1;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 0) {
-//        // location must be 2 property group (Baltic/Med or Park Place/Boardwalk)
-//        // must sell both hotels and then arrange houses as 1/2
-//        numHousesToSell1 = 3;
-//        numHousesToSell2 = 2;
-//        numHousesToSell3 = 4;
-//
-//      } else {
-//        logSevere("Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup);
-//        assert false : "Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup;
-//      }
-//      break;
-//
-//    case 2:
-//      if (numHotelsInGroup == 3) {
-//        // must sell all hotels and 10 houses and then arrange houses as 0/1/1
-//        numHousesToSell1 = 4;
-//        numHousesToSell2 = 3;
-//        numHousesToSell3 = 3;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 4) {
-//        // must sell both hotels and then arrange houses as 2/2/2
-//        numHousesToSell1 = 2;
-//        numHousesToSell2 = 2;
-//        numHousesToSell3 = 2;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 0) {
-//        // must sell both hotels then arrange houses as 1/1
-//        numHousesToSell1 = 3;
-//        numHousesToSell2 = 3;
-//        numHousesToSell3 = 4;
-//
-//      } else {
-//        logSevere("Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup);
-//        assert false : "Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup;
-//      }
-//      break;
-//
-//    case 1:
-//      if (numHotelsInGroup == 3) {
-//        // must sell all hotels and 11 houses and then arrange houses as 0/0/1
-//        numHousesToSell1 = 4;
-//        numHousesToSell2 = 4;
-//        numHousesToSell3 = 3;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 4) {
-//        // must sell both hotels and then arrange houses as 1/2/2
-//        numHousesToSell1 = 2;
-//        numHousesToSell2 = 2;
-//        numHousesToSell3 = 3;
-//
-//      } else if (numHotelsInGroup == 2 && numHousesInGroup == 0) {
-//        // must sell both hotels and then arrange houses as 0/1
-//        numHousesToSell1 = 4;
-//        numHousesToSell2 = 3;
-//        numHousesToSell3 = 4;
-//
-//      } else {
-//        logSevere("Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup);
-//        assert false : "Invalid number of hotels/houses in property group for location "
-//            + location
-//            + "; hotels/houses: "
-//            + numHotelsInGroup
-//            + "/"
-//            + numHousesInGroup;
-//      }
-//      break;
-//
-//    case 0:
-//      numHousesToSell1 = 4;
-//      numHousesToSell2 = 4;
-//      numHousesToSell3 = 4;
-//      break;
-//    }
-//
-//    sell(player, location, owned, numHousesToSell1, numHousesToSell2,
-//        numHousesToSell3);
-//    numHouses = 0;
-//  }
 
   /**
    * Player is bankrupt, so hotels on location are liquidated
@@ -571,104 +403,9 @@ public class Monopoly implements Runnable {
     assert numHotels == 1 : "Location has more than one hotel!";
     l.removeHotel();
     ++numHotels;
-    abstractPlayer.receiveCash(cost);
+    // hotel liquidation is the same as selling 1 hotel and 4 houses
+    abstractPlayer.receiveCash(cost + 4 * l.getHouseCost());
   }
-
-  /**
-   * Change the location of the number of houses to sell based on the property
-   * group. In certain property groups, any extra house should go on the first
-   * property in the group. In other groups, any extra house goes on the second
-   * property. This method adjusts the numHousesToSell array so the extra house
-   * is on the correct property.
-   * 
-   * @param location
-   *          The property the identifies the group.
-   * @param numHousesToSell
-   *          A 3-element array containing the number of houses to sell. This array
-   *          is modified so that if there is an uneven number of houses to sell, the
-   *          correct property gets the extra house.
-   */
-  private void swapHousesToSell(Location location, int[] numHousesToSell) {
-    switch (location.getGroup()) {
-    case PURPLE:
-    case RED:
-    case YELLOW:
-    case GREEN:
-      // for these properties, ensure first property has any 2nd extra house
-      if (numHousesToSell[0] < numHousesToSell[1]) {
-        int temp = numHousesToSell[1];
-        numHousesToSell[1] = numHousesToSell[0];
-        numHousesToSell[0] = temp;
-      }
-      break;
-    default:
-      // for everything else, no change
-    }
-  }
-
-  /**
-   * Sell all hotels in the property group to which the location belongs, and
-   * then sell the houses given by each of the numHouses params.
-   * 
-   * @param player
-   *          The player who owns the properties and who will receive the money
-   *          from the sale.
-   * @param location
-   *          The property that identifies the group from which hotels and
-   *          houses will be sold.
-   * @param owned
-   *          The collection of properties owned by the player.
-   * @param numHousesToSell1
-   *          The number of houses to sell from the first property in the group.
-   * @param numHousesToSell2
-   *          The number of houses to sell from the second property in the
-   *          group.
-   * @param numHousesToSell3
-   *          The number of houses to sell from the third property in the group.
-   */
-//  private void sell(AbstractPlayer player, Location location,
-//      Collection<Location> owned, int numHousesToSell1, int numHousesToSell2,
-//      int numHousesToSell3) {
-//
-//    // change the order of the houses to sell based on property group
-//    swapHousesToSell(location, new int[] { numHousesToSell1, numHousesToSell2,
-//        numHousesToSell3 });
-//
-//    int count = 0;
-//
-//    for (Location loc : owned) {
-//      if (loc.getGroup() == location.getGroup()) {
-//        ++count;
-//
-//        loc.removeHotel();
-//        logInfo("Sold hotel at " + loc.toString());
-//        ++numHotels;
-//        assert numHotels < 13 : "Invalid number hotels: " + numHotels;
-//
-//        player.receiveCash(loc.getHotelCost() / 2);
-//
-//        int sellCount = 0;
-//        switch (count) {
-//        case 1:
-//          sellCount = numHousesToSell1;
-//          break;
-//        case 2:
-//          sellCount = numHousesToSell2;
-//          break;
-//        case 3:
-//          sellCount = numHousesToSell3;
-//          break;
-//        }
-//
-//        for (; sellCount > 0; sellCount--) {
-//          loc.removeHouse();
-//          // in this method, don't increment the number of houses
-//          // because the houses at the location are virtual houses
-//          player.receiveCash(loc.getHouseCost() / 2);
-//        }
-//      }
-//    }
-//  }
 
   /**
    * Buy a house for player at location.
@@ -698,18 +435,18 @@ public class Monopoly implements Runnable {
       assert !PropertyFactory.getPropertyFactory(gamekey).groupIsMortgaged(location.getGroup()) : 
         "Player tried to buy house; Some property in " + location.getGroup() + " is mortgaged.";
 
-      location.addHouse();
       player.getCash(location.getHouseCost());
+      location.addHouse();
+
       logInfo(player.getName() + " bought house for property group " + location.getGroup());
-      --numHouses;
+      getHouse();
       assert numHouses >= 0 : "Invalid number of houses: " + numHouses;
       logFinest("Bank now has " + numHouses + " houses");
       return 1;
+
     } catch (BankruptcyException ignored) {
       // expect that any player that buys a house first verifies they
       // have enough cash
-      location.removeHouse();
-      ++numHouses;
       ignored.printStackTrace();
     } catch (AssertionError ae) {
       logFinest(player.toString());
@@ -737,22 +474,20 @@ public class Monopoly implements Runnable {
     try {
       assert player.canRaiseCash(location.getHotelCost()) : 
         "Player tried to buy house with insufficient cash";
+      player.getCash(location.getHotelCost());
+
       location.addHotel();
       --numHotels;
-      player.getCash(location.getHotelCost());
-      logInfo("Bought hotel at " + location.toString());
       assert numHotels >= 0 : "Invalid number of hotels: " + numHotels;
+      
+      logInfo("Bought hotel at " + location.toString());
 
       // add the houses back to the bank
-      numHouses += 4;
-      assert numHouses < 33 : "Invalid number of houses: " + numHouses;
+      this.addHouses(4);
+
       return 1;
     } catch (BankruptcyException ignored) {
-      // expect that any player that buys a house first verifies they
-      // have enough cash
-      // TODO Verify that this exception will not occur
-      Throwable t = new Throwable(toString(), ignored);
-      t.printStackTrace();
+      ignored.printStackTrace();
     }
     return 0;
   }
@@ -1144,5 +879,31 @@ public class Monopoly implements Runnable {
   public AbstractPlayer[] getAllPlayers()
   {
     return players;
+  }
+  
+  public int getHouse() {
+    numHouses--;
+    assert numHouses >= 0;
+    return 1;
+  }
+  
+  public void addHouse() {
+    addHouses(1);
+  }
+  
+  public void setNumHouses(int num) {
+    numHouses = num;
+    assert numHouses >= 0;
+    assert numHouses <= 32;
+  }
+  
+  public void addHouses(int num) {
+    numHouses += num;
+    assert numHouses < 33 : "Invalid number of houses: " + numHouses;
+  }
+
+  public void mortgageProperty(Location lot) {
+    lot.setMortgaged();
+    lot.owner.receiveCash(lot.getCost() / 2);
   }
 }

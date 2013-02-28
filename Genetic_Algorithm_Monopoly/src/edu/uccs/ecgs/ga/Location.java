@@ -270,7 +270,6 @@ public abstract class Location implements Comparable<Location> {
   {
     --numHotels;
     assert numHotels == 0 : "Illegal hotel count: " + numHotels;
-    numHouses = 4;
   }
 
   /**

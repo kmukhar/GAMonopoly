@@ -95,6 +95,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     owned = new TreeMap<Integer, Location>();
     clearAllProperties();
     cash = 1500;
+    locationIndex = 0;
   }
 
   /**
@@ -787,8 +788,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
             && l.getGroup() != PropertyGroups.RAILROADS) {
           // mortgage property if not part of monopoly
           logInfo(getName() + " will mortgage " + l.name);
-          l.setMortgaged();
-          receiveCash(l.getCost() / 2);
+          game.mortgageProperty(l);
         }
         if (cash >= amount) {
           return;
@@ -826,14 +826,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
 
       // sell hotels in reverse build order
-      for (int i = groupOrder.length - 1; i <= 0; i--) {
+      for (int i = groupOrder.length - 1; i >= 0; i--) {
         for (Location l : owned.values()) {
           if (l.getGroup() != groupOrder[i])
             continue;
 
           if (l.getNumHotels() > 0) {
             logInfo(getName() + " will sell hotel at " + l.name);
-            game.sellHotel2(this, l, owned.values());
+            game.sellHotel2(l, owned.values());
           }
           if (cash >= amount) {
             return;
@@ -1127,17 +1127,17 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     result += (int) (totalnet * 0.01);
     result += (int) (avgnet * 0.01);
 
-    // plus 5% of the number of houses or hotels. (assume frayn meant 5% of
-    // cost)
+    // plus 10% of the number of houses or hotels. 
+    // (frayn specified 5%, but that seems low)
     PropertyFactory pf = PropertyFactory.getPropertyFactory(this.gameKey);
     for (int i = 0; i < 40; i++) {
       Location l = pf.getLocationAt(i);
       if (l.getNumHouses() > 0 && l.owner != this) {
-        result += (int) (l.getNumHouses() * l.getHouseCost() * 0.05);
+        result += (int) (l.getNumHouses() * l.getHouseCost() * 0.1);
       }
       if (l.getNumHotels() > 0 && l.owner != this) {
         // multiply by 5 because hotels cost is hotelCost + 4 houses
-        result += (int) (l.getNumHotels() * l.getHotelCost() * 0.05) * 5;
+        result += (int) (l.getNumHotels() * l.getHotelCost() * 0.1) * 5;
       }
     }
 
@@ -1415,7 +1415,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
 //    result.append("Player ").append(playerIndex+1)
-    result.append(getName())
+    result.append(getName()).append(separator)
+        .append("Current location: ").append(getCurrentLocation().toString())
         .append(separator).append("  Total cash  : ").append(cash)
         .append(separator).append("  Net worth   : ").append(getTotalWorth())
 //        .append(separator).append("  Fitness     : ").append(fitnessScore)
@@ -1462,9 +1463,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     setGameKey(game.gamekey);
 
     propertyTrader = new PropertyNegotiator(this, this.gameKey);
-    resetAll();
     location = PropertyFactory.getPropertyFactory(this.gameKey).getLocationAt(
         locationIndex);
+    resetAll();
   }
 
   /**
