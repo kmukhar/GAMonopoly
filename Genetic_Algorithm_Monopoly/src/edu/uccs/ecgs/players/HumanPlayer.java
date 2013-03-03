@@ -313,7 +313,7 @@ public class HumanPlayer extends AbstractPlayer {
       if (result == 1)
         break;
 
-      Object selected = 
+      Object object = 
           JOptionPane.showInputDialog(null, "<html><body width=450>"
                   + "Which property do you want to buy a house for?<p<p>"
                   + "Click Cancel if you no longer want to buy a "
@@ -321,11 +321,12 @@ public class HumanPlayer extends AbstractPlayer {
               "Select property to build on", JOptionPane.QUESTION_MESSAGE,
               null, monopolies.toArray(), monopolies.get(0));
 
+      Location selected = (Location) object;
       if (selected != null)
-        if (location.getNumHouses() < 4)
-          game.buyHouse(this, (Location) selected);
+        if (selected.getNumHouses() < 4)
+          game.buyHouse(this, selected);
         else
-          game.buyHotel(this, (Location) selected);
+          game.buyHotel(this, selected);
 
       fireChangeEvent();
     }

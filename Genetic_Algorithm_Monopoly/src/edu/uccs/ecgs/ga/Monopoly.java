@@ -584,24 +584,29 @@ public class Monopoly implements Runnable {
       AbstractPlayer highBidPlayer = null;
       int secondHighestBid = 0;
 
-      TreeMap<Integer, AbstractPlayer> bids = 
-          new TreeMap<Integer, AbstractPlayer>();
+      TreeMap<Integer, Vector<AbstractPlayer>> bids = 
+          new TreeMap<Integer, Vector<AbstractPlayer>>();
       for (AbstractPlayer p : players) {
         int bid = p.getBidForLocation(location);
-        // TODO Fix this map to allow duplicate bids
-        bids.put(bid, p);
+        Vector<AbstractPlayer> v = bids.get(bid);
+        if (v == null)
+          v = new Vector<AbstractPlayer>(); 
+        v.add(p);
+        bids.put(bid, v);
       }
 
       for (Integer bid : bids.keySet()) {
-        AbstractPlayer p = bids.get(bid);
-        logInfo(p.getName() + " bids " + bid);
+        Vector<AbstractPlayer> players = bids.get(bid);
+        for (AbstractPlayer player : players) {
+          logInfo(player.getName() + " bids " + bid);
 
-        if (bid > highBid) {
-          secondHighestBid = highBid;
-          highBid = bid;
-          highBidPlayer = p;
-        } else if (bid > secondHighestBid) {
-          secondHighestBid = bid;
+          if (bid > highBid) {
+            secondHighestBid = highBid;
+            highBid = bid;
+            highBidPlayer = player;
+          } else if (bid > secondHighestBid) {
+            secondHighestBid = bid;
+          }
         }
       }
 
