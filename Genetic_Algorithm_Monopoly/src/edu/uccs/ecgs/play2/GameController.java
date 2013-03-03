@@ -6,6 +6,7 @@ import edu.uccs.ecgs.ga.Monopoly;
 public class GameController implements Controllable {
 
   private Monopoly game;
+  boolean paused = true;
 
   public GameController(Monopoly game) {
     this.game = game;
@@ -13,9 +14,7 @@ public class GameController implements Controllable {
 
   @Override
   public void pause()
-  {
-    game.pause();
-  }
+  {}
 
   @Override
   public void resume()
@@ -26,7 +25,7 @@ public class GameController implements Controllable {
   @Override
   public boolean isPaused()
   {
-    return true;
+    return paused;
   }
 
 }
