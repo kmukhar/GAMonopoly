@@ -32,6 +32,7 @@ public class PlayerGui extends JPanel {
   private JTextArea gameInfo;
 
   private Thread gameThread;
+  private GameController controller;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -80,6 +81,8 @@ public class PlayerGui extends JPanel {
     main.pause();
     Main.maxTurns = 500; // set a high number so the game can run to finish
     game = new Monopoly(0, 0, 0, players);
+    controller = new GameController(game);
+    game.setFlowController(controller);
     game.setLogger(createTextAreaLogger());
   }
 
@@ -453,7 +456,7 @@ public class PlayerGui extends JPanel {
       public void actionPerformed(ActionEvent arg0)
       {
         main.resume();
-        game.resume();
+        controller.resume();
       }
     });
   }

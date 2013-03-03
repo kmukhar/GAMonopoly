@@ -8,7 +8,7 @@ import java.util.logging.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.states.Events;
 
-public class Monopoly implements Runnable {
+public class Monopoly implements Runnable, Controllable {
 
   private Logger logger;
 
@@ -42,6 +42,8 @@ public class Monopoly implements Runnable {
   private long seed;
   private boolean paused = false;
 
+  private Controllable flowController = this;
+
   /**
    * Constructor
    * @param generation Generation number for this game.
@@ -71,6 +73,10 @@ public class Monopoly implements Runnable {
     numHotels = 12;
 
     cards = Cards.getCards();
+  }
+
+  public void setFlowController(Controllable flowController) {
+    this.flowController = flowController;
   }
 
   @Override
@@ -111,11 +117,8 @@ public class Monopoly implements Runnable {
 
     while (!done) {
 
-      // TODO
-      paused = true;
-      
       synchronized (this) {
-        if (paused) {
+        if (flowController.isPaused()) {
           try {
             wait();
           } catch (InterruptedException e) {
@@ -215,6 +218,8 @@ public class Monopoly implements Runnable {
 
       logInfo(player.toString());
     }
+
+    assert done;
 
     ArrayList<AbstractPlayer> sortedPlayers = new ArrayList<AbstractPlayer>();
 
@@ -919,5 +924,11 @@ public class Monopoly implements Runnable {
   public void mortgageProperty(Location lot) {
     lot.setMortgaged();
     lot.owner.receiveCash(lot.getCost() / 2);
+  }
+
+  @Override
+  public boolean isPaused()
+  {
+    return paused;
   }
 }

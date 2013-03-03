@@ -73,6 +73,7 @@ public class GAEngine implements Runnable {
    * A Thread pool for executing the games in runnableGames.
    */
   private ThreadPoolExecutor gameExecutor;
+  private GAController gaController;
 
   public GAEngine(Main main) {
     program = main;
@@ -181,10 +182,14 @@ public class GAEngine implements Runnable {
         gameNumber = 0;
 
         games = new ArrayList<Monopoly>();
+        gaController = new GAController();
 
         while (!playerPool.isEmpty()) {
           Monopoly game = new Monopoly(generation, matches, gameNumber,
               getFourPlayers());
+          gaController.addGame(game);
+          game.setFlowController(gaController);
+
           Logger logger = Utility.initLogger(generation, matches, gameNumber,
               game.gamekey);
           game.setLogger(logger);
@@ -474,17 +479,13 @@ public class GAEngine implements Runnable {
    */
   public void resume()
   {
-    for (Monopoly game : games) {
-      game.resume();
-    }
+    gaController.resume();
   }
   
   /**
    * Send pause signal to all games.
    */
   public void pause() {
-    for (Monopoly game : games) {
-      game.pause();
-    }    
+    gaController.pause();
   }
 }

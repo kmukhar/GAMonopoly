@@ -23,7 +23,7 @@ public class PropertyNegotiator {
       2.0 / 36.0, 3.0 / 36.0, 4.0 / 36.0, 5.0 / 36.0, 6.0 / 36.0, 5.0 / 36.0,
       4.0 / 36.0, 3.0 / 36.0, 2.0 / 36.0, 1.0 / 36.0 };
 
-  private static TreeMap<PropertyGroups, Double> mtProbs;
+  private TreeMap<PropertyGroups, Double> mtProbs;
 
   private enum GroupType {
     GROUP_2, GROUP_3, GROUP_4, NULL
@@ -158,13 +158,14 @@ public class PropertyNegotiator {
       if (playerLocation == 10)
         continue;
 
-      // Get the first location in the group for rent query
-      ArrayList<Location> locationGroup = locationGroups.get(group);
-      Location location = locationGroup.get(0);
-      double prob = mtProbs.get(group).doubleValue();
+      Double d = mtProbs.get(group);
+      double prob = d.doubleValue();
 
       // dice roll is only used for utilities, so use average roll of 7
       int diceRoll = 7;
+      // Get the first location in the group for rent query
+      ArrayList<Location> locationGroup = locationGroups.get(group);
+      Location location = locationGroup.get(0);
       double rent = (double) location.getPotentialRent(numHouses, diceRoll);
 
       mtGain += prob * rent;
