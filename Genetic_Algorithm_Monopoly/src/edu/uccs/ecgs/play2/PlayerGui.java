@@ -5,11 +5,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
-
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.players.HumanPlayer;
@@ -21,7 +19,7 @@ public class PlayerGui extends JPanel {
   private static NameAndIndexDialog dialog;
   private ArrayList<String> dataNames = new ArrayList<String>();
   private JButton startButton;
-//  private JButton pauseButton;
+  // private JButton pauseButton;
   private JButton resignButton;
   private JButton nextButton;
 
@@ -48,7 +46,7 @@ public class PlayerGui extends JPanel {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     frame.setLayout(new BorderLayout());
-    
+
     // Add content to the window.
     PlayerGui gui = new PlayerGui();
 
@@ -71,7 +69,7 @@ public class PlayerGui extends JPanel {
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
-    
+
     gui.playGame();
   }
 
@@ -84,6 +82,8 @@ public class PlayerGui extends JPanel {
     controller = new GameController(game);
     game.setFlowController(controller);
     game.setLogger(createTextAreaLogger());
+
+    gameThread = new Thread(game);
   }
 
   private AbstractPlayer[] createPlayers()
@@ -117,21 +117,21 @@ public class PlayerGui extends JPanel {
   private static void showInitialDialog()
   {
     Calendar endCal = GregorianCalendar.getInstance();
-    // set end date for research to 30 Mar 2013 
+    // set end date for research to 30 Mar 2013
     endCal.set(2013, 2, 30, 12, 0, 0);
-    
+
     Calendar nowCal = GregorianCalendar.getInstance();
     String path = "About.html";
     if (nowCal.after(endCal)) {
       path = "About2.html";
     }
-    
+
     InputStream is = PlayerGui.class.getResourceAsStream(path);
     InputStreamReader isr = new InputStreamReader(is);
-    BufferedReader br = new BufferedReader(isr); 
+    BufferedReader br = new BufferedReader(isr);
 
     StringBuilder aboutMsg = new StringBuilder();
-    
+
     String line = null;
     try {
       line = br.readLine();
@@ -154,12 +154,12 @@ public class PlayerGui extends JPanel {
     final JEditorPane editorPane = new JEditorPane();
     editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
         Boolean.TRUE);
-    editorPane.setPreferredSize(new Dimension(500,420));
+    editorPane.setPreferredSize(new Dimension(500, 420));
     editorPane.setEditable(false);
     editorPane.setContentType("text/html");
     editorPane.setText(aboutMsg.toString());
 
-    // This section of code from 
+    // This section of code from
     // https://forums.oracle.com/forums/message.jspa?messageID=9909614
     Color c = new Color(214, 217, 223); // default color for JOptionPane
     UIDefaults defaults = new UIDefaults();
@@ -169,11 +169,12 @@ public class PlayerGui extends JPanel {
     editorPane.setBackground(c);
     // end code https://forums.oracle.com/forums/message.jspa?messageID=9909614
 
-    // the code for resizing the editorpane is from 
+    // the code for resizing the editorpane is from
     // http://java.dzone.com/tips/tip-displaying-rich-messages-u
     // set editor pane to be resizeable
     editorPane.addHierarchyListener(new HierarchyListener() {
-      public void hierarchyChanged(HierarchyEvent e) {
+      public void hierarchyChanged(HierarchyEvent e)
+      {
         Window window = SwingUtilities.getWindowAncestor(editorPane);
         if (window instanceof Dialog) {
           Dialog dialog = (Dialog) window;
@@ -184,14 +185,16 @@ public class PlayerGui extends JPanel {
       }
     });
 
-    // the code for processing hyperlinks is from 
+    // the code for processing hyperlinks is from
     // http://java.dzone.com/tips/tip-displaying-rich-messages-u
     // Add Hyperlink listener to process hyperlinks
     editorPane.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(final HyperlinkEvent e) {
+      public void hyperlinkUpdate(final HyperlinkEvent e)
+      {
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
           EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            public void run()
+            {
               // Show hand cursor
               SwingUtilities.getWindowAncestor(editorPane).setCursor(
                   Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -201,7 +204,8 @@ public class PlayerGui extends JPanel {
           });
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
           EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            public void run()
+            {
               // Show default cursor
               SwingUtilities.getWindowAncestor(editorPane).setCursor(
                   Cursor.getDefaultCursor());
@@ -225,10 +229,9 @@ public class PlayerGui extends JPanel {
     sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     sp.setBorder(null);
 
-    int result = JOptionPane.showConfirmDialog(null, sp,
-        "About this program", JOptionPane.OK_CANCEL_OPTION,
-        JOptionPane.INFORMATION_MESSAGE);
-    
+    int result = JOptionPane.showConfirmDialog(null, sp, "About this program",
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+
     if (result == JOptionPane.CANCEL_OPTION) {
       System.exit(0);
     }
@@ -236,8 +239,7 @@ public class PlayerGui extends JPanel {
 
   private static void getNameAndIndex()
   {
-    dialog = new NameAndIndexDialog(
-        new javax.swing.JFrame(), true);
+    dialog = new NameAndIndexDialog(new javax.swing.JFrame(), true);
     dialog.setLocationRelativeTo(null);
     dialog.setVisible(true);
   }
@@ -260,16 +262,17 @@ public class PlayerGui extends JPanel {
         }
       }
     } catch (Exception ex) {
-      java.util.logging.Logger.getLogger(PlayerGui.class.getName())
-          .log(java.util.logging.Level.SEVERE, null, ex);
+      java.util.logging.Logger.getLogger(PlayerGui.class.getName()).log(
+          java.util.logging.Level.SEVERE, null, ex);
     }
 
     /* Create and display the dialog */
     java.awt.EventQueue.invokeLater(new Runnable() {
-        public void run() {
-          createAndShowGUI();        
-        }
-    });    
+      public void run()
+      {
+        createAndShowGUI();
+      }
+    });
   }
 
   static String factoryKey = "edu.uccs.ecgs.play";
@@ -284,7 +287,7 @@ public class PlayerGui extends JPanel {
     JTabbedPane tabbedPane = new JTabbedPane();
 
     playerPanels = new PlayerPanel[4];
-    int tabWidth=48;
+    int tabWidth = 48;
 
     for (int i = 0; i < playerPanels.length; i++) {
       PlayerPanel panel = makePlayerPanel();
@@ -301,27 +304,27 @@ public class PlayerGui extends JPanel {
 
     // Add the tabbed pane to this panel.
     JPanel gamePanel = new JPanel();
-    gamePanel.setLayout(new GridLayout(1,2));
+    gamePanel.setLayout(new GridLayout(1, 2));
     gamePanel.add(tabbedPane);
-    
+
     // The following line enables to use scrolling tabs.
     tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-    
+
     gameInfo = new JTextArea();
     gameInfo.setEditable(false);
     gameInfo.setLineWrap(true);
     gameInfo.setWrapStyleWord(true);
 
     JScrollPane scrollPane = new JScrollPane(gameInfo);
-    scrollPane.setPreferredSize(new Dimension(180,50));
+    scrollPane.setPreferredSize(new Dimension(180, 50));
     scrollPane
         .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     scrollPane
         .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    
+
     JTextField columnHead = new JTextField("Game Information");
     columnHead.setEditable(false);
-    columnHead.setPreferredSize(new Dimension(180,22));
+    columnHead.setPreferredSize(new Dimension(180, 22));
     scrollPane.setColumnHeaderView(columnHead);
 
     gamePanel.add(scrollPane);
@@ -330,8 +333,8 @@ public class PlayerGui extends JPanel {
     createStartButton();
     buttonPanel.add(startButton);
 
-//    createPauseButton();
-//    buttonPanel.add(pauseButton);
+    // createPauseButton();
+    // buttonPanel.add(pauseButton);
 
     createNextButton();
     buttonPanel.add(nextButton);
@@ -413,12 +416,13 @@ public class PlayerGui extends JPanel {
   {
     resignButton = new JButton("Resign");
     resignButton.setEnabled(false);
-    resignButton.addActionListener(new ActionListener(){
+    resignButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
         // TODO Auto-generated method stub
-      }});
+      }
+    });
   }
 
   /**
@@ -426,21 +430,21 @@ public class PlayerGui extends JPanel {
    */
   private void createPauseButton()
   {
-//    pauseButton = new JButton("Pause");
-//    pauseButton.setEnabled(false);
-//    pauseButton.addActionListener(new ActionListener(){
-//      @Override
-//      public void actionPerformed(ActionEvent arg0)
-//      {
-//        if (pauseButton.getText().equalsIgnoreCase("pause")) {
-//          main.pause();
-//          pauseButton.setText("Resume");
-//        } else {
-//          pauseButton.setText("Pause");
-//          main.resume();
-//          game.resume();
-//        }
-//      }});
+    // pauseButton = new JButton("Pause");
+    // pauseButton.setEnabled(false);
+    // pauseButton.addActionListener(new ActionListener(){
+    // @Override
+    // public void actionPerformed(ActionEvent arg0)
+    // {
+    // if (pauseButton.getText().equalsIgnoreCase("pause")) {
+    // main.pause();
+    // pauseButton.setText("Resume");
+    // } else {
+    // pauseButton.setText("Pause");
+    // main.resume();
+    // game.resume();
+    // }
+    // }});
   }
 
   /**
@@ -468,15 +472,41 @@ public class PlayerGui extends JPanel {
   {
     startButton = new JButton("Start");
     startButton.setMnemonic(KeyEvent.VK_S);
-    startButton.addActionListener(new ActionListener(){
+    startButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
         startButton.setEnabled(false);
         nextButton.setEnabled(true);
-        gameThread = new Thread(game);
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+          public void run()
+          {
+            startGame();
+          }
+        });
+      }
+    });
+  }
+
+  private void startGame()
+  {
+    Thread t = new Thread(new Runnable() {
+      @Override
+      public void run()
+      {
         gameThread.start();
+
+        try {
+          gameThread.join();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        JOptionPane.showMessageDialog(null, "The Game Is Over");
+        System.exit(0);
       }});
+    t.start();
   }
 
   /**
