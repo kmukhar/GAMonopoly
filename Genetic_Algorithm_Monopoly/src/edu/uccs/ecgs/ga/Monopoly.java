@@ -111,7 +111,8 @@ public class Monopoly implements Runnable {
 
     while (!done) {
 
-//      paused = true;
+      // TODO
+      paused = true;
       
       synchronized (this) {
         if (paused) {
@@ -429,16 +430,21 @@ public class Monopoly implements Runnable {
     }
 
     try {
-      assert player.canRaiseCash(location.getHouseCost()) : "Player tried to buy house with insufficient cash";
-      assert !location.isMortgaged : "Player tried to buy house; Location " + location.name + " is mortgaged.";
-      assert location.partOfMonopoly : "Player tried to buy house; Location " + location.name + " is not part of monopoly";
-      assert !PropertyFactory.getPropertyFactory(gamekey).groupIsMortgaged(location.getGroup()) : 
-        "Player tried to buy house; Some property in " + location.getGroup() + " is mortgaged.";
+      assert player.canRaiseCash(location.getHouseCost()) :
+          "Player tried to buy house with insufficient cash";
+      assert !location.isMortgaged : "Player tried to buy house; Location "
+          + location.name + " is mortgaged.";
+      assert location.partOfMonopoly : "Player tried to buy house; Location "
+          + location.name + " is not part of monopoly";
+      assert !PropertyFactory.getPropertyFactory(gamekey).groupIsMortgaged(
+          location.getGroup()) : "Player tried to buy house; Some property in "
+          + location.getGroup() + " is mortgaged.";
 
       player.getCash(location.getHouseCost());
       location.addHouse();
 
-      logInfo(player.getName() + " bought house for property group " + location.getGroup());
+      logInfo(player.getName() + " bought house for property group "
+          + location.getGroup());
       getHouse();
       assert numHouses >= 0 : "Invalid number of houses: " + numHouses;
       logFinest("Bank now has " + numHouses + " houses");
@@ -582,6 +588,7 @@ public class Monopoly implements Runnable {
           new TreeMap<Integer, AbstractPlayer>();
       for (AbstractPlayer p : players) {
         int bid = p.getBidForLocation(location);
+        // TODO Fix this map to allow duplicate bids
         bids.put(bid, p);
       }
 
@@ -626,7 +633,7 @@ public class Monopoly implements Runnable {
       }
     }
 
-    logInfo("Auction has ended " + msg + "\n");
+    logInfo("Auction has ended " + msg);
     boolean printHead = true;
     for (Location location : lotsToAuction.values()) {
       if (location.owner == null) {
@@ -726,17 +733,19 @@ public class Monopoly implements Runnable {
    *          The player that receives the amount from other players.
    */
   public void collect10FromAll(AbstractPlayer player) {
-    // TODO Fix so debug output is cleaner
+    int payments = 0;
+
     for (AbstractPlayer p : players) {
       if (p != player && !p.bankrupt()) {
         try {
           p.getCash(10);
-          player.receiveCash(10);
+          payments += 10;
         } catch (BankruptcyException e) {
           processBankruptcy(p, player);
         }
       }
     }
+    player.receiveCash(payments);
   }
 
   public Cards getCards() {

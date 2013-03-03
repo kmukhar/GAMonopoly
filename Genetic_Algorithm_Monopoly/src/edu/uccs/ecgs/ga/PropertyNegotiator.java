@@ -472,42 +472,42 @@ public class PropertyNegotiator {
    * U = w1 * (sum(f(c)) + M) - w2 * (stLoss + mtLoss)<br>
    * 
    */
-  public int evaluateOwnersHoldings(TradeProposal trade)
-  {
-    Location gaining = null;
-    Location losing = null;
-    if (trade.location.owner == owner) {
-      losing = trade.location;
-      gaining = trade.location2;
-    } else {
-      gaining = trade.location;
-      losing = trade.location2;
-    }
-    
-    //TODO Fix this
-    // This seems dangerous to me, but this is the quick and dirty solution
-    // we reset the owners as if a trade has been made, so we can evaluate
-    // the result of the trade. At the end of the method these will be reset.
-    AbstractPlayer originalOwner = gaining.getOwner();
-
-    PropertyTrader.tradeProperties(losing, gaining);
-
-    double bigU = evaluateOwnersHoldings();
-
-    bigU -= owner.w2
-        * ((double) (computeShortTermLoss(gaining) + computeMidTermLoss(gaining)));
-
-    PropertyTrader.tradeProperties(gaining, losing);
-
-    assert losing.getOwner() == owner;
-    assert gaining.getOwner() == originalOwner;
-    assert owner.getAllProperties().containsValue(losing);
-    assert !owner.getAllProperties().containsValue(gaining);
-    assert originalOwner.getAllProperties().containsValue(gaining);
-    assert !originalOwner.getAllProperties().containsValue(losing);
-
-    return (int) bigU;
-  }
+//  public int evaluateOwnersHoldings(TradeProposal trade)
+//  {
+//    Location gaining = null;
+//    Location losing = null;
+//    if (trade.location.owner == owner) {
+//      losing = trade.location;
+//      gaining = trade.location2;
+//    } else {
+//      gaining = trade.location;
+//      losing = trade.location2;
+//    }
+//    
+//    //TODO Fix this
+//    // This seems dangerous to me, but this is the quick and dirty solution
+//    // we reset the owners as if a trade has been made, so we can evaluate
+//    // the result of the trade. At the end of the method these will be reset.
+//    AbstractPlayer originalOwner = gaining.getOwner();
+//
+//    PropertyTrader.tradeProperties(losing, gaining);
+//
+//    double bigU = evaluateOwnersHoldings();
+//
+//    bigU -= owner.w2
+//        * ((double) (computeShortTermLoss(gaining) + computeMidTermLoss(gaining)));
+//
+//    PropertyTrader.tradeProperties(gaining, losing);
+//
+//    assert losing.getOwner() == owner;
+//    assert gaining.getOwner() == originalOwner;
+//    assert owner.getAllProperties().containsValue(losing);
+//    assert !owner.getAllProperties().containsValue(gaining);
+//    assert originalOwner.getAllProperties().containsValue(gaining);
+//    assert !originalOwner.getAllProperties().containsValue(losing);
+//
+//    return (int) bigU;
+//  }
 
   /**
    * Create a list of all possible property trades between owner and the other
@@ -569,7 +569,7 @@ public class PropertyNegotiator {
     int gain = Integer.MIN_VALUE;
 
     for (TradeProposal trade : proposals) {
-      int newVal = evaluateOwnersHoldings(trade);
+      int newVal = evaluateOwnersHoldings2(trade);
       owner.logFinest("\nNew val after trading " + trade.location + " for "
           + trade.location2 + " is " + newVal);
 
@@ -615,5 +615,65 @@ public class PropertyNegotiator {
     }
 
     return bestTrade;
+  }
+  /**
+   * this is the big U eval function from the paper, but now compute the players
+   * holdings based on a possible trade<br>
+   * U = w1 * (sum(f(c)) + M) - w2 * (stLoss + mtLoss)<br>
+   * 
+   */
+
+  /**
+   * Evaluate the trade from the perspective of the player identified by the
+   * instance field owner. This is the big U eval function from the paper, but
+   * now compute the players holdings based on a possible trade<br>
+   * U = w1 * (sum(f(c)) + M) - w2 * (stLoss + mtLoss)<br>
+   * 
+   * @param trade
+   *          The proposed trade
+   * @return A numeric value that represents the potential profit to this.owner
+   *         from making this trade.
+   */
+  public int evaluateOwnersHoldings2(TradeProposal trade)
+  {
+    Location location1 = null;
+    Location location2 = null;
+    int startCash = owner.cash;
+
+    if (trade.location.owner == owner) {
+      location2 = trade.location;
+      location1 = trade.location2;
+      owner.cash -= trade.cashDiff;
+    } else {
+      location1 = trade.location;
+      location2 = trade.location2;
+      owner.cash += trade.cashDiff;
+    }
+
+    AbstractPlayer owner1 = location1.getOwner();
+    AbstractPlayer owner2 = location2.getOwner();
+
+    location1.setOwner(owner2);
+    location2.setOwner(owner1);
+    
+    double bigU = evaluateOwnersHoldings();
+
+    bigU -= owner.w2
+        * ((double) (computeShortTermLoss(location1) 
+            + computeMidTermLoss(location1)));
+
+    location1.setOwner(owner1);
+    location2.setOwner(owner2);
+    owner.cash = startCash;
+
+    assert owner.cash == startCash;
+    assert location2.getOwner() == owner2;
+    assert location1.getOwner() == owner1;
+    assert owner2.getAllProperties().containsValue(location2);
+    assert !owner2.getAllProperties().containsValue(location1);
+    assert owner1.getAllProperties().containsValue(location1);
+    assert !owner1.getAllProperties().containsValue(location2);
+
+    return (int) bigU;
   }
 }

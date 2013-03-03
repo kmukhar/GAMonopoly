@@ -50,7 +50,8 @@ public class HumanPlayer extends AbstractPlayer {
   public boolean buyProperty(Location location)
   {
     int result = JOptionPane.showConfirmDialog(null, "Do you want to buy "
-        + location.name + "?", "Buy Property?", JOptionPane.YES_NO_OPTION);
+        + location.name + " for " + location.getCost() + " dollars?",
+        "Buy Property?", JOptionPane.YES_NO_OPTION);
     return result == JOptionPane.YES_OPTION;
   }
 
@@ -321,7 +322,12 @@ public class HumanPlayer extends AbstractPlayer {
               null, monopolies.toArray(), monopolies.get(0));
 
       if (selected != null)
-        game.buyHouse(this, (Location) selected);
+        if (location.getNumHouses() < 4)
+          game.buyHouse(this, (Location) selected);
+        else
+          game.buyHotel(this, (Location) selected);
+
+      fireChangeEvent();
     }
   }
 

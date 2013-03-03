@@ -1271,6 +1271,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         }
       }
     }
+    fireChangeEvent();
     logInfo(toString());
   }
 
@@ -1415,17 +1416,17 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
 //    result.append("Player ").append(playerIndex+1)
-    result.append(getName()).append(separator)
+    result.append(separator).append(getName()).append(separator)
         .append("Current location: ").append(getCurrentLocation().toString())
         .append(separator).append("  Total cash  : ").append(cash)
         .append(separator).append("  Net worth   : ").append(getTotalWorth())
 //        .append(separator).append("  Fitness     : ").append(fitnessScore)
         .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
         .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
-        .append(separator).append(separator);
+        .append(separator);
 
     if (!owned.isEmpty()) {
-      result.append("  Properties owned: ").append(separator);
+      result.append(separator).append("  Properties owned: ").append(separator);
       for (Location location : owned.values()) {
         result.append("    ").append(location.getFullInfoString())
             .append(separator);
@@ -1544,15 +1545,17 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   public int evaluateTrade(TradeProposal trade) {
     int base = propertyTrader.evaluateOwnersHoldings();
-    int newVal = propertyTrader.evaluateOwnersHoldings(trade);
+    int newVal = propertyTrader.evaluateOwnersHoldings2(trade);
 
     return newVal - base;
   }
 
   /**
    * A method to make trading decisions and act on those decisions.
-   * @param locations The properties owned by other players that this player
-   * can trade for.
+   * 
+   * @param locations
+   *          The properties owned by other players that this player can trade
+   *          for.
    */
   public void processTradeDecisionEvent(ArrayList<Location> locations) {
     // only try to trade if this player owns at least one propertie
@@ -1582,7 +1585,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // If the estimated profit from the trade is less than threshold, then
     // reject the trade.
     int baseValue = propertyTrader.evaluateOwnersHoldings();
-    int newValue = propertyTrader.evaluateOwnersHoldings(bestTrade);
+    int newValue = propertyTrader.evaluateOwnersHoldings2(bestTrade);
     
     int profit = newValue - baseValue + bestTrade.cashDiff;
     
@@ -1626,7 +1629,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     this.changeListener = cl;
   }
   
-  private void fireChangeEvent() {
+  protected void fireChangeEvent() {
     if (changeListener != null) 
       changeListener.stateChanged(new ChangeEvent(this));
   }
