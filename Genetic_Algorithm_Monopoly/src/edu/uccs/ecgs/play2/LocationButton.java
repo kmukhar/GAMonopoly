@@ -4,15 +4,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import edu.uccs.ecgs.ga.Location;
+import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
-public class LocationButton extends JButton implements ActionListener {
+public class LocationButton extends JButton 
+implements ActionListener, ChangeListener 
+{
 
   private Location location;
+  boolean[] players = new boolean[] { false, false, false, false, false };
 
   public LocationButton(Location location) {    
     this.location = location;
+    if (location.index == 0)
+      players = new boolean[] { true, true, true, true, true };
+
     this.setPreferredSize(new Dimension(75, 75));
 
     ImageIcon icon = createImageIcon(location);
@@ -100,7 +109,7 @@ public class LocationButton extends JButton implements ActionListener {
       java.net.URL imgURL = LocationButton.class.getResource(path);
 
       if (imgURL != null) {
-        ImageIcon icon = new ImageIcon(imgURL);
+        ImageIcon icon = new DoubleImageIcon(imgURL);
         return icon;
       } else {
         System.err.println("Couldn't find file: " + path);
@@ -109,5 +118,40 @@ public class LocationButton extends JButton implements ActionListener {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public void stateChanged(ChangeEvent e)
+  {
+    if (e instanceof LocationChangedEvent) {
+      AbstractPlayer player = (AbstractPlayer) e.getSource();
+      Location previous = ((LocationChangedEvent) e).getPreviousLocation();
+      if (location == previous)
+        removePlayer(player);
+
+      Location current = player.getCurrentLocation();
+      if (location == current)
+        addPlayer(player);
+    }
+  }
+
+  private void addPlayer(AbstractPlayer player)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private void removePlayer(AbstractPlayer player)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+  
+  private String getStringForPlayers() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 1; i < 5; i++) 
+      if (players[i])
+        sb.append(i);
+    return sb.toString();
   }
 }

@@ -8,6 +8,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.uccs.ecgs.ga.*;
+import edu.uccs.ecgs.play2.LocationChangedEvent;
 import edu.uccs.ecgs.states.Events;
 import edu.uccs.ecgs.states.PlayerState;
 
@@ -74,7 +75,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
   protected String gameKey;
-  private ChangeListener changeListener;
+  private ArrayList<ChangeListener> changeListeners;
 
   /**
    * Constructor
@@ -84,6 +85,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param chromoType
    */
   public AbstractPlayer(int index, ChromoTypes chromoType) {
+    changeListeners = new ArrayList<ChangeListener>();
     this.chromoType = chromoType;
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -242,6 +244,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       locationIndex += 40;
     }
 
+    LocationChangedEvent lce = 
+        new LocationChangedEvent(this, getCurrentLocation());
     Location location = PropertyFactory.getPropertyFactory(this.gameKey)
         .getLocationAt(locationIndex);
     setCurrentLocation(location);
@@ -254,7 +258,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
       receiveCash(200);
     }
-    fireChangeEvent();
+    fireChangeEvent(lce);
   }
 
   /**
@@ -1626,11 +1630,15 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
   
   public void addChangeListener(ChangeListener cl) {
-    this.changeListener = cl;
+    changeListeners.add(cl);
   }
   
   protected void fireChangeEvent() {
-    if (changeListener != null) 
-      changeListener.stateChanged(new ChangeEvent(this));
+      fireChangeEvent(new ChangeEvent(this));
+  }
+
+  protected void fireChangeEvent(ChangeEvent event) {
+    for (ChangeListener cl : changeListeners)
+      cl.stateChanged(new ChangeEvent(this));
   }
 }

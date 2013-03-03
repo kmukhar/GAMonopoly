@@ -10,6 +10,8 @@ import edu.uccs.ecgs.ga.*;
 public class HumanPlayer extends AbstractPlayer {
 
   private String name;
+  private String htmlStart = "<html><body>";
+  private String htmlEnd = "</body></html>";
 
   public HumanPlayer(int index, String name) {
     super(index, ChromoTypes.HUM);
@@ -49,8 +51,9 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public boolean buyProperty(Location location)
   {
-    int result = JOptionPane.showConfirmDialog(null, "Do you want to buy "
-        + location.name + " for " + location.getCost() + " dollars?",
+    int result = JOptionPane.showConfirmDialog(null, htmlStart
+        + "You landed on " + location.name + ".<p>Do you want to buy "
+        + location.name + " for " + location.getCost() + " dollars?" + htmlEnd,
         "Buy Property?", JOptionPane.YES_NO_OPTION);
     return result == JOptionPane.YES_OPTION;
   }
@@ -68,8 +71,8 @@ public class HumanPlayer extends AbstractPlayer {
       defaultOption = percent;
 
     int result = JOptionPane.showOptionDialog(null,
-        "<html><body width=300>Your current net worth is " + totalWorth
-            + "<p>Do you want to pay 10% or $200</body></html>", "Income Tax",
+        htmlStart + "Your current net worth is " + totalWorth
+            + "<p>Do you want to pay 10% or $200"+htmlEnd, "Income Tax",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
         new String[] { percent, flat }, defaultOption);
     if (result == 0) {
@@ -87,22 +90,22 @@ public class HumanPlayer extends AbstractPlayer {
   {
     int bid = 0;
     while (true) {
-      String result = JOptionPane.showInputDialog(null, "<html><body width=300>"
+      String result = JOptionPane.showInputDialog(null, htmlStart
           + currentLocation.name + " is being auctioned.<p>"
           + "What is the maximum you want to bid for this property?<p>" 
           + "(0 to " + cash + ")"
-          + "</body></html>", "Bid for property", JOptionPane.QUESTION_MESSAGE);
+          + htmlEnd, "Bid for property", JOptionPane.QUESTION_MESSAGE);
       try {
         bid = Integer.parseInt(result);
         if (bid < 0 || bid > cash)
           throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, "<html><body width=300>"
+        JOptionPane.showMessageDialog(null, htmlStart
             + "Your bid does not appear to be valid.<p>"
             + "Please enter a whole number between 0 "
             + "and " + cash + ".<p>"
-            + "Bid 0 to decline the auction" + "</body></html>", "Bid error",
+            + "Bid 0 to decline the auction" + htmlEnd, "Bid error",
             JOptionPane.ERROR_MESSAGE);
       }
     }
@@ -123,7 +126,7 @@ public class HumanPlayer extends AbstractPlayer {
     int cash = bestTrade.cashDiff;
     
     StringBuilder sb = new StringBuilder();
-    sb.append("<html><body width=300>").append(bestTrade.location.owner.getName())
+    sb.append(htmlStart).append(bestTrade.location.owner.getName())
         .append(" is proposing to trade ").append(bestTrade.location);
     if (cash > 0)
       sb.append(" and ").append(cash).append(" dollars ");
@@ -132,7 +135,7 @@ public class HumanPlayer extends AbstractPlayer {
     if (cash < 0)
       sb.append(" and ").append(Math.abs(cash)).append(" dollars.")
           .append("<p><p>")
-          .append("Do you want to Accept or Reject this trade</body></html>");
+          .append("Do you want to Accept or Reject this trade").append(htmlEnd);
     
     int result = JOptionPane.showOptionDialog(null, sb.toString(),
         "Trade Proposed", JOptionPane.DEFAULT_OPTION,
@@ -156,8 +159,8 @@ public class HumanPlayer extends AbstractPlayer {
     if (this.getNumProperties() == 0)
       return;
 
-    int result = JOptionPane.showOptionDialog(null, "<html><body width=300>"
-        + "Do you want to trade any of your properties?</body></html>",
+    int result = JOptionPane.showOptionDialog(null, htmlStart
+        + "Do you want to trade any of your properties?"+htmlEnd,
         "Trade Properties", JOptionPane.YES_NO_OPTION,
         JOptionPane.QUESTION_MESSAGE,null, new String[]{"Yes","No"}, "No");
 
@@ -171,7 +174,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       Location locationToTrade = (Location) JOptionPane.showInputDialog(null,
-          "<html><body width=300>"
+          htmlStart
               + " Which property of yours do you wish to trade?",
           "Select your property", JOptionPane.QUESTION_MESSAGE, null,
           list.toArray(), list.get(0));
@@ -180,7 +183,7 @@ public class HumanPlayer extends AbstractPlayer {
         return;
       
       Location locationToGet = (Location) JOptionPane.showInputDialog(null,
-          "<html><body width=300>"
+          htmlStart
               + " Which property of another player do you wish to trade for?",
           "Select other player's property", JOptionPane.QUESTION_MESSAGE, null,
           locations.toArray(), locations.get(0));
@@ -207,9 +210,9 @@ public class HumanPlayer extends AbstractPlayer {
     String none = "No Cash";
     String defaultOption = none;
 
-    int result = JOptionPane.showOptionDialog(null, "<html><body width=300>"
+    int result = JOptionPane.showOptionDialog(null, htmlStart
         + "Do you want to give or receive cash with the trade?"
-        + "</body></html>", "Cash Portion of Trade",
+        + htmlEnd, "Cash Portion of Trade",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
         new String[] { give, receive, none }, defaultOption);
 
@@ -219,9 +222,9 @@ public class HumanPlayer extends AbstractPlayer {
     int amount = 0;
     while (true) {
       String strCash = JOptionPane.showInputDialog(null,
-          "<html><body width=300>" + "How much cash do you want to "
+          htmlStart + "How much cash do you want to "
               + (result == 0 ? "give" : "receive") + "?<p>" + "(0 to " + cash
-              + ")" + "</body></html>", "Bid for property",
+              + ")" + htmlEnd, "Bid for property",
           JOptionPane.QUESTION_MESSAGE);
       try {
         amount = Integer.parseInt(strCash);
@@ -229,10 +232,10 @@ public class HumanPlayer extends AbstractPlayer {
           throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, "<html><body width=300>"
+        JOptionPane.showMessageDialog(null, htmlStart
             + "The cash amount does not appear to be valid.<p>"
             + "Please enter a whole number between 0 " + "and " + cash + ".<p>"
-            + "</body></html>", "Error", JOptionPane.ERROR_MESSAGE);
+            + htmlEnd, "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
 
@@ -304,9 +307,9 @@ public class HumanPlayer extends AbstractPlayer {
       if (monopolies.size() == 0)
         break;
 
-      int result = JOptionPane.showOptionDialog(null, "<html><body width=300>"
+      int result = JOptionPane.showOptionDialog(null, htmlStart
           + "Do you want to buy any houses or hotels for your properties?"
-          + "</body></html>", "Build Houses or Hotels?",
+          + htmlEnd, "Build Houses or Hotels?",
           JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
           new String[] { "Yes", "No" }, "No");
 
@@ -314,10 +317,10 @@ public class HumanPlayer extends AbstractPlayer {
         break;
 
       Object object = 
-          JOptionPane.showInputDialog(null, "<html><body width=300>"
+          JOptionPane.showInputDialog(null, htmlStart
                   + "Which property do you want to buy a house for?<p<p>"
                   + "Click Cancel if you no longer want to buy a "
-                  +" house or hotel.</body></html>",
+                  +" house or hotel."+htmlEnd,
               "Select property to build on", JOptionPane.QUESTION_MESSAGE,
               null, monopolies.toArray(), monopolies.get(0));
 
@@ -344,7 +347,7 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     if (!canRaiseCash(amount)) {
-      JOptionPane.showMessageDialog(null, "<html><body width=300>"
+      JOptionPane.showMessageDialog(null, htmlStart
           + "You are unable to raise enough " + "cash to pay your bill of "
           + amount + ". You are bankrupt!");
       throw new BankruptcyException();
@@ -354,12 +357,11 @@ public class HumanPlayer extends AbstractPlayer {
     String theGame = "Let Game raise cash for me";
     String defaultOption = myself;
 
-    int result = JOptionPane.showOptionDialog(null, "<html><body width=300>"
-        + "You do not have enough cash to pay what you owe. Do you want to " +
-        "try to sell houses or hotels, and mortgage properties yourself to " +
-        "raise the cash? Or do you want to let the game sell your properties " +
-        "to raise the cash?"
-        + "</body></html>", "Raise cash to pay bills",
+    int result = JOptionPane.showOptionDialog(null, htmlStart 
+        + "You do not have enough cash to pay what you owe. Do you want to "
+        + "try to sell houses or hotels, and mortgage properties yourself to "
+        + "raise the cash? Or do you want to let the game sell your properties "
+        + "to raise the cash?" + htmlEnd, "Raise cash to pay bills",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
         new String[] { myself, theGame }, defaultOption);
 
@@ -368,8 +370,6 @@ public class HumanPlayer extends AbstractPlayer {
       return;
     }
 
-    // TODO present dialogs to allow player to sell houses, hotels, or mortgage
-    // properties
     boolean done = false;
     while (!done) {
       String mortgage = "Mortgage property";
@@ -411,10 +411,10 @@ public class HumanPlayer extends AbstractPlayer {
       if (!lotsWithHouses.isEmpty())
         options.add(sellHouse);
 
-      result = JOptionPane.showOptionDialog(null, "<html><body width=300>"
+      result = JOptionPane.showOptionDialog(null, htmlStart
           + "Do you want to mortgage properties, sell hotels, or sell "
           + "houses to raise cash?"
-          + "</body></html>", "Raise cash to pay bills",
+          + htmlEnd, "Raise cash to pay bills",
           JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
           options.toArray(), options.get(0));
 
@@ -422,7 +422,7 @@ public class HumanPlayer extends AbstractPlayer {
 
       if (selected.equals(mortgage)) {
         Location locationToMortgage = (Location) JOptionPane.showInputDialog(
-            null, "<html><body width=300>"
+            null, htmlStart
                 + " Which property of yours do you wish to mortgage?",
             "Select property to mortgage", JOptionPane.QUESTION_MESSAGE, null,
             unmortgaged.toArray(), unmortgaged.get(0));
@@ -431,7 +431,7 @@ public class HumanPlayer extends AbstractPlayer {
 
       if (selected.equals(sellHotel)) {
         Location hotel = (Location) JOptionPane.showInputDialog(
-            null, "<html><body width=300>"
+            null, htmlStart
                 + " Which property has a hotel that you want to sell?",
             "Select hotel to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHotels.toArray(), lotsWithHotels.get(0));
@@ -440,7 +440,7 @@ public class HumanPlayer extends AbstractPlayer {
 
       if (selected.equals(sellHouse)) {
         Location house = (Location) JOptionPane.showInputDialog(
-            null, "<html><body width=300>"
+            null, htmlStart
                 + " Which property has a house that you want to sell?",
             "Select house to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHouses.toArray(), lotsWithHouses.get(0));

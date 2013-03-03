@@ -31,6 +31,7 @@ public class PlayerGui extends JPanel {
 
   private Thread gameThread;
   private GameController controller;
+  private Hashtable<Location, LocationButton> locationButtons;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -64,6 +65,12 @@ public class PlayerGui extends JPanel {
     frame.add(gui.getWestBorder(), BorderLayout.WEST);
     frame.add(gui.getNorthBorder(), BorderLayout.NORTH);
     frame.add(gui.getEastBorder(), BorderLayout.EAST);
+
+    for (AbstractPlayer player : gui.players) {
+      for (LocationButton lb : gui.locationButtons.values()) {
+        player.addChangeListener(lb);
+      }
+    }
 
     // Display the window.
     frame.pack();
@@ -282,6 +289,8 @@ public class PlayerGui extends JPanel {
   public PlayerGui() {
     setLayout(new BorderLayout());
 
+    locationButtons = new Hashtable<Location, LocationButton>();
+
     players = createPlayers();
 
     JTabbedPane tabbedPane = new JTabbedPane();
@@ -362,6 +371,7 @@ public class PlayerGui extends JPanel {
       Location l = factory.getLocationAt(i);
       LocationButton lb = new LocationButton(l);
       south.add(lb);
+      locationButtons.put(l, lb);
     }
 
     return south;
@@ -376,6 +386,7 @@ public class PlayerGui extends JPanel {
       Location l = factory.getLocationAt(i);
       LocationButton lb = new LocationButton(l);
       west.add(lb);
+      locationButtons.put(l, lb);
     }
 
     return west;
@@ -390,6 +401,7 @@ public class PlayerGui extends JPanel {
       Location l = factory.getLocationAt(i);
       LocationButton lb = new LocationButton(l);
       north.add(lb);
+      locationButtons.put(l, lb);
     }
 
     return north;
@@ -404,6 +416,7 @@ public class PlayerGui extends JPanel {
       Location l = factory.getLocationAt(i);
       LocationButton lb = new LocationButton(l);
       east.add(lb);
+      locationButtons.put(l, lb);
     }
 
     return east;
@@ -517,7 +530,6 @@ public class PlayerGui extends JPanel {
   }
 
   /**
-   * 
    * @return
    */
   private Logger createTextAreaLogger()
@@ -527,5 +539,13 @@ public class PlayerGui extends JPanel {
     Handler h = new TextAreaHandler(gameInfo);
     logger.addHandler(h);
     return logger;
+  }
+
+  /**
+   * @param lot
+   * @return
+   */
+  public LocationButton getButtonForLocation(Location lot) {
+    return locationButtons.get(lot);
   }
 }
