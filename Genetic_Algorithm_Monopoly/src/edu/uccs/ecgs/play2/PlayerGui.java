@@ -503,7 +503,14 @@ public class PlayerGui extends JPanel {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        JOptionPane.showMessageDialog(null, "The Game Is Over");
+        AbstractPlayer[] players = game.getAllPlayers();
+        AbstractPlayer winner = null;
+        for (AbstractPlayer player : players) {
+          if (player.getFinishOrder() == 1)
+            winner = player;
+        }
+        JOptionPane.showMessageDialog(null,
+            "The Game Is Over. " + winner.getName() + " is the winner.");
         System.exit(0);
       }});
     t.start();
