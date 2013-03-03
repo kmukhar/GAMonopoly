@@ -3,6 +3,7 @@ package edu.uccs.ecgs.play2;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -10,15 +11,20 @@ import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
-public class LocationButton extends JButton 
-implements ActionListener, ChangeListener 
+public class LocationButton extends JButton implements ActionListener,
+    ChangeListener 
 {
 
   private Location location;
   boolean[] players = new boolean[] { false, false, false, false, false };
+  private static Hashtable<String, ImageIcon> playerIcons;
 
-  public LocationButton(Location location) {    
+public LocationButton(Location location) {
     this.location = location;
+
+    playerIcons = new Hashtable<String, ImageIcon>();
+    createPlayerIcons();
+
     if (location.index == 0)
       players = new boolean[] { true, true, true, true, true };
 
@@ -26,12 +32,15 @@ implements ActionListener, ChangeListener
 
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
-      this.setIcon(icon);
+      DoubleIcon dicon = new DoubleIcon(icon, null); 
+      setMargin(new Insets(1, -8, 1, 1));
+      setIcon(dicon);
     } else {
       Color color = location.getGroup().getColor();
       setMargin(new Insets(1, -8, 1, 1));
       this.setBackground(color);
-      this.setText("<html><body><center><p>"+location.name+"</p></center></body></html>");
+      this.setText("<html><body><center><p>" + location.name
+          + "</p></center></body></html>");
     }
 
     this.addActionListener(this);
@@ -101,7 +110,7 @@ implements ActionListener, ChangeListener
       path = "/edu/uccs/ecgs/icons/monopoly_icon_tax_col_sm.gif";
       break;
     default:
-      path=null;      
+      path = null;
       break;
     }
 
@@ -109,7 +118,7 @@ implements ActionListener, ChangeListener
       java.net.URL imgURL = LocationButton.class.getResource(path);
 
       if (imgURL != null) {
-        ImageIcon icon = new DoubleImageIcon(imgURL);
+        ImageIcon icon = new ImageIcon(imgURL);
         return icon;
       } else {
         System.err.println("Couldn't find file: " + path);
@@ -132,26 +141,62 @@ implements ActionListener, ChangeListener
       Location current = player.getCurrentLocation();
       if (location == current)
         addPlayer(player);
+
+      String key = getStringForPlayers();
+      if ("".equals(key))
+        ;
     }
   }
 
+  /**
+   * Set a flag for the player, so the button knows which players are at the
+   * location
+   * 
+   * @param player
+   *          A player at the location represented by this button
+   */
   private void addPlayer(AbstractPlayer player)
   {
-    // TODO Auto-generated method stub
-    
+    players[player.playerIndex] = true;
   }
 
+  /**
+   * Clear the flag for the player, so the button knows which players are at the
+   * location
+   * 
+   * @param player
+   *          A player who was previously at the location represented by this
+   *          button, but who has now left
+   */
   private void removePlayer(AbstractPlayer player)
   {
-    // TODO Auto-generated method stub
-    
+    players[player.playerIndex] = false;
   }
-  
-  private String getStringForPlayers() {
+
+  private String getStringForPlayers()
+  {
     StringBuilder sb = new StringBuilder();
-    for (int i = 1; i < 5; i++) 
+    for (int i = 1; i < 5; i++)
       if (players[i])
         sb.append(i);
     return sb.toString();
+  }
+
+  private void createPlayerIcons()
+  {
+    String[] iconNames = new String[] { "1.png", "12.png", "123.png",
+        "1234.png", "124.png", "13.png", "134.png", "14.png", "2.png",
+        "23.png", "234.png", "24.png", "3.png", "34.png", "4.png" };
+
+    for (String name : iconNames) {
+      java.net.URL imgURL = LocationButton.class.getResource(name);
+
+      if (imgURL != null) {
+        ImageIcon icon = new ImageIcon(imgURL);
+        playerIcons.put(name, icon);
+      } else {
+        System.err.println("Couldn't find file: " + name);
+      }
+    }
   }
 }

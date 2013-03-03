@@ -114,7 +114,7 @@ public class PlayerGui extends JPanel {
       } else {
         int index = r.nextInt(dataNames.size());
         String path = dataNames.remove(index);
-        player = PlayerLoader.loadPlayer(path, i);
+        player = PlayerLoader.loadPlayer(path, i+1);
         players[i] = player;
       }
     }
