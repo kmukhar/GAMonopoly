@@ -105,10 +105,17 @@ public class StreetLocation extends Location {
   public String getFullInfoString()
   {
     StringBuilder sb = new StringBuilder(super.getFullInfoString());
-    if (getNumHouses() + getNumHotels() > 0)
-      sb.append(" (").append(getNumHouses()).append(" houses/")
-          .append(getNumHotels()).append(" hotels)");
-
+    if (getNumHouses() + getNumHotels() > 0) {
+      sb.append(" (");
+      if (getNumHouses() >0) {
+        sb.append(getNumHouses());
+        sb.append(getNumHouses() == 1 ? " house" : " houses");
+      } else {
+        sb.append(getNumHotels()).append(" hotel");
+      }
+      sb.append(")");
+    }
+    
     return sb.toString();
   }
 
@@ -152,7 +159,7 @@ public class StreetLocation extends Location {
   public String getFormattedString()
   {
     StringBuilder result = new StringBuilder();
-    result.append(name).append(".\n\n");
+    result.append(name).append(" - $").append(cost).append(".\n\n");
     result.append("Rent\t\t$").append(rentUnimproved).append(".\n");
     result.append("With 1 House\t$").append(rentOneHouse).append(".\n");
     result.append("With 2 Houses\t$").append(rentTwoHouses).append(".\n");
