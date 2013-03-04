@@ -33,6 +33,8 @@ public class PlayerGui extends JPanel {
   private GameController controller;
   private Hashtable<Location, LocationButton> locationButtons;
 
+  public static PropertyFactory factory;
+
   /**
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event dispatch thread.
@@ -50,6 +52,8 @@ public class PlayerGui extends JPanel {
 
     // Add content to the window.
     PlayerGui gui = new PlayerGui();
+    gui.game = new Monopoly(0, 0, 0, gui.players);
+    PlayerGui.factory = PropertyFactory.getPropertyFactory(gui.game.gamekey);
 
     frame.addWindowListener(new java.awt.event.WindowAdapter() {
       @Override
@@ -85,7 +89,7 @@ public class PlayerGui extends JPanel {
     main = new Main();
     main.pause();
     Main.maxTurns = 500; // set a high number so the game can run to finish
-    game = new Monopoly(0, 0, 0, players);
+
     controller = new GameController(game);
     game.setFlowController(controller);
     game.setLogger(createTextAreaLogger());
@@ -281,10 +285,6 @@ public class PlayerGui extends JPanel {
       }
     });
   }
-
-  static String factoryKey = "edu.uccs.ecgs.play";
-  static PropertyFactory factory = PropertyFactory
-      .getPropertyFactory(factoryKey);
 
   public PlayerGui() {
     setLayout(new BorderLayout());

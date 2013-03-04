@@ -135,16 +135,25 @@ public LocationButton(Location location) {
     if (e instanceof LocationChangedEvent) {
       AbstractPlayer player = (AbstractPlayer) e.getSource();
       Location previous = ((LocationChangedEvent) e).getPreviousLocation();
-      if (location == previous)
+      if (this.location == previous)
         removePlayer(player);
 
       Location current = player.getCurrentLocation();
-      if (location == current)
+      if (this.location == current)
         addPlayer(player);
 
       String key = getStringForPlayers();
-      if ("".equals(key))
-        ;
+      DoubleIcon icon = (DoubleIcon) getIcon();
+      if (icon == null) 
+        icon = new DoubleIcon(null, null);
+
+      if ("".equals(key)) {
+        icon.setIcon2(null);
+        setIcon(icon);
+      } else {
+        icon.setIcon2(playerIcons.get(key)); 
+        setIcon(icon);
+      }
     }
   }
 
@@ -179,6 +188,7 @@ public LocationButton(Location location) {
     for (int i = 1; i < 5; i++)
       if (players[i])
         sb.append(i);
+    sb.append(".png");
     return sb.toString();
   }
 

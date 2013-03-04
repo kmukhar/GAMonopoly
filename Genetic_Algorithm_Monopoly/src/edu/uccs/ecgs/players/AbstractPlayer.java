@@ -1639,6 +1639,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   protected void fireChangeEvent(ChangeEvent event) {
     for (ChangeListener cl : changeListeners)
-      cl.stateChanged(new ChangeEvent(this));
+      cl.stateChanged(event);
   }
 }
