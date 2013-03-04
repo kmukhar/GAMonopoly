@@ -28,8 +28,10 @@ public LocationButton(Location location) {
     if (location.index == 0)
       players = new boolean[] { true, true, true, true, true };
 
-    this.setPreferredSize(new Dimension(75, 75));
-
+    setPreferredSize(new Dimension(75, 75));
+    setHorizontalTextPosition(JButton.CENTER);
+    setVerticalTextPosition(JButton.CENTER);
+    
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
       DoubleIcon dicon = new DoubleIcon(icon, null); 

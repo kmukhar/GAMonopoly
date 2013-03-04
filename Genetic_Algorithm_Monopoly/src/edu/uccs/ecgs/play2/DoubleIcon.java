@@ -26,6 +26,26 @@ public class DoubleIcon extends ImageIcon {
       icon2.paintIcon(c, g, x, y);
   }
 
+  /**
+   * @see javax.swing.ImageIcon#getIconWidth()
+   */
+  @Override
+  public int getIconWidth() {
+    if (icon2 != null) return icon2.getIconWidth();
+    if (icon1 != null) return icon1.getIconWidth();
+    return super.getIconWidth();
+  }
+
+  /**
+   * @see javax.swing.ImageIcon#getIconHeight()
+   */
+  @Override
+  public int getIconHeight() {
+    if (icon2 != null) return icon2.getIconHeight();
+    if (icon1 != null) return icon1.getIconHeight();
+    return super.getIconHeight();
+  }
+
   public void setIcon2(ImageIcon icon)
   {
     icon2 = icon;
