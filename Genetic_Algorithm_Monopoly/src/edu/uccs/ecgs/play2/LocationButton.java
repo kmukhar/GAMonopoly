@@ -154,6 +154,7 @@ public LocationButton(Location location) {
         icon.setIcon2(playerIcons.get(key)); 
         setIcon(icon);
       }
+      this.fireStateChanged();
     }
   }
 

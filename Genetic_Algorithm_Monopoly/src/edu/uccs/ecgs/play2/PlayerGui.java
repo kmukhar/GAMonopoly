@@ -72,7 +72,8 @@ public class PlayerGui extends JPanel {
 
     for (AbstractPlayer player : gui.players) {
       for (LocationButton lb : gui.locationButtons.values()) {
-        player.addChangeListener(lb);
+        if (player != null)
+          player.addChangeListener(lb);
       }
     }
 
@@ -103,22 +104,23 @@ public class PlayerGui extends JPanel {
 
     playerName = dialog.getName();
     playerIndex = dialog.getIndex();
-
+ 
     AbstractPlayer[] players = new AbstractPlayer[4];
-    for (int i = 0; i < 4; i++) {
+
+    for (int i = 1; i < 5; i++) {
       String baseName = "player000";
       dataNames.add(baseName + i + ".dat");
     }
 
     for (int i = 0; i < players.length; i++) {
       AbstractPlayer player;
-      if (i == playerIndex) {
-        player = new HumanPlayer(i, playerName);
+      if (i == playerIndex - 1) {
+        player = new HumanPlayer(playerIndex, playerName);
         players[i] = player;
       } else {
         int index = r.nextInt(dataNames.size());
         String path = dataNames.remove(index);
-        player = PlayerLoader.loadPlayer(path, i+1);
+        player = PlayerLoader.loadPlayer(path, i + 1);
         players[i] = player;
       }
     }
