@@ -244,8 +244,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       locationIndex += 40;
     }
 
-    LocationChangedEvent lce = 
-        new LocationChangedEvent(this, getCurrentLocation());
     Location location = PropertyFactory.getPropertyFactory(this.gameKey)
         .getLocationAt(locationIndex);
     setCurrentLocation(location);
@@ -258,7 +256,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
       receiveCash(200);
     }
-    fireChangeEvent(lce);
   }
 
   /**
@@ -268,7 +265,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     enteredJail();
     setLocationIndex(jail.index);
     setCurrentLocation(jail);
-    fireChangeEvent();
   }
 
   /**
@@ -281,18 +277,21 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Set the player's current location to the location parameter.
    * 
-   * @param location
+   * @param lot
    *          The location where the player is currently located.
    */
-  private void setCurrentLocation(Location location) {
-    this.location = location;
+  private void setCurrentLocation(Location lot) {
+    LocationChangedEvent lce = 
+        new LocationChangedEvent(this, getCurrentLocation());
+    this.location = lot;
+    fireChangeEvent(lce);
 
-    logInfo(getName() + " moving to " + location.name);
-    if (location.owner != null) {
-      logInfo(location.name + " is owned by " + location.owner.getName());
+    logInfo(getName() + " moving to " + lot.name);
+    if (lot.owner != null) {
+      logInfo(lot.name + " is owned by " + lot.owner.getName());
     }
 
-    if (location.name.equals("Jail")) {
+    if (lot.name.equals("Jail")) {
       if (inJail) {
         logInfo(getName() + " is in Jail");
         logFinest("Player sentence: " + jailSentence);
@@ -1419,12 +1418,19 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public String toString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-//    result.append("Player ").append(playerIndex+1)
     result.append(separator).append(getName()).append(separator)
-        .append("Current location: ").append(getCurrentLocation().toString())
-        .append(separator).append("  Total cash  : ").append(cash)
-        .append(separator).append("  Net worth   : ").append(getTotalWorth())
-//        .append(separator).append("  Fitness     : ").append(fitnessScore)
+        .append("Current location: ").append(getCurrentLocation().toString());
+
+    if (inJail()) {
+      result.append(" - Behind Bars!");
+    } else if (location.index == 10 && !inJail()) {
+      result.append(" - Just Visiting.");
+    }
+
+    result.append(separator).append("  Total cash  : ").append(cash)
+        .append(separator).append("  Net worth   : ")
+        .append(getTotalWorth())
+        // .append(separator).append("  Fitness     : ").append(fitnessScore)
         .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
         .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
         .append(separator);
