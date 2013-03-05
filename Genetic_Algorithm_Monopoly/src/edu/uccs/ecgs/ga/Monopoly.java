@@ -135,9 +135,10 @@ public class Monopoly implements Runnable, Controllable {
       AbstractPlayer player = getNextPlayer();
       player.resetDoubles();
 
-      logInfo("*********************************************************");
+      logInfo("****************************************");
+      logInfo("****************************************");
       logInfo("Turn: " + turnCounter);
-      logInfo(player.toString());
+      logInfo(player.toShortString());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;
       Actions action = Actions.NULL;

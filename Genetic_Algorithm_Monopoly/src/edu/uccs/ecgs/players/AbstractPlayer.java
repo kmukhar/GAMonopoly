@@ -1415,7 +1415,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public abstract AbstractPlayer[] createChildren(AbstractPlayer parent2,
       int index);
 
-  public String toString() {
+  /**
+   * @return A String with just name, location, cash, net worth, and flags for
+   *         whether the player has a monopoly and whether the player is
+   *         bankrupt.
+   */
+  public String toShortString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
     result.append(separator).append(getName()).append(separator)
@@ -1434,7 +1439,20 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
         .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
         .append(separator);
+    return result.toString();
+  }
 
+  /**
+   * @return A String with name, location, cash, net worth, and flags for
+   *         whether the player has a monopoly and whether the player is
+   *         bankrupt, and finally with a list of the properties owned by
+   *         the player.
+   */
+  @Override
+  public String toString() {
+    String separator = System.getProperty("line.separator");
+    StringBuilder result = new StringBuilder(toShortString());
+    
     if (!owned.isEmpty()) {
       result.append(separator).append("  Properties owned: ").append(separator);
       for (Location location : owned.values()) {

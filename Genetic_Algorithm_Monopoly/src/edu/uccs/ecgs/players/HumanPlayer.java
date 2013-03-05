@@ -10,7 +10,7 @@ import edu.uccs.ecgs.ga.*;
 public class HumanPlayer extends AbstractPlayer {
 
   private String name;
-  private String htmlStart = "<html><body width=200>";
+  private String htmlStart = "<html><body width=250>";
   private String htmlEnd = "</body></html>";
 
   public HumanPlayer(int index, String name) {
