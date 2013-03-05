@@ -22,6 +22,11 @@ public abstract class Location implements Comparable<Location> {
   public final String name;
 
   /**
+   * The hyphenated name of this property, for displays on buttons, etc.
+   */
+  public final String hname;
+
+  /**
    * The type of this location: Property, Railroad, Utility, or Special.
    */
   protected final String type;
@@ -86,6 +91,9 @@ public abstract class Location implements Comparable<Location> {
     index = getInteger(key + ".index", properties);
     name = properties.getProperty(key + ".name");
     type = properties.getProperty(key + ".type");
+    
+    String temp = properties.getProperty(key + ".hname");
+    hname = temp == null ? name : temp;
   }
 
   /**
@@ -351,4 +359,8 @@ public abstract class Location implements Comparable<Location> {
    * @return The rent for this location with the given number of houses
    */
   public abstract int getPotentialRent(int numHouses, int diceRoll);
+
+  public String getHyphenatedName() {
+    return hname;
+  }
 }

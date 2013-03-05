@@ -8,12 +8,20 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import edu.uccs.ecgs.ga.Location;
+import edu.uccs.ecgs.ga.PropertyGroups;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
 public class LocationButton extends JButton implements ActionListener,
     ChangeListener 
 {
+
+  private static final int MED_AVE = 1;
+  private static final int CONNECTICUT = 9;
+  private static final int TENNESSEE = 18;
+  private static final int PENNSYLVANIA = 34;
+  private static final int PARK_PLACE = 37;
+  private static final int BOARDWALK = 39;
 
   private Location location;
   boolean[] players = new boolean[] { false, false, false, false, false };
@@ -29,20 +37,23 @@ public LocationButton(Location location) {
       players = new boolean[] { true, true, true, true, true };
 
     setPreferredSize(new Dimension(75, 75));
-    setHorizontalTextPosition(JButton.CENTER);
+    setHorizontalTextPosition(SwingConstants.CENTER);
     setVerticalTextPosition(JButton.CENTER);
     
+    String name = location.getHyphenatedName();
+
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
       DoubleIcon dicon = new DoubleIcon(icon, null); 
-      setMargin(new Insets(1, 1, 1, 1));
+      setMargin(new Insets(0, 0, 0, 0));
       setIcon(dicon);
     } else {
       Color color = location.getGroup().getColor();
-      setMargin(new Insets(1, 1, 1, 1));
-      this.setBackground(color);
-      this.setText("<html><body><center>" + location.name
-          + "</center></body></html>");
+      setMargin(new Insets(0, 0, 0, 0));
+      setBackground(color);
+      if (location.index == PARK_PLACE || location.index == BOARDWALK) 
+        setForeground(Color.white);
+      setText("<html><body>" + name + "</body></html>");
     }
 
     this.addActionListener(this);
@@ -68,7 +79,7 @@ public LocationButton(Location location) {
     String path = "";
     switch (location.index) {
     case 0:
-      path = "/edu/uccs/ecgs/icons/monopoly_icon_arrow_2_bw_sm.gif";
+      path = "/edu/uccs/ecgs/icons/monopoly_icon_arrow_col_sm.gif";
       break;
     case 2:
     case 17:
@@ -79,10 +90,16 @@ public LocationButton(Location location) {
       path = "/edu/uccs/ecgs/icons/monopoly_icon_tax_bw_sm.gif"; // income tax
       break;
     case 5:
+      path = "/edu/uccs/ecgs/icons/monopoly_icon_train_reading.gif";
+      break;
     case 15:
+      path = "/edu/uccs/ecgs/icons/monopoly_icon_train_penn.gif";
+      break;
     case 25:
+      path = "/edu/uccs/ecgs/icons/monopoly_icon_train_bo.gif";
+      break;
     case 35:
-      path = "/edu/uccs/ecgs/icons/monopoly_icon_train_bw_sm.gif";
+      path = "/edu/uccs/ecgs/icons/monopoly_icon_train_short.gif";
       break;
     case 7:
       path = "/edu/uccs/ecgs/icons/monopoly_icon_chance_3_col_sm.gif";
