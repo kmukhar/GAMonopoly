@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import edu.uccs.ecgs.ga.Location;
-import edu.uccs.ecgs.ga.PropertyGroups;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
@@ -16,10 +15,7 @@ public class LocationButton extends JButton implements ActionListener,
     ChangeListener 
 {
 
-  private static final int MED_AVE = 1;
-  private static final int CONNECTICUT = 9;
-  private static final int TENNESSEE = 18;
-  private static final int PENNSYLVANIA = 34;
+  private static final int GO_TO_JAIL = 30;
   private static final int PARK_PLACE = 37;
   private static final int BOARDWALK = 39;
 
@@ -31,7 +27,10 @@ public LocationButton(Location location) {
     this.location = location;
 
     playerIcons = new Hashtable<String, ImageIcon>();
-    createPlayerIcons();
+    if (location.index == PARK_PLACE || location.index == BOARDWALK)
+      createPlayerIconsWhite();
+    else
+      createPlayerIcons();
 
     if (location.index == 0)
       players = new boolean[] { true, true, true, true, true };
@@ -179,14 +178,17 @@ public LocationButton(Location location) {
 
   /**
    * Set a flag for the player, so the button knows which players are at the
-   * location
+   * location.
    * 
    * @param player
    *          A player at the location represented by this button
    */
   private void addPlayer(AbstractPlayer player)
   {
-    players[player.playerIndex] = true;
+    // If location is Go To Jail, then players will never stay at that 
+    // location, so all flags at that location are alway false
+    if (location.index != GO_TO_JAIL)
+      players[player.playerIndex] = true;
   }
 
   /**
@@ -217,6 +219,24 @@ public LocationButton(Location location) {
     String[] iconNames = new String[] { "1.png", "12.png", "123.png",
         "1234.png", "124.png", "13.png", "134.png", "14.png", "2.png",
         "23.png", "234.png", "24.png", "3.png", "34.png", "4.png" };
+
+    for (String name : iconNames) {
+      java.net.URL imgURL = LocationButton.class.getResource(name);
+
+      if (imgURL != null) {
+        ImageIcon icon = new ImageIcon(imgURL);
+        playerIcons.put(name, icon);
+      } else {
+        System.err.println("Couldn't find file: " + name);
+      }
+    }
+  }
+
+  private void createPlayerIconsWhite()
+  {
+    String[] iconNames = new String[] { "1w.png", "12w.png", "123w.png",
+        "1234w.png", "124w.png", "13w.png", "134w.png", "14w.png", "2w.png",
+        "23w.png", "234w.png", "24w.png", "3w.png", "34w.png", "4w.png" };
 
     for (String name : iconNames) {
       java.net.URL imgURL = LocationButton.class.getResource(name);
