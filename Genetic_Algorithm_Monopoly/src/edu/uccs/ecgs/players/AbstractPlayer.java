@@ -75,6 +75,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
   protected String gameKey;
+  private ArrayList<ChangeListener> changeListeners;
 
   /**
    * Constructor
@@ -84,6 +85,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param chromoType
    */
   public AbstractPlayer(int index, ChromoTypes chromoType) {
+    changeListeners = new ArrayList<ChangeListener>();
     this.chromoType = chromoType;
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -96,9 +98,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     clearAllProperties();
     cash = 1500;
     locationIndex = 0;
-  }
-
-  public AbstractPlayer() {
   }
 
   /**
@@ -118,6 +117,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (owned != null) {
       owned.clear();
     }
+    fireChangeEvent();
   }
 
   /**
@@ -182,6 +182,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     bankruptIndex = 0;
 
     clearAllProperties();
+    fireChangeEvent();
   }
 
   /**
@@ -257,6 +258,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
       receiveCash(200);
     }
+    fireChangeEvent(lce);
   }
 
   /**
@@ -266,6 +268,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     enteredJail();
     setLocationIndex(jail.index);
     setCurrentLocation(jail);
+    fireChangeEvent();
   }
 
   /**
@@ -320,6 +323,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void receiveCash(int amount) {
     cash += amount;
     logInfo(getName() + " received " + amount + " dollars.");
+    fireChangeEvent();
   }
 
   /**
@@ -335,6 +339,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     raiseCash(amount);
     cash = cash - amount;
     logInfo(getName() + " paid " + amount + " dollars.");
+    fireChangeEvent();
   }
 
   /**
@@ -379,6 +384,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (location.partOfMonopoly) {
       logInfo(getName() + " acquired monopoly with " + location.name);
     }
+    fireChangeEvent();
   }
 
   /**
@@ -447,6 +453,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       throw new IllegalArgumentException(
           "Illegal attempt to use Get Out Of Jail Card");
     }
+    fireChangeEvent();
   }
 
   /**
@@ -544,6 +551,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setGetOutOfJail(Chance chanceJailCard) {
     chanceGOOJ = chanceJailCard;
+    fireChangeEvent();
   }
 
   /**
@@ -554,6 +562,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setGetOutOfJail(CommunityChest ccJailCard) {
     ccGOOJ = ccJailCard;
+    fireChangeEvent();
   }
 
   /**
@@ -908,6 +917,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (!gameOver) {
       processMortgagedNewProperties(mortgaged);
     }
+
+    fireChangeEvent();
   }
 
   /**
@@ -1146,6 +1157,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public int getAllCash() {
     int amount = cash;
     cash = 0;
+    fireChangeEvent();
     return amount;
   }
 
@@ -1154,6 +1166,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setBankrupt() {
     isBankrupt = true;
+    fireChangeEvent();
   }
 
   /**
@@ -1169,6 +1182,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (l.getNumHouses() > 0)
         game.liquidateHouses(this, l);
     }
+
+    fireChangeEvent();
   }
 
   /**
@@ -1260,6 +1275,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         }
       }
     }
+    fireChangeEvent();
     logInfo(toString());
   }
 
@@ -1611,5 +1627,18 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       logInfo(getName() + " chooses to pay $200");
       getCash(200);
     }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    changeListeners.add(cl);
+  }
+  
+  protected void fireChangeEvent() {
+      fireChangeEvent(new ChangeEvent(this));
+  }
+
+  protected void fireChangeEvent(ChangeEvent event) {
+    for (ChangeListener cl : changeListeners)
+      cl.stateChanged(event);
   }
 }

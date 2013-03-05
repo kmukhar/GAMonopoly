@@ -330,6 +330,8 @@ public class HumanPlayer extends AbstractPlayer {
           game.buyHouse(this, selected);
         else
           game.buyHotel(this, selected);
+
+      fireChangeEvent();
     }
   }
 

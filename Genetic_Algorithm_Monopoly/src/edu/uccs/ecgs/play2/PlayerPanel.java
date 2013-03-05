@@ -10,7 +10,6 @@ import javax.swing.event.ChangeListener;
 
 import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.players.AbstractPlayer;
-import edu.uccs.ecgs.players.GamePlayer;
 
 public class PlayerPanel extends JPanel implements ChangeListener {
 
@@ -26,7 +25,7 @@ public class PlayerPanel extends JPanel implements ChangeListener {
     add(filler);
   }
   
-  public void setPlayer(GamePlayer player) {
+  public void setPlayer(AbstractPlayer player) {
     this.player = player;
     player.addChangeListener(this);
   }
