@@ -91,10 +91,13 @@ public class HumanPlayer extends AbstractPlayer {
     int bid = 0;
     while (true) {
       String result = JOptionPane.showInputDialog(null, htmlStart
-          + currentLocation.name + " is being auctioned.<p>"
-          + "What is the maximum you want to bid for this property?<p>" 
-          + "(0 to " + cash + ")"
-          + htmlEnd, "Bid for property", JOptionPane.QUESTION_MESSAGE);
+          + currentLocation.name + " is being auctioned.<p><p>" 
+              + "The normal cost for this property is $"
+              + currentLocation.getCost() + ".<p><p>"
+              + getOtherOwners(currentLocation.getGroup())
+              + "What is the maximum you want to bid for this property? "
+              + "(0 to " + cash + ")" + htmlEnd, "Bid for property",
+          JOptionPane.QUESTION_MESSAGE);
       try {
         bid = Integer.parseInt(result);
         if (bid < 0 || bid > cash)
@@ -103,7 +106,7 @@ public class HumanPlayer extends AbstractPlayer {
       } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, htmlStart
             + "Your bid does not appear to be valid.<p>"
-            + "Please enter a whole number between 0 "
+            + "Please enter a dollar amount between 0 "
             + "and " + cash + ".<p>"
             + "Bid 0 to decline the auction" + htmlEnd, "Bid error",
             JOptionPane.ERROR_MESSAGE);
@@ -111,6 +114,36 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     return bid;
+  }
+
+  /**
+   * Checks to see if any properties in the group are owned, and if so lists the
+   * owners of those properties.
+   * 
+   * @param group
+   *          The group to check if other locations are owned by other players.
+   * @return A String with a list of other owners of properties in the group.
+   *         Empty String if there are no other properties owned in the group.
+   */
+  private String getOtherOwners(PropertyGroups group) {
+    StringBuilder result = new StringBuilder();
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(this.gameKey);
+    ArrayList<Location> lots = pf.getAllPropertiesInGroup(group);
+
+    for (Location lot : lots) {
+      if (lot.owner != null) {
+        result.append(lot.name).append(" is owned by ")
+            .append(lot.owner.getName()).append("<br>");
+      }
+    }
+
+    if (result.length() > 0) {
+      result.insert(0, "Some properties in this group are "
+          + "owned by other players.<br>");
+      result.append("<p><p>");
+    }
+    
+    return result.toString();
   }
 
   /* (non-Javadoc)

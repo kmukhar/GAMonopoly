@@ -314,12 +314,8 @@ public class Monopoly implements Runnable, Controllable {
 
   public void sellHotel2(Location location, Collection<Location> owned) 
   {
-    // get all the properties in the group
-    ArrayList<Location> lots = new ArrayList<Location>();
-    for (Location lot : owned) {
-      if (lot.getGroup() == location.getGroup())
-        lots.add(lot);
-    }
+    PropertyFactory pf = PropertyFactory.getPropertyFactory(gamekey);
+    ArrayList<Location> lots = pf.getAllPropertiesInGroup(location.getGroup());
 
     int countHotels = 0;
     int countHouses = 0;
@@ -873,25 +869,6 @@ public class Monopoly implements Runnable, Controllable {
     }
   }
 
-  /**
-   * Return a list of properties owned by players other than the given player.
-   */
-  public ArrayList<Location> getPropertiesOwnedByOthers(AbstractPlayer xPlayer)
-  {
-    ArrayList<Location> locations = new ArrayList<Location>();
-    
-    for (AbstractPlayer player : players) {
-      if (player != xPlayer) {
-        Collection<Location> owned = player.getAllProperties().values();
-        for (Location location : owned) {
-          if (location.getNumHotels() + location.getNumHouses() == 0)
-            locations.add(location);
-        }
-      }
-    }
-    return locations;
-  }
-  
   /**
    * @return A list of all the players in this game
    */

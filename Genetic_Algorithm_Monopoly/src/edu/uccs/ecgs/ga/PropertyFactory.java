@@ -467,4 +467,35 @@ public class PropertyFactory {
   {
     return getPropertyFactory(gamekey).getLocationAt(index);
   }
+
+  /**
+   * Return a list of properties owned by players other than the given player,
+   * and which aren't developed.
+   */
+  public ArrayList<Location> getPropertiesOwnedByOthers(AbstractPlayer xPlayer) {
+    ArrayList<Location> result = new ArrayList<Location>();
+
+    for (Location lot : locations) {
+      if (lot.owner != null && lot.owner != xPlayer) {
+        if (lot.getNumHotels() + lot.getNumHouses() == 0)
+          result.add(lot);
+      }      
+    }
+    
+    return result;
+  }
+
+  /**
+   * Finds all the properties in the given group and returns them in a list.
+   * @param group The group to search for
+   * @return A list of all properties in the group
+   */
+  public ArrayList<Location> getAllPropertiesInGroup(PropertyGroups group) {
+    ArrayList<Location> lots = new ArrayList<Location>();
+    for (Location lot : locations) {
+      if (lot.getGroup() == group)
+        lots.add(lot);
+    }
+    return lots;
+  }
 }

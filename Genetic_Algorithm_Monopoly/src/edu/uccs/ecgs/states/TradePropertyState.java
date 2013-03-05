@@ -19,7 +19,10 @@ public class TradePropertyState extends PlayerState {
     
     case TRADE_DECISION_EVENT:
       game.logFinest("\nStarting process trade decision event");
-      ArrayList<Location> locations = game.getPropertiesOwnedByOthers(player);
+      PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+      // get list of undeveloped lots owned by other players
+      ArrayList<Location> locations = pf.getPropertiesOwnedByOthers(player);
+
       if (!locations.isEmpty())
         player.processTradeDecisionEvent(locations);
 
