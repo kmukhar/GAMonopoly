@@ -35,11 +35,11 @@ public LocationButton(Location location) {
     ImageIcon icon = createImageIcon(location);
     if (icon != null) {
       DoubleIcon dicon = new DoubleIcon(icon, null); 
-      setMargin(new Insets(1, -8, 1, 1));
+      setMargin(new Insets(1, 1, 1, 1));
       setIcon(dicon);
     } else {
       Color color = location.getGroup().getColor();
-      setMargin(new Insets(1, -8, 1, 1));
+      setMargin(new Insets(1, 1, 1, 1));
       this.setBackground(color);
       this.setText("<html><body><center><p>" + location.name
           + "</p></center></body></html>");
