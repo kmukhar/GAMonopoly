@@ -45,8 +45,17 @@ public class PlayerGui extends JPanel {
     getNameAndIndex();
 
     // Create and set up the window.
+    JFrame.setDefaultLookAndFeelDecorated(true);
     JFrame frame = new JFrame("Monopoly Simulator");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    // TODO
+    //Set the frame icon to an image loaded from a file.
+    java.net.URL imgURL = PlayerGui.class.getResource("hat32.png");
+    if (imgURL != null) {
+      ImageIcon icon = new ImageIcon(imgURL);
+      frame.setIconImage(icon.getImage());
+    }
 
     frame.setLayout(new BorderLayout());
 

@@ -364,13 +364,12 @@ public class HumanPlayer extends AbstractPlayer {
       if (result == 1)
         break;
 
-      Object object = 
-          JOptionPane.showInputDialog(null, htmlStart
-                  + "Which property do you want to buy a house for?<p<p>"
-                  + "Click Cancel if you no longer want to buy a "
-                  +" house or hotel."+htmlEnd,
-              "Select property to build on", JOptionPane.QUESTION_MESSAGE,
-              null, monopolies.toArray(), monopolies.get(0));
+      Object object = JOptionPane.showInputDialog(null, htmlStart
+          + "Which property do you want to buy a house for?<p<p>"
+          + "Click Cancel if you no longer want to buy a house or hotel."
+          + htmlEnd, "Select property to build on",
+          JOptionPane.QUESTION_MESSAGE, null, monopolies.toArray(),
+          monopolies.get(0));
 
       Location selected = (Location) object;
       if (selected != null)
