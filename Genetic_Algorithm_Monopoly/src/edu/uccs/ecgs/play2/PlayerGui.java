@@ -10,6 +10,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
+import edu.uccs.ecgs.players.GamePlayer;
 import edu.uccs.ecgs.players.HumanPlayer;
 
 @SuppressWarnings("serial")
@@ -24,7 +25,7 @@ public class PlayerGui extends JPanel {
   private JButton nextButton;
 
   private PlayerPanel[] playerPanels;
-  private AbstractPlayer[] players;
+  private GamePlayer[] players;
   private Main main;
   private Monopoly game;
   private JTextArea gameInfo;
@@ -70,7 +71,7 @@ public class PlayerGui extends JPanel {
     frame.add(gui.getNorthBorder(), BorderLayout.NORTH);
     frame.add(gui.getEastBorder(), BorderLayout.EAST);
 
-    for (AbstractPlayer player : gui.players) {
+    for (GamePlayer player : gui.players) {
       for (LocationButton lb : gui.locationButtons.values()) {
         if (player != null)
           player.addChangeListener(lb);
@@ -98,14 +99,14 @@ public class PlayerGui extends JPanel {
     gameThread = new Thread(game);
   }
 
-  private AbstractPlayer[] createPlayers()
+  private GamePlayer[] createPlayers()
   {
     Random r = new Random(System.currentTimeMillis());
 
     playerName = dialog.getName();
     playerIndex = dialog.getIndex();
  
-    AbstractPlayer[] players = new AbstractPlayer[4];
+    GamePlayer[] players = new GamePlayer[4];
 
     for (int i = 1; i < 5; i++) {
       String baseName = "player000";
@@ -116,12 +117,12 @@ public class PlayerGui extends JPanel {
       AbstractPlayer player;
       if (i == playerIndex - 1) {
         player = new HumanPlayer(playerIndex, playerName);
-        players[i] = player;
+        players[i] = new GamePlayer(player);
       } else {
         int index = r.nextInt(dataNames.size());
         String path = dataNames.remove(index);
         player = PlayerLoader.loadPlayer(path, i + 1);
-        players[i] = player;
+        players[i] = new GamePlayer(player);
       }
     }
     return players;
