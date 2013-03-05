@@ -1,7 +1,6 @@
 package edu.uccs.ecgs.states;
 
-import java.util.TreeMap;
-
+import java.util.ArrayList;
 import edu.uccs.ecgs.ga.Actions;
 import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.ga.Monopoly;
@@ -21,9 +20,9 @@ public class AuctionState extends PlayerState {
     
     case AUCTION_STARTED_EVENT:
       
-      TreeMap<Integer, Location> lotsToAuction = new TreeMap<Integer, Location>();
+      ArrayList<Location> lotsToAuction = new ArrayList<Location>();
       Location location = player.getCurrentLocation();
-      lotsToAuction.put(location.index, location);
+      lotsToAuction.add(location);
       
       game.auctionLots(lotsToAuction);
 

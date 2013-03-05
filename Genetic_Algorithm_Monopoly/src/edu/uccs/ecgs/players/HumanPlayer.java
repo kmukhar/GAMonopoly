@@ -10,7 +10,7 @@ import edu.uccs.ecgs.ga.*;
 public class HumanPlayer extends AbstractPlayer {
 
   private String name;
-  private String htmlStart = "<html><body>";
+  private String htmlStart = "<html><body width=200>";
   private String htmlEnd = "</body></html>";
 
   public HumanPlayer(int index, String name) {
@@ -95,7 +95,7 @@ public class HumanPlayer extends AbstractPlayer {
               + "The normal cost for this property is $"
               + currentLocation.getCost() + ".<p><p>"
               + getOtherOwners(currentLocation.getGroup())
-              + "What is the maximum you want to bid for this property? "
+              + "What is the MAXIMUM you want to bid for this property? "
               + "(0 to " + cash + ")" + htmlEnd, "Bid for property",
           JOptionPane.QUESTION_MESSAGE);
       try {
@@ -114,6 +114,21 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     return bid;
+  }
+
+  /**
+   * Receive the results of an auction and provide a dialog so the actual
+   * human player is notified of the results.
+   * @see edu.uccs.ecgs.players.AbstractPlayer#auctionResult
+   * (edu.uccs.ecgs.players.AbstractPlayer, edu.uccs.ecgs.ga.Location, int)
+   */
+  @Override
+  public void auctionResult(AbstractPlayer player, Location lot,
+      int amount) {
+    JOptionPane.showMessageDialog(null, htmlStart + player.getName()
+        + " won the auction for " + lot.name + " with a winning bid "
+        + " (may not be the max bid) of $" + amount + "." + htmlEnd,
+        "Auction Complete", JOptionPane.INFORMATION_MESSAGE);
   }
 
   /**

@@ -1,7 +1,6 @@
 package edu.uccs.ecgs.states;
 
-import java.util.TreeMap;
-
+import java.util.ArrayList;
 import edu.uccs.ecgs.ga.Actions;
 import edu.uccs.ecgs.ga.BankruptcyException;
 import edu.uccs.ecgs.ga.Location;
@@ -39,8 +38,8 @@ public class BuyPropertyState extends PlayerState {
         t.printStackTrace();
 
         //but just in case this happens...
-        TreeMap<Integer, Location> lotsToAuction = new TreeMap<Integer,Location>();
-        lotsToAuction.put(location.index, location);
+        ArrayList<Location> lotsToAuction = new ArrayList<Location>();
+        lotsToAuction.add(location.index, location);
         game.auctionLots(lotsToAuction);
       }
 

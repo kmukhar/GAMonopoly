@@ -1647,4 +1647,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     for (ChangeListener cl : changeListeners)
       cl.stateChanged(event);
   }
+
+  public void auctionResult(AbstractPlayer highBidPlayer, Location location2,
+      int finalBid) {
+  }
 }

@@ -8,7 +8,6 @@ import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.uccs.ecgs.ga.Location;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 public class PlayerPanel extends JPanel implements ChangeListener {

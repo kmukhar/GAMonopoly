@@ -544,8 +544,8 @@ public class Monopoly implements Runnable, Controllable {
       player.getAllCash();
 
       if (!gameOver) {
-        TreeMap<Integer, Location> lotsToAuction = new TreeMap<Integer, Location>();
-        lotsToAuction.putAll(player.getAllProperties());
+        ArrayList<Location> lotsToAuction = new ArrayList<Location>();
+        lotsToAuction.addAll(player.getAllProperties().values());
         player.clearAllProperties();
         auctionLots(lotsToAuction);
       }
@@ -569,16 +569,24 @@ public class Monopoly implements Runnable, Controllable {
     assert player.cash == 0;
   }
 
-  public void auctionLots(TreeMap<Integer, Location> lotsToAuction) {    
+  /**
+   * For each lot in the map, gather the bids from each player and decide on 
+   * the winner of each auction. In case of ties bids, the winner is the
+   * player that makes the bid first. Bids are gathered by iterating through
+   * the array of AbstractPlayers, so the player with the lower array index
+   * will win when there is a tie. 
+   * @param lotsToAuction The Map
+   */
+  public void auctionLots(Collection<Location> lotsToAuction) {
     // set owner to null and mortgaged to false for all lots
-    for (Location location : lotsToAuction.values()) {
+    for (Location location : lotsToAuction) {
       location.owner = null;
       location.setMortgaged(false);
     }
 
     String msg = "";
 
-    for (Location location : lotsToAuction.values()) {
+    for (Location location : lotsToAuction) {
       logInfo("\nAUCTION\nBank is auctioning " + location.name);
 
       int highBid = 0;
@@ -599,7 +607,7 @@ public class Monopoly implements Runnable, Controllable {
       for (Integer bid : bids.keySet()) {
         Vector<AbstractPlayer> players = bids.get(bid);
         for (AbstractPlayer player : players) {
-          logInfo(player.getName() + " bids " + bid);
+          logInfo(player.getName() + "'s maximum bid is " + bid);
 
           if (bid > highBid) {
             secondHighestBid = highBid;
@@ -631,6 +639,9 @@ public class Monopoly implements Runnable, Controllable {
 
       try {
         processAuctionResult(highBidPlayer, location, finalBid);
+        for (AbstractPlayer player : players) {
+          player.auctionResult(highBidPlayer, location, finalBid);
+        }
       } catch (BankruptcyException e) {
         // assume player cannot win auction unless they have enough cash
         // TODO Verify that this exception will not occur
@@ -641,7 +652,7 @@ public class Monopoly implements Runnable, Controllable {
 
     logInfo("Auction has ended " + msg);
     boolean printHead = true;
-    for (Location location : lotsToAuction.values()) {
+    for (Location location : lotsToAuction) {
       if (location.owner == null) {
         if (printHead) {
           logInfo("The following lots were not bought at auction:");
@@ -662,8 +673,10 @@ public class Monopoly implements Runnable, Controllable {
   private void processAuctionResult(AbstractPlayer aPlayer, Location aLocation,
       int amount) throws BankruptcyException 
   {
-    logInfo("\n" + aPlayer.getName() + " wins " + aLocation.name
-        + " auction for " + amount + " dollars.");
+    logInfo("\n" + aPlayer.getName() + " won the auction for " + aLocation.name
+        + " with a winning bid (may not be the max bid) of $"
+        + amount + ".");    
+
     aPlayer.getCash(amount);
     aPlayer.addProperty(aLocation);
   }
