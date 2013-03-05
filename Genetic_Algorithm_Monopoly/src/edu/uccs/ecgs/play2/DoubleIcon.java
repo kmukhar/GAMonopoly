@@ -23,7 +23,7 @@ public class DoubleIcon extends ImageIcon {
     if (icon1 != null)
       icon1.paintIcon(c, g, x, y);
     if (icon2 != null)
-      icon2.paintIcon(c, g, x, y);
+      icon2.paintIcon(c, g, x+5, y);
   }
 
   /**

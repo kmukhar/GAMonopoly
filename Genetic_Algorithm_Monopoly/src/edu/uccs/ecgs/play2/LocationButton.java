@@ -41,8 +41,8 @@ public LocationButton(Location location) {
       Color color = location.getGroup().getColor();
       setMargin(new Insets(1, 1, 1, 1));
       this.setBackground(color);
-      this.setText("<html><body><center><p>" + location.name
-          + "</p></center></body></html>");
+      this.setText("<html><body><center>" + location.name
+          + "</center></body></html>");
     }
 
     this.addActionListener(this);
