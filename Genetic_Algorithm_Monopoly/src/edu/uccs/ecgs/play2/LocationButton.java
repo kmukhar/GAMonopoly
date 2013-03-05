@@ -21,13 +21,13 @@ public class LocationButton extends JButton implements ActionListener,
 
   private Location location;
   boolean[] players = new boolean[] { false, false, false, false, false };
-  private static Hashtable<String, ImageIcon> playerIcons;
+  private Hashtable<String, ImageIcon> playerIcons;
 
 public LocationButton(Location location) {
     this.location = location;
 
     playerIcons = new Hashtable<String, ImageIcon>();
-    if (location.index == PARK_PLACE || location.index == BOARDWALK)
+    if (isDarkBlue())
       createPlayerIconsWhite();
     else
       createPlayerIcons();
@@ -50,7 +50,7 @@ public LocationButton(Location location) {
       Color color = location.getGroup().getColor();
       setMargin(new Insets(0, 0, 0, 0));
       setBackground(color);
-      if (location.index == PARK_PLACE || location.index == BOARDWALK) 
+      if (isDarkBlue()) 
         setForeground(Color.white);
       setText("<html><body>" + name + "</body></html>");
     }
@@ -204,14 +204,27 @@ public LocationButton(Location location) {
     players[player.playerIndex] = false;
   }
 
+  /**
+   * @return The string name for the player icon file to display for this
+   *         button.
+   */
   private String getStringForPlayers()
   {
     StringBuilder sb = new StringBuilder();
     for (int i = 1; i < 5; i++)
       if (players[i])
         sb.append(i);
+    if (isDarkBlue())
+      sb.append("w");
     sb.append(".png");
     return sb.toString();
+  }
+
+  /**
+   * @return True if this location is Park Place or Boardwalk, false otherwise
+   */
+  private boolean isDarkBlue() {
+    return location.index == PARK_PLACE || location .index == BOARDWALK;
   }
 
   private void createPlayerIcons()
