@@ -16,11 +16,15 @@ public class PlayerLoader {
   
   private PlayerLoader() {
     InputStream is = 
-        PlayerLoader.class.getResourceAsStream("data/playerfiles.properties");
+        PlayerLoader.class.getResourceAsStream("data");
+    
     playerFiles = new Properties();
 
     try {
       playerFiles.load(is);
+      for (Object key : playerFiles.keySet().toArray()) {
+        playerFiles.put(key.toString(), key.toString());
+      }
     } catch (IOException ignored) {
     } finally {
       try {
