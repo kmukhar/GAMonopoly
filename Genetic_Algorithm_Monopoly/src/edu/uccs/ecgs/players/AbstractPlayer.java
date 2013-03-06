@@ -76,6 +76,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private int tradeThreshold = 100;
   protected String gameKey;
   private ArrayList<ChangeListener> changeListeners;
+  private String sourceName = "";
 
   /**
    * Constructor
@@ -1668,5 +1669,22 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   public void auctionResult(AbstractPlayer highBidPlayer, Location location2,
       int finalBid) {
+  }
+
+  /**
+   * Arbitrary name for the source of the player, preferably the name of the
+   * data file used to load this player.
+   * @param source A string to identify this player
+   */
+  public void setSourceName(String source) {
+    sourceName = source;
+  }
+
+  /**
+   * @return A string that can be used to further identify this player. Can
+   * be empty.
+   */
+  public String getSourceName() {
+    return sourceName;
   }
 }

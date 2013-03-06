@@ -6,6 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JOptionPane;
 import edu.uccs.ecgs.ga.*;
+import edu.uccs.ecgs.play2.LocationButton;
+import edu.uccs.ecgs.play2.PlayerGui;
 
 public class HumanPlayer extends AbstractPlayer {
 
@@ -49,12 +51,22 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   @Override
-  public boolean buyProperty(Location location)
+  public boolean buyProperty(Location lot)
   {
-    int result = JOptionPane.showConfirmDialog(null, htmlStart
-        + "You landed on " + location.name + ".<p>Do you want to buy "
-        + location.name + " for " + location.getCost() + " dollars?" + htmlEnd,
+    StringBuilder msg = new StringBuilder();
+
+    msg.append(htmlStart);
+    msg.append("You landed on ").append(lot.name)
+        .append(".<p>Do you want to buy ").append(lot.name).append(" for ")
+        .append(lot.getCost()).append(" dollars?<p><p>")
+        .append("<table border=1 width=\"100%\"><tr><td>")
+        .append(lot.getFormattedString())
+        .append("</td></tr></table>")
+        .append(htmlEnd);
+
+    int result = JOptionPane.showConfirmDialog(null, msg.toString(),
         "Buy Property?", JOptionPane.YES_NO_OPTION);
+
     return result == JOptionPane.YES_OPTION;
   }
 
@@ -497,6 +509,14 @@ public class HumanPlayer extends AbstractPlayer {
       if (cash > amount)
         done = true;
     }
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#getSourceName()
+   */
+  @Override
+  public String getSourceName() {
+    return getName();
   }
 
   @Override

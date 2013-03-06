@@ -17,7 +17,6 @@ public class PlayerGui extends JPanel {
   private static String playerName;
   private static int playerIndex;
   private static NameAndIndexDialog dialog;
-  private ArrayList<String> dataNames = new ArrayList<String>();
   private JButton startButton;
   // private JButton pauseButton;
   private JButton resignButton;
@@ -34,6 +33,8 @@ public class PlayerGui extends JPanel {
   private Hashtable<Location, LocationButton> locationButtons;
 
   public static PropertyFactory factory;
+  private static ImageIcon monopolyIcon;
+  private static PlayerGui gui;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -41,6 +42,11 @@ public class PlayerGui extends JPanel {
    */
   private static void createAndShowGUI()
   {
+    java.net.URL imgURL = PlayerGui.class.getResource("hat32.png");
+    if (imgURL != null) {
+      monopolyIcon = new ImageIcon(imgURL);
+    }
+
     showInitialDialog();
     getNameAndIndex();
 
@@ -49,18 +55,14 @@ public class PlayerGui extends JPanel {
     JFrame frame = new JFrame("Monopoly Simulator");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    // TODO
-    //Set the frame icon to an image loaded from a file.
-    java.net.URL imgURL = PlayerGui.class.getResource("hat32.png");
-    if (imgURL != null) {
-      ImageIcon icon = new ImageIcon(imgURL);
-      frame.setIconImage(icon.getImage());
+    if (monopolyIcon != null) {
+      frame.setIconImage(monopolyIcon.getImage());
     }
 
     frame.setLayout(new BorderLayout());
 
     // Add content to the window.
-    PlayerGui gui = new PlayerGui();
+    gui = new PlayerGui();
     gui.game = new Monopoly(0, 0, 0, gui.players);
     PlayerGui.factory = PropertyFactory.getPropertyFactory(gui.game.gamekey);
 
@@ -107,32 +109,21 @@ public class PlayerGui extends JPanel {
     gameThread = new Thread(game);
   }
 
+  /**
+   * @return An array of players for the game. Includes 1 human player and 3
+   * Computer Players
+   */
   private AbstractPlayer[] createPlayers()
   {
-    Random r = new Random(System.currentTimeMillis());
-
     playerName = dialog.getName();
     playerIndex = dialog.getIndex();
  
-    AbstractPlayer[] players = new AbstractPlayer[4];
+    PlayerLoader loader = PlayerLoader.getLoader();
+    AbstractPlayer[] players = loader.get4Players();
 
-    for (int i = 1; i < 5; i++) {
-      String baseName = "player000";
-      dataNames.add(baseName + i + ".dat");
-    }
+    AbstractPlayer player = new HumanPlayer(playerIndex, playerName);
+    players[playerIndex - 1] = player;
 
-    for (int i = 0; i < players.length; i++) {
-      AbstractPlayer player;
-      if (i == playerIndex - 1) {
-        player = new HumanPlayer(playerIndex, playerName);
-        players[i] = player;
-      } else {
-        int index = r.nextInt(dataNames.size());
-        String path = dataNames.remove(index);
-        player = PlayerLoader.loadPlayer(path, i + 1);
-        players[i] = player;
-      }
-    }
     return players;
   }
 
@@ -252,7 +243,7 @@ public class PlayerGui extends JPanel {
     sp.setBorder(null);
 
     int result = JOptionPane.showConfirmDialog(null, sp, "About this program",
-        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, monopolyIcon);
 
     if (result == JOptionPane.CANCEL_OPTION) {
       System.exit(0);
@@ -268,8 +259,12 @@ public class PlayerGui extends JPanel {
 
   public static void main(String[] args)
   {
-    /* Set the Nimbus look and feel */
+    /* Set some properties for when the user is on a Mac */
+    System.setProperty("apple.laf.useScreenMenuBar", "true");
+    System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+        "Monopoly");
 
+    /* Set the Nimbus look and feel */
     /*
      * If Nimbus (introduced in Java SE 6) is not available, stay with the
      * default look and feel. For details see
@@ -553,10 +548,10 @@ public class PlayerGui extends JPanel {
   }
 
   /**
-   * @param lot
-   * @return
+   * @param lot The location for which the call wants the button
+   * @return The LocationButton instance for the location
    */
-  public LocationButton getButtonForLocation(Location lot) {
-    return locationButtons.get(lot);
+  public static LocationButton getButtonForLocation(Location lot) {
+    return gui.locationButtons.get(lot);
   }
 }

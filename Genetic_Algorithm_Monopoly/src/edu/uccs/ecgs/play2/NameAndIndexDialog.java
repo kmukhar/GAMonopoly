@@ -5,6 +5,14 @@
 package edu.uccs.ecgs.play2;
 
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
@@ -13,13 +21,32 @@ import javax.swing.KeyStroke;
  * @author Kevin
  */
 public class NameAndIndexDialog extends javax.swing.JDialog {
-
     /**
      * Creates new form NameAndIndexDialog
      */
     public NameAndIndexDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+
+        File f = new File("monopoly_name.txt");
+        System.out.println("load: " + f.getAbsolutePath());
+        BufferedReader br = null;
+
+        if (f.exists()) {
+          try {
+            br = new BufferedReader(new FileReader(f));
+            name = br.readLine();
+            System.out.println("name: " + name);
+          } catch (FileNotFoundException ignored) {
+          } catch (IOException ignored) {
+          } finally {
+            try {
+              br.close();
+            } catch (IOException ignored) {
+            }
+          }
+        }
         initComponents();
+        nameField.setText(name);
     }
 
     /**
@@ -173,11 +200,32 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
     }                                     
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        saveName();
         this.dispose();
     }
 
     private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {
+        saveName();
         this.dispose();
+    }
+
+    private void saveName() {
+      File f = new File("monopoly_name.txt");
+      System.out.println("save: " + f.getAbsolutePath());
+      BufferedWriter bw = null;
+
+        try {
+          bw = new BufferedWriter(new FileWriter(f));
+          bw.write(nameField.getText());
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException ignored) {
+        } finally {
+          try {
+            bw.flush();
+            bw.close();
+          } catch (IOException ignored) {
+          }
+        }
     }
 
     /**
@@ -242,4 +290,6 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JTextField nameField;
     // End of variables declaration
+
+    private String name = "";
 }
