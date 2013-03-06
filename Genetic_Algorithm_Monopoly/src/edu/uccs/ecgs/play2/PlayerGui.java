@@ -6,8 +6,6 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.players.HumanPlayer;
@@ -33,7 +31,7 @@ public class PlayerGui extends JPanel {
   private Hashtable<Location, LocationButton> locationButtons;
 
   public static PropertyFactory factory;
-  private static ImageIcon monopolyIcon;
+  static ImageIcon monopolyIcon;
   private static PlayerGui gui;
 
   /**
@@ -47,7 +45,21 @@ public class PlayerGui extends JPanel {
       monopolyIcon = new ImageIcon(imgURL);
     }
 
-    showInitialDialog();
+    Calendar endCal = GregorianCalendar.getInstance();
+    // set end date for research to 30 Mar 2013
+    endCal.set(2013, 2, 30, 12, 0, 0);
+
+    Calendar nowCal = GregorianCalendar.getInstance();
+    String infoFileName = "About.html";
+    if (nowCal.after(endCal)) {
+      infoFileName = "About2.html";
+    }
+
+    int result = InfoDialog.showInfoDialog(infoFileName);
+    if (result == JOptionPane.CANCEL_OPTION) {
+      System.exit(0);
+    }
+
     getNameAndIndex();
 
     // Create and set up the window.
@@ -125,129 +137,6 @@ public class PlayerGui extends JPanel {
     players[playerIndex - 1] = player;
 
     return players;
-  }
-
-  private static void showInitialDialog()
-  {
-    Calendar endCal = GregorianCalendar.getInstance();
-    // set end date for research to 30 Mar 2013
-    endCal.set(2013, 2, 30, 12, 0, 0);
-
-    Calendar nowCal = GregorianCalendar.getInstance();
-    String path = "About.html";
-    if (nowCal.after(endCal)) {
-      path = "About2.html";
-    }
-
-    InputStream is = PlayerGui.class.getResourceAsStream(path);
-    InputStreamReader isr = new InputStreamReader(is);
-    BufferedReader br = new BufferedReader(isr);
-
-    StringBuilder aboutMsg = new StringBuilder();
-
-    String line = null;
-    try {
-      line = br.readLine();
-      while (line != null) {
-        aboutMsg.append(line);
-        line = br.readLine();
-      }
-    } catch (IOException e) {
-      aboutMsg = new StringBuilder();
-      aboutMsg.append("Monopoly Simulator");
-    } finally {
-      try {
-        br.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    System.setProperty("awt.useSystemAAFontSettings", "on");
-    final JEditorPane editorPane = new JEditorPane();
-    editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-        Boolean.TRUE);
-    editorPane.setPreferredSize(new Dimension(500, 420));
-    editorPane.setEditable(false);
-    editorPane.setContentType("text/html");
-    editorPane.setText(aboutMsg.toString());
-
-    // This section of code from
-    // https://forums.oracle.com/forums/message.jspa?messageID=9909614
-    Color c = new Color(214, 217, 223); // default color for JOptionPane
-    UIDefaults defaults = new UIDefaults();
-    defaults.put("EditorPane[Enabled].backgroundPainter", c);
-    editorPane.putClientProperty("Nimbus.Overrides", defaults);
-    editorPane.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
-    editorPane.setBackground(c);
-    // end code https://forums.oracle.com/forums/message.jspa?messageID=9909614
-
-    // the code for resizing the editorpane is from
-    // http://java.dzone.com/tips/tip-displaying-rich-messages-u
-    // set editor pane to be resizeable
-    editorPane.addHierarchyListener(new HierarchyListener() {
-      public void hierarchyChanged(HierarchyEvent e)
-      {
-        Window window = SwingUtilities.getWindowAncestor(editorPane);
-        if (window instanceof Dialog) {
-          Dialog dialog = (Dialog) window;
-          if (!dialog.isResizable()) {
-            dialog.setResizable(true);
-          }
-        }
-      }
-    });
-
-    // the code for processing hyperlinks is from
-    // http://java.dzone.com/tips/tip-displaying-rich-messages-u
-    // Add Hyperlink listener to process hyperlinks
-    editorPane.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(final HyperlinkEvent e)
-      {
-        if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-          EventQueue.invokeLater(new Runnable() {
-            public void run()
-            {
-              // Show hand cursor
-              SwingUtilities.getWindowAncestor(editorPane).setCursor(
-                  Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-              // Show URL as the tooltip
-              editorPane.setToolTipText(e.getURL().toExternalForm());
-            }
-          });
-        } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-          EventQueue.invokeLater(new Runnable() {
-            public void run()
-            {
-              // Show default cursor
-              SwingUtilities.getWindowAncestor(editorPane).setCursor(
-                  Cursor.getDefaultCursor());
-              // Reset tooltip
-              editorPane.setToolTipText(null);
-            }
-          });
-        } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-          if (Desktop.isDesktopSupported()) {
-            try {
-              Desktop.getDesktop().browse(e.getURL().toURI());
-            } catch (Exception ignored) {
-            }
-          }
-        }
-      }
-    });
-
-    JScrollPane sp = new JScrollPane(editorPane);
-    sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    sp.setBorder(null);
-
-    int result = JOptionPane.showConfirmDialog(null, sp, "About this program",
-        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, monopolyIcon);
-
-    if (result == JOptionPane.CANCEL_OPTION) {
-      System.exit(0);
-    }
   }
 
   private static void getNameAndIndex()
@@ -530,6 +419,7 @@ public class PlayerGui extends JPanel {
         }
         JOptionPane.showMessageDialog(null,
             "The Game Is Over. " + winner.getName() + " is the winner.");
+        InfoDialog.showInfoDialog("GameOver.html");
         System.exit(0);
       }});
     t.start();
