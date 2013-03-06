@@ -89,12 +89,17 @@ public class RailroadLocation extends Location {
   {
     StringBuilder result = new StringBuilder();
     
-    result.append(name).append("\n\n");
-    result.append("Rent\t\t$").append(rent).append("\n");
-    result.append("If 2 R.R.'s are owned\t$").append(rent*2).append("\n");
-    result.append("If 3 R.R.'s are owned\t$").append(rent*4).append("\n");
-    result.append("If 4 R.R.'s are owned\t$").append(rent*8).append("\n\n");
-    result.append("Mortgage Value\t$").append(cost/2);
+    result.append(name).append("<p>");
+    result.append("<table width=100% border=0>");
+    result.append("<tr><td>Rent</td><td>$").append(rent).append("</td></tr>");
+    result.append("<tr><td>If 2 R.R.'s are owned</td><td>$").append(rent * 2);
+    result.append("</td></tr>");
+    result.append("<tr><td>If 3 R.R.'s are owned</td><td>$").append(rent * 4);
+    result.append("</td></tr>");
+    result.append("<tr><td>If 4 R.R.'s are owned</td><td>$").append(rent * 8);
+    result.append("</td></tr>");
+    result.append("<tr><td>Mortgage Value</td><td>$").append(cost / 2);
+    result.append("</td></tr></table>");
     
     return result.toString();
   }

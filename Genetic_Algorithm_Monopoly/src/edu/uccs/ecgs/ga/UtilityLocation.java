@@ -84,12 +84,15 @@ public class UtilityLocation extends Location {
   {
     StringBuilder result = new StringBuilder();
 
-    result.append(name).append("\n\n");
-    result.append("If one utility is owned\nrent is 4 times amount shown\n");
-    result.append("on dice.\n\n");
-    result.append("If both utilities are owned\nrent is 10 times amount shown");
-    result.append("\non dice.\n\n");
-    result.append("Mortgage Value\t$").append(cost/2);
+    result.append(name).append("<p><p>");
+    result.append("If one utility is owned rent is 4 times amount shown ");
+    result.append("on dice.<p><p>");
+    result.append("If both utilities are owned rent is 10 times amount shown ");
+    result.append("on dice.<p>");
+    result.append("<table width=100% border=0>");
+    result.append("<tr><td>");
+    result.append("Mortgage Value</td><td>$").append(cost/2).append("</td></tr>");
+    result.append("</table>");
 
     return result.toString();
   }

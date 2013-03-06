@@ -22,6 +22,7 @@ public class LocationButton extends JButton implements ActionListener,
   private Location location;
   boolean[] players = new boolean[] { false, false, false, false, false };
   private Hashtable<String, ImageIcon> playerIcons;
+  private JDialog dialog;
 
 public LocationButton(Location location) {
     this.location = location;
@@ -61,10 +62,14 @@ public LocationButton(Location location) {
   @Override
   public void actionPerformed(ActionEvent arg0)
   {
-    JTextPane msgpane = new JTextPane();
-    msgpane.setText(location.getFormattedString());
-    JDialog dialog = new JOptionPane(msgpane).createDialog("");
-    msgpane.setBackground(dialog.getRootPane().getBackground());
+    int width = 250;
+    if (location.index == 10)
+      width=600;
+
+    dialog = new JOptionPane("<html><body width=" + width + ">"
+        + location.getFormattedString() + "</body></html>").createDialog(this,
+        "");
+    dialog.setModal(false);
     dialog.setTitle(location.getFormattedTitle());
     dialog.setVisible(true);
   }
@@ -260,6 +265,13 @@ public LocationButton(Location location) {
       } else {
         System.err.println("Couldn't find file: " + name);
       }
+    }
+  }
+
+  public void closeDialog() {
+    if (dialog != null) {
+      dialog.dispose();
+      dialog = null;
     }
   }
 }
