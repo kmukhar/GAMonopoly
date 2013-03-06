@@ -2,7 +2,6 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
@@ -64,7 +63,7 @@ public class PlayerGui extends JPanel {
 
     // Create and set up the window.
     JFrame.setDefaultLookAndFeelDecorated(true);
-    JFrame frame = new JFrame("Monopoly Simulator");
+    JFrame frame = new JFrame("Monopoly");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     if (monopolyIcon != null) {
