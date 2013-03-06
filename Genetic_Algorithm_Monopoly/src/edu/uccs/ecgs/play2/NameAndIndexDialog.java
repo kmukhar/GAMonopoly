@@ -28,14 +28,12 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
         super(parent, modal);
 
         File f = new File("monopoly_name.txt");
-        System.out.println("load: " + f.getAbsolutePath());
         BufferedReader br = null;
 
         if (f.exists()) {
           try {
             br = new BufferedReader(new FileReader(f));
             name = br.readLine();
-            System.out.println("name: " + name);
           } catch (FileNotFoundException ignored) {
           } catch (IOException ignored) {
           } finally {
@@ -211,7 +209,6 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
 
     private void saveName() {
       File f = new File("monopoly_name.txt");
-      System.out.println("save: " + f.getAbsolutePath());
       BufferedWriter bw = null;
 
         try {
