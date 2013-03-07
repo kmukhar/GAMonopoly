@@ -287,7 +287,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     this.location = lot;
     fireChangeEvent(lce);
 
-    logInfo(getName() + " moving to " + lot.name);
+    logFinest(getName() + " moving to " + lot.name);
     if (lot.owner != null) {
       logInfo(lot.name + " is owned by " + lot.owner.getName());
     }
