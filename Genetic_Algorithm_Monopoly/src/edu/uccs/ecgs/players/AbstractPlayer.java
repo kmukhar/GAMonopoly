@@ -1418,14 +1418,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       int index);
 
   /**
-   * @return A String with just name, location, cash, net worth, and flags for
-   *         whether the player has a monopoly and whether the player is
-   *         bankrupt.
+   * @return A String with just name, location, and cash.
    */
-  public String toShortString() {
+  public String toTinyString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-    result.append(separator).append(getName()).append(separator);
+    result.append(getName()).append(separator);
     
     if (!bankrupt()) {
       result.append("Current location: ").append(
@@ -1438,14 +1436,30 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
 
       result.append(separator).append("  Total cash  : ").append(cash);
-      result.append(separator).append("  Net worth   : ")
-      .append(getTotalWorth());
-      // .append(separator).append("  Fitness     : ").append(fitnessScore)
-      result.append(separator).append("  Has Monopoly: ").append(hasMonopoly());
     } else {
-      result.append(separator).append("  Is Bankrupt : ").append(bankrupt())
-          .append(separator);
+      result.append(separator).append("  Is Bankrupt : ").append(bankrupt());
     }
+
+    return result.toString();
+    
+  }
+
+  /**
+   * @return A String with just name, location, cash, net worth, and flags for
+   *         whether the player has a monopoly and whether the player is
+   *         bankrupt.
+   */
+  public String toShortString() {
+    String separator = System.getProperty("line.separator");
+    StringBuilder result = new StringBuilder(1024);
+    result.append(toTinyString());
+
+    if (!bankrupt()) {
+      result.append(separator);
+      result.append("  Net worth   : ").append(getTotalWorth());
+      result.append(separator).append("  Has Monopoly: ").append(hasMonopoly());
+    }
+    result.append(separator);
 
     return result.toString();
   }
@@ -1606,6 +1620,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
   }
 
+  /**
+   * Evaluate the proposed trade and respond true or false depending on whether
+   * the trade is accepted or not.
+   * @param bestTrade The proposed trade
+   * @return True --> if the trade is accepted<br>False --> otherwise.
+   */
   public boolean answerProposedTrade(TradeProposal bestTrade) {
     logInfo(getName() + " is evaluating trade proposal from "
         + bestTrade.getProposer() + "\n" + bestTrade.toString());

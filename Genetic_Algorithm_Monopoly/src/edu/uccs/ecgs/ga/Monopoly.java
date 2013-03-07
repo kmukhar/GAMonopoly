@@ -136,9 +136,9 @@ public class Monopoly implements Runnable, Controllable {
       player.resetDoubles();
 
       logInfo("****************************************");
+      logInfo("           START OF TURN " + turnCounter);
       logInfo("****************************************");
-      logInfo("Turn: " + turnCounter);
-      logInfo(player.toShortString());
+      logInfo(player.toTinyString());
 
       Events event = Events.PLAYER_ACTIVATED_EVENT;
       Actions action = Actions.NULL;
@@ -217,7 +217,9 @@ public class Monopoly implements Runnable, Controllable {
         done = true;
       }
 
-      logInfo(player.toString());
+      logInfo("");
+      logInfo(player.toTinyString());
+      logInfo("");
     }
 
     assert done;
@@ -801,7 +803,7 @@ public class Monopoly implements Runnable, Controllable {
    *          The values of each dice.
    */
   public void logDiceRoll(int[] roll) {
-    logInfo("Dice : " + roll[0]+"; " + roll[1]);
+    logInfo("\nDice : " + roll[0]+"; " + roll[1]);
 
     if (roll[0] == roll[1]) {
       logInfo("Doubles!!");
@@ -845,18 +847,21 @@ public class Monopoly implements Runnable, Controllable {
   }
 
   /**
-   * Process a proposed trade between two players
+   * Process a proposed trade between two players.
    * 
    * @param bestTrade
    *          The object that contains the two properties and cash to be traded.
+   * @return True --> if the trade was accepted<br>False --> otherwise
    */
-  public void proposeTrade(TradeProposal bestTrade)
+  public boolean proposeTrade(TradeProposal bestTrade)
   {
     AbstractPlayer owner1 = bestTrade.location.owner;
     AbstractPlayer owner2 = bestTrade.location2.owner;
-    
+    boolean tradeAccepted = false;
+
     if (owner2.answerProposedTrade(bestTrade)) {
-      
+      tradeAccepted = true;
+
       logFinest("\nOwner 1 before trade");
       logFinest(owner1.toString());
       logFinest("\nOwner 2 before trade");
@@ -881,6 +886,8 @@ public class Monopoly implements Runnable, Controllable {
       logFinest("\nOwner 2 after trade");
       logFinest(owner2.toString());
     }
+
+    return tradeAccepted;
   }
 
   /**

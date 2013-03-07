@@ -262,7 +262,22 @@ public class HumanPlayer extends AbstractPlayer {
       assert bestTrade.location != null;
       assert bestTrade.location2 != null;
 
-      game.proposeTrade(bestTrade);
+      AbstractPlayer owner = locationToGet.owner;
+
+      boolean accepted = game.proposeTrade(bestTrade);
+      StringBuilder sb = new StringBuilder();
+      sb.append(htmlStart);
+      if (accepted) {
+        sb.append(owner.getName()).append(" accepted the trade. You now own ");
+        sb.append(locationToGet.name).append(" and ").append(owner.getName());
+        sb.append(" owns ").append(locationToTrade.name).append(".");
+      } else {
+        sb.append(owner.getName()).append(" rejected the trade.");
+      }
+      sb.append(htmlEnd);
+
+      JOptionPane.showMessageDialog(null, sb.toString(), "Trade Result",
+          JOptionPane.INFORMATION_MESSAGE);
     }
   }
 
