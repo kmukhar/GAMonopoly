@@ -21,7 +21,7 @@ public class PlayerLoader {
    */
   private PlayerLoader() {
     InputStream is = 
-        PlayerLoader.class.getResourceAsStream("data");
+        PlayerLoader.class.getResourceAsStream("data/datafiles.properties");
     
     playerFiles = new Properties();
 
