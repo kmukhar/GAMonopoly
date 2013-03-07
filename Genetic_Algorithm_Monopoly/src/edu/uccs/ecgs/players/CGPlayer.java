@@ -55,9 +55,6 @@ public abstract class CGPlayer extends AbstractPlayer {
    */
   public double[][] chrJail;
 
-  // TODO Chromosome to determine when and how to trade properties?
-  // Or use some other technique? For now, we ignore trading.
-
   public CGPlayer(int index, ChromoTypes chromoType) {
     super(index, chromoType);
   }

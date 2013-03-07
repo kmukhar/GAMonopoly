@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.play2.LocationButton;
 import edu.uccs.ecgs.play2.PlayerGui;
@@ -14,6 +16,8 @@ public class HumanPlayer extends AbstractPlayer {
   private String name;
   private String htmlStart = "<html><body width=250>";
   private String htmlEnd = "</body></html>";
+  private CopyOnWriteArrayList<Location> monopolies;
+  private CopyOnWriteArrayList<Location> sellableLots;
 
   public HumanPlayer(int index, String name) {
     super(index, ChromoTypes.HUM);
@@ -325,89 +329,20 @@ public class HumanPlayer extends AbstractPlayer {
    */
   @Override
   public void processDevelopHouseEvent() {
-    // Player has to have a monopoly
-    if (!hasMonopoly()) {
-      logFinest("Player does not have monopoly");
-      return;
-    }
+    // don't do anything here, the gui allows the player to decide when to buy
+    // houses
+  }
 
+  /**
+   * Buy houses for monopolies
+   */
+  public void buyHouses() {
     boolean done = false;
     while (!done) {
-      if (game.getNumHousesInBank() == 0) {
-        logInfo("Bank has no more houses to sell");
+      if (monopolies.size() == 0) {
         done = true;
         break;
       }
-
-      // the min number of houses on the properties in a group
-      int[] groupMin = new int[PropertyGroups.values().length];
-      for (PropertyGroups group : PropertyGroups.values()) {
-        groupMin[group.ordinal()] = Integer.MAX_VALUE;
-      }
-      
-      // Create a list of all the properties that the player owns that are also
-      // part of monopolies
-      CopyOnWriteArrayList<Location> monopolies = 
-          new CopyOnWriteArrayList<Location>();
-
-      for (Location location : getAllProperties().values()) {
-        if (PropertyFactory.getPropertyFactory(this.gameKey).groupIsMortgaged(
-            location.getGroup())) {
-          // skip this property since the group is mortgaged
-          continue;
-        }
-
-        if (location.partOfMonopoly && location.getNumHotels() == 0) {
-          monopolies.add(location);
-          if (location.getNumHouses() < groupMin[location.getGroup().ordinal()]) 
-          {
-            groupMin[location.getGroup().ordinal()] = location.getNumHouses();
-          }
-          logFinest(location.toString()
-              + " added to list of monopolies in processDevelopHouseEvent");
-        }
-      }
-
-      // now remove any properties that have more than the min properties in a
-      // group houses and hotels must be balanced, so one can't build on a 
-      // property that already has greater than the min number of houses. Also 
-      // remove properties where the cost of a house is greater than the 
-      // player's cash.
-      for (Location location : monopolies) {
-        int index = location.getGroup().ordinal();
-        if (location.getNumHouses() > groupMin[index]) {
-          monopolies.remove(location);
-        } else if (location.getHouseCost() > cash) {
-          monopolies.remove(location);
-        }
-      }
-
-      if (monopolies.size() == 0)
-        break;
-
-      StringBuilder msg = new StringBuilder();
-      msg.append(htmlStart).append(
-          "Do you want to buy any houses or hotels for your ");
-      msg.append("properties?<p><p>You can current buy houses for the ");
-      msg.append("following properties:<p>");
-      msg.append("<table width=100% border=0>");
-      msg.append("<tr><th align=left>Property</th>").append(
-          "<th align=center>Cost of House/Hotel</th></tr>");
-      for (Location lot : monopolies) {
-        msg.append("<tr><td align=left>").append(lot.name)
-            .append("</td><td align=center>");
-        msg.append(lot.getHouseCost()).append("</td></tr>");
-      }
-      msg.append("</table>");
-      msg.append(htmlEnd);
-      
-      int result = JOptionPane.showOptionDialog(null, msg.toString(),
-          "Build Houses or Hotels?", JOptionPane.YES_NO_OPTION,
-          JOptionPane.QUESTION_MESSAGE, null, new String[] { "Yes", "No" },
-          "No");
-
-      if (result == 1)
-        break;
 
       Object object = JOptionPane.showInputDialog(null, htmlStart
           + "Which property do you want to buy a house for?<p<p>"
@@ -417,11 +352,60 @@ public class HumanPlayer extends AbstractPlayer {
           monopolies.get(0));
 
       Location selected = (Location) object;
-      if (selected != null)
+      if (selected != null) {
         if (selected.getNumHouses() < 4)
           game.buyHouse(this, selected);
         else
           game.buyHotel(this, selected);
+      } 
+      else
+        done = true;
+
+      fireChangeEvent();
+    }
+  }
+
+  /**
+   * Sell houses
+   */
+  public void sellHouses() {
+    boolean done = false;
+
+    while (!done) {
+      if (sellableLots.size() == 0) {
+        done = true;
+        break;
+      }
+
+      Object object = JOptionPane.showInputDialog(null, htmlStart
+          + "Which property do you want to sell a house or hotel from?<p<p>"
+          + "Click Cancel if you no longer want to sell a house or hotel."
+          + htmlEnd, "Select property to sell house or hotel from",
+          JOptionPane.QUESTION_MESSAGE, null, sellableLots.toArray(),
+          sellableLots.get(0));
+
+      Location selected = (Location) object;
+      if (selected != null) {
+        if (selected.getNumHouses() > 0)
+          game.sellHouse(selected);
+        else {
+          if (game.getNumHousesInBank() < 4) {
+            Object[] selectionValues = new Object[] {
+                "Ok, I still want to sell that hotel", "No, let me reconsider" };
+            JOptionPane.showInputDialog(null, htmlStart
+                + "Because the bank has less than 4 houses, "
+                + "you must sell more hotels or houses in addition to the"
+                + "hotel you have chosen to sell. If you choose to proceed, "
+                + "the bank will automatically sell the correct number of "
+                + "hotels and houses." + htmlEnd,
+                "Selling a hotel", JOptionPane.WARNING_MESSAGE,
+                    null, selectionValues, selectionValues[0]);
+          }
+          game.sellHotel2(selected,getAllProperties().values());
+        }
+      } else {
+        done = true;
+      }
 
       fireChangeEvent();
     }
@@ -550,6 +534,123 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public String getSourceName() {
     return getName();
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#fireChangeEvent(javax.swing.event.ChangeEvent)
+   */
+  @Override
+  protected void fireChangeEvent(ChangeEvent event) {
+    super.fireChangeEvent(event);
+
+    boolean ableToSell = false;
+    boolean ableToBuy = false;
+    
+    // if the player has houses or hotels, then enable sell
+    if (getNumHotels() + getNumHouses() > 0) {
+      ableToSell = true;
+      updateSellableLots();
+    }
+
+    // if this player has a monopoly AND...
+    // if the game has houses to sell AND...
+    if (hasMonopoly() && game.getNumHousesInBank() > 0) {
+      // if the player can buy houses
+      // the min number of houses on the properties in a group
+      updateHouseReadyLots();
+
+      if (monopolies.size() > 0)
+        ableToBuy = true;
+    }
+    
+    PlayerGui.updateHouseButtons(ableToSell, ableToBuy);
+  }
+
+  /**
+   * Create a list of lots upon which a player can build houses. 
+   */
+  private void updateHouseReadyLots() {
+    int[] groupMin = new int[PropertyGroups.values().length];
+    for (PropertyGroups group : PropertyGroups.values()) {
+      groupMin[group.ordinal()] = Integer.MAX_VALUE;
+    }
+    
+    // Create a list of all the properties that the player owns that are also
+    // part of monopolies
+    monopolies = new CopyOnWriteArrayList<Location>();
+
+    for (Location location : getAllProperties().values()) {
+      if (PropertyFactory.getPropertyFactory(this.gameKey).groupIsMortgaged(
+          location.getGroup())) {
+        // skip this property since the group is mortgaged
+        continue;
+      }
+
+      if (location.partOfMonopoly && location.getNumHotels() == 0) {
+        monopolies.add(location);
+        if (location.getNumHouses() < groupMin[location.getGroup().ordinal()]) 
+        {
+          groupMin[location.getGroup().ordinal()] = location.getNumHouses();
+        }
+        logFinest(location.toString()
+            + " added to list of monopolies in updateHouseReadyLots");
+      }
+    }
+
+    // now remove any properties that have more than the min properties in a
+    // group. Houses and hotels must be balanced, so one can't build on a 
+    // property that already has greater than the min number of houses. Also 
+    // remove properties where the cost of a house is greater than the 
+    // player's cash.
+    for (Location location : monopolies) {
+      int index = location.getGroup().ordinal();
+      if (location.getNumHouses() > groupMin[index]) {
+        monopolies.remove(location);
+      } else if (location.getHouseCost() > cash) {
+        monopolies.remove(location);
+      }
+    }
+  }
+
+  /**
+   * Create a list of lots from which a player can sell houses. 
+   */
+  private void updateSellableLots() {
+    int[] groupMax = new int[PropertyGroups.values().length];
+    for (PropertyGroups group : PropertyGroups.values()) {
+      groupMax[group.ordinal()] = Integer.MIN_VALUE;
+    }
+    
+    // Create a list of all the properties that the player owns that are also
+    // part of monopolies
+    sellableLots = new CopyOnWriteArrayList<Location>();
+
+    for (Location location : getAllProperties().values()) {
+      if (location.getNumHotels() == 0 && location.getNumHouses() == 0) {
+        // skip this property since there are no hotels or houses to sell
+        continue;
+      }
+
+      sellableLots.add(location);
+      int numHouses = location.getNumHouses() + location.getNumHotels() * 5;
+
+      if (numHouses > groupMax[location.getGroup().ordinal()]) {
+        groupMax[location.getGroup().ordinal()] = numHouses;
+      }
+      logFinest(location.toString()
+          + " added to list of lots with houses to sell in updateSellableLots");
+    }
+
+    // now remove any properties that have less than the max properties in a
+    // group. Houses and hotels must be balanced, so one can't sell a house
+    // from a property that already has less than the max number of houses.
+    for (Location location : sellableLots) {
+      int index = location.getGroup().ordinal();
+      int numHouses = location.getNumHouses() + location.getNumHotels() * 5;
+      if (numHouses < groupMax[index]) {
+        sellableLots.remove(location);
+      }
+    }
   }
 
   @Override

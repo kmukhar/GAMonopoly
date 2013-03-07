@@ -8,7 +8,6 @@ import edu.uccs.ecgs.players.AbstractPlayer;
  * evaluator is based solely on the number of properties owned, and does not
  * include any information about properties which may be more highly valued.
  */
-// TODO Maybe have an evaluator that also includes property value or strength.
 public class NumPropertiesFitnessEvaluator extends AbstractFitnessEvaluator {
   @Override
   public void evaluate(Vector<AbstractPlayer> players)

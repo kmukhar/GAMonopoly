@@ -1595,7 +1595,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   public int evaluateTrade(TradeProposal trade) {
     int base = propertyTrader.evaluateOwnersHoldings();
-    int newVal = propertyTrader.evaluateOwnersHoldings2(trade);
+    int newVal = propertyTrader.evaluateOwnersHoldings(trade);
 
     return newVal - base;
   }
@@ -1641,7 +1641,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // If the estimated profit from the trade is less than threshold, then
     // reject the trade.
     int baseValue = propertyTrader.evaluateOwnersHoldings();
-    int newValue = propertyTrader.evaluateOwnersHoldings2(bestTrade);
+    int newValue = propertyTrader.evaluateOwnersHoldings(bestTrade);
     
     int profit = newValue - baseValue + bestTrade.cashDiff;
     

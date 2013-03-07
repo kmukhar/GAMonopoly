@@ -171,11 +171,6 @@ public class PlayerPanel extends JPanel implements ListSelectionListener {
     setVisible(true);
   }
 
-  //TODO Is this method needed??
-  // public void addPlayer() {
-  // GamePlayers.players[index] = player;
-  // }
-
   public void disableLoadButton() {
     loadButton.setEnabled(false);
   }

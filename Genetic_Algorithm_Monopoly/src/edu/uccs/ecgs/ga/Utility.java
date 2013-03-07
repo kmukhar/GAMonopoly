@@ -129,12 +129,6 @@ public class Utility
         @Override
         public String format(LogRecord record) {
           return record.getMessage() + "\n";
-          //TODO
-//          return Monopoly.this.generation + ":" + Monopoly.this.match
-//              + ":" + Monopoly.this.game + ":"
-//              + Thread.currentThread().getName() + ":"
-//              + dateFormat.format(Calendar.getInstance().getTime()) + ": "
-//              + record.getMessage() + "\n";
         }
       };
 

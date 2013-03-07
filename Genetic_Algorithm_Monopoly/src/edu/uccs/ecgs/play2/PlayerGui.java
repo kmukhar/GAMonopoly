@@ -2,11 +2,10 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
+
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.players.AbstractPlayer;
 import edu.uccs.ecgs.players.HumanPlayer;
@@ -16,10 +15,10 @@ public class PlayerGui extends JPanel {
   private static String playerName;
   private static int playerIndex;
   private static NameAndIndexDialog dialog;
-  private JButton startButton;
-  // private JButton pauseButton;
-  private JButton resignButton;
   private JButton nextButton;
+  private JButton resignButton;
+  private JButton sellHouseButton;
+  private JButton buyHouseButton;
 
   private PlayerPanel[] playerPanels;
   private AbstractPlayer[] players;
@@ -30,10 +29,12 @@ public class PlayerGui extends JPanel {
   private Thread gameThread;
   private GameController controller;
   private Hashtable<Location, LocationButton> locationButtons;
+  private HumanPlayer humanPlayer;
 
   public static PropertyFactory factory;
   static ImageIcon monopolyIcon;
   private static PlayerGui gui;
+  private static boolean initialized = false;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -115,7 +116,7 @@ public class PlayerGui extends JPanel {
   {
     main = new Main();
     main.pause();
-    Main.maxTurns = 1; // set a high number so the game can run to finish
+    Main.maxTurns = 100; // set a high number so the game can run to finish
 
     controller = new GameController(game);
     game.setFlowController(controller);
@@ -136,8 +137,8 @@ public class PlayerGui extends JPanel {
     PlayerLoader loader = PlayerLoader.getLoader();
     AbstractPlayer[] players = loader.get4Players();
 
-    AbstractPlayer player = new HumanPlayer(playerIndex, playerName);
-    players[playerIndex - 1] = player;
+    humanPlayer = new HumanPlayer(playerIndex, playerName);
+    players[playerIndex - 1] = humanPlayer;
 
     return players;
   }
@@ -237,11 +238,8 @@ public class PlayerGui extends JPanel {
     gamePanel.add(scrollPane);
 
     JPanel buttonPanel = new JPanel();
-    createStartButton();
-    buttonPanel.add(startButton);
 
-    // createPauseButton();
-    // buttonPanel.add(pauseButton);
+    initializeGame();
 
     createNextButton();
     buttonPanel.add(nextButton);
@@ -249,9 +247,16 @@ public class PlayerGui extends JPanel {
     createResignButton();
     buttonPanel.add(resignButton);
 
+    createSellHouseButton();
+    buttonPanel.add(sellHouseButton);
+
+    createBuyHouseButton();
+    buttonPanel.add(buyHouseButton);
+
     add(buttonPanel, BorderLayout.NORTH);
     add(gamePanel, BorderLayout.CENTER);
 
+    initialized = true;
   }
 
   protected PlayerPanel makePlayerPanel()
@@ -339,32 +344,10 @@ public class PlayerGui extends JPanel {
   /**
    * 
    */
-  private void createPauseButton()
-  {
-    // pauseButton = new JButton("Pause");
-    // pauseButton.setEnabled(false);
-    // pauseButton.addActionListener(new ActionListener(){
-    // @Override
-    // public void actionPerformed(ActionEvent arg0)
-    // {
-    // if (pauseButton.getText().equalsIgnoreCase("pause")) {
-    // main.pause();
-    // pauseButton.setText("Resume");
-    // } else {
-    // pauseButton.setText("Pause");
-    // main.resume();
-    // game.resume();
-    // }
-    // }});
-  }
-
-  /**
-   * 
-   */
   private void createNextButton()
   {
-    nextButton = new JButton("Step");
-    nextButton.setEnabled(false);
+    nextButton = new JButton("Play a Turn");
+    nextButton.setEnabled(true);
     nextButton.setMnemonic(KeyEvent.VK_S);
     nextButton.addActionListener(new ActionListener() {
       @Override
@@ -379,24 +362,44 @@ public class PlayerGui extends JPanel {
   /**
    * 
    */
-  private void createStartButton()
+  private void createSellHouseButton()
   {
-    startButton = new JButton("Start");
-    startButton.setMnemonic(KeyEvent.VK_S);
-    startButton.addActionListener(new ActionListener() {
+    sellHouseButton = new JButton("Sell Houses");
+    sellHouseButton.setEnabled(false);
+    sellHouseButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
-        startButton.setEnabled(false);
-        nextButton.setEnabled(true);
+        humanPlayer.sellHouses();
+      }
+    });
+  }
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-          public void run()
-          {
-            startGame();
-          }
-        });
+  /**
+   * 
+   */
+  private void createBuyHouseButton()
+  {
+    buyHouseButton = new JButton("Buy Houses");
+    buyHouseButton.setEnabled(false);
+    buyHouseButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent arg0)
+      {
+        humanPlayer.buyHouses();
+      }
+    });
+  }
+
+  /**
+   * 
+   */
+  private void initializeGame()
+  {
+    /* Create and display the dialog */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        startGame();
       }
     });
   }
@@ -468,5 +471,17 @@ public class PlayerGui extends JPanel {
    */
   public static LocationButton getButtonForLocation(Location lot) {
     return gui.locationButtons.get(lot);
+  }
+
+  /**
+   * Update the buy/sell house buttons based on player state 
+   * @param ableToBuy True if the humanPlayer can buy houses or hotels
+   * @param ableToSell True if the humanPlayer can sell houses or hotels 
+   */
+  public static void updateHouseButtons(boolean ableToSell, boolean ableToBuy) {
+    if (initialized ) {
+      gui.sellHouseButton.setEnabled(ableToSell);
+      gui.buyHouseButton.setEnabled(ableToBuy);
+    }
   }
 }
