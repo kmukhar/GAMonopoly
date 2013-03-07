@@ -58,7 +58,7 @@ public class PlayerState {
     player.setDoubles(dice.rolledDoubles());
     if (dice.rolledDoubles()) {
       numDoubles += 1;
-      game.logInfo("numDoubles : " + numDoubles);
+      game.logFinest("numDoubles : " + numDoubles);
     }
 
     Location location;

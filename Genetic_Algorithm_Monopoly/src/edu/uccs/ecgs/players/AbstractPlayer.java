@@ -8,7 +8,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.uccs.ecgs.ga.*;
-import edu.uccs.ecgs.play2.LocationChangedEvent;
+import edu.uccs.ecgs.play2.BankruptcyEvent;
+import edu.uccs.ecgs.play2.LocationChangeEvent;
 import edu.uccs.ecgs.states.Events;
 import edu.uccs.ecgs.states.PlayerState;
 
@@ -282,8 +283,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          The location where the player is currently located.
    */
   private void setCurrentLocation(Location lot) {
-    LocationChangedEvent lce = 
-        new LocationChangedEvent(this, getCurrentLocation());
+    LocationChangeEvent lce = 
+        new LocationChangeEvent(this, getCurrentLocation());
     this.location = lot;
     fireChangeEvent(lce);
 
@@ -1166,7 +1167,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setBankrupt() {
     isBankrupt = true;
-    fireChangeEvent();
+    fireChangeEvent(new BankruptcyEvent(this));
   }
 
   /**
@@ -1424,22 +1425,28 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public String toShortString() {
     String separator = System.getProperty("line.separator");
     StringBuilder result = new StringBuilder(1024);
-    result.append(separator).append(getName()).append(separator)
-        .append("Current location: ").append(getCurrentLocation().toString());
+    result.append(separator).append(getName()).append(separator);
+    
+    if (!bankrupt()) {
+      result.append("Current location: ").append(
+          getCurrentLocation().toString());
 
-    if (inJail()) {
-      result.append(" - Behind Bars!");
-    } else if (location.index == 10 && !inJail()) {
-      result.append(" - Just Visiting.");
+      if (inJail()) {
+        result.append(" - Behind Bars!");
+      } else if (location.index == 10 && !inJail()) {
+        result.append(" - Just Visiting.");
+      }
+
+      result.append(separator).append("  Total cash  : ").append(cash);
+      result.append(separator).append("  Net worth   : ")
+      .append(getTotalWorth());
+      // .append(separator).append("  Fitness     : ").append(fitnessScore)
+      result.append(separator).append("  Has Monopoly: ").append(hasMonopoly());
+    } else {
+      result.append(separator).append("  Is Bankrupt : ").append(bankrupt())
+          .append(separator);
     }
 
-    result.append(separator).append("  Total cash  : ").append(cash)
-        .append(separator).append("  Net worth   : ")
-        .append(getTotalWorth())
-        // .append(separator).append("  Fitness     : ").append(fitnessScore)
-        .append(separator).append("  Has Monopoly: ").append(hasMonopoly())
-        .append(separator).append("  Is Bankrupt : ").append(isBankrupt)
-        .append(separator);
     return result.toString();
   }
 

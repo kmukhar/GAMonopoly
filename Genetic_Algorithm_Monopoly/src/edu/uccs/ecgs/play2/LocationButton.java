@@ -155,30 +155,63 @@ public LocationButton(Location location) {
   @Override
   public void stateChanged(ChangeEvent e)
   {
-    if (e instanceof LocationChangedEvent) {
-      AbstractPlayer player = (AbstractPlayer) e.getSource();
-      Location previous = ((LocationChangedEvent) e).getPreviousLocation();
-      if (this.location == previous)
-        removePlayer(player);
-
+    AbstractPlayer player = (AbstractPlayer) e.getSource();
+    if (e instanceof LocationChangeEvent) {
+      LocationChangeEvent lce = (LocationChangeEvent) e;
+      Location previous = lce.getPreviousLocation();
       Location current = player.getCurrentLocation();
-      if (this.location == current)
-        addPlayer(player);
-
-      String key = getStringForPlayers();
-      DoubleIcon icon = (DoubleIcon) getIcon();
-      if (icon == null) 
-        icon = new DoubleIcon(null, null);
-
-      if ("".equals(key)) {
-        icon.setIcon2(null);
-        setIcon(icon);
-      } else {
-        icon.setIcon2(playerIcons.get(key)); 
-        setIcon(icon);
-      }
-      this.fireStateChanged();
+      locationChange(player, previous, current);
+    } else if (e instanceof BankruptcyEvent) {
+      Location previous = player.getCurrentLocation();
+      Location current = null;
+      locationChange(player, previous, current);
     }
+  }
+
+  /**
+   * Update the button icons based on current and previous locations. If this
+   * button is the previous location, remove the player icon. If this location
+   * is the current location, add the player icon.
+   * 
+   * @param player
+   *          The player that moved
+   * @param previous
+   *          The player's previous location
+   * @param current
+   *          The player's current location
+   */
+  private void locationChange(AbstractPlayer player, Location previous,
+                              Location current)
+  {
+    if (this.location == previous) {
+      removePlayer(player);
+      updatePlayerIcons();
+    }
+
+    if (this.location == current) {
+      addPlayer(player);
+      updatePlayerIcons();
+    }
+  }
+
+  /**
+   * Update which icon is displayed on the button to show player location
+   */
+  private void updatePlayerIcons()
+  {
+    String key = getStringForPlayers();
+    DoubleIcon icon = (DoubleIcon) getIcon();
+    if (icon == null) 
+      icon = new DoubleIcon(null, null);
+
+    if ("".equals(key)) {
+      icon.setIcon2(null);
+      setIcon(icon);
+    } else {
+      icon.setIcon2(playerIcons.get(key)); 
+      setIcon(icon);
+    }
+    this.fireStateChanged();
   }
 
   /**
