@@ -207,7 +207,7 @@ public class HumanPlayer extends AbstractPlayer {
     if (result == 0) {
       return true;
     }
-    
+
     return false;
   }
 

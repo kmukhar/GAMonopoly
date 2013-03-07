@@ -50,12 +50,14 @@ public class PlayerGui extends JPanel {
 
     Calendar nowCal = GregorianCalendar.getInstance();
     String infoFileName = "About.html";
+    String[] options = new String[] { "Let's Play!", "Get Me Out Of Here" };
     if (nowCal.after(endCal)) {
       infoFileName = "About2.html";
+      options = new String[] { "Ok" };
     }
 
-    int result = InfoDialog.showInfoDialog(infoFileName);
-    if (result == JOptionPane.CANCEL_OPTION) {
+    int result = InfoDialog.showOptionDialog(infoFileName, options);
+    if (result == JOptionPane.NO_OPTION) {
       System.exit(0);
     }
 
@@ -418,7 +420,7 @@ public class PlayerGui extends JPanel {
         }
         JOptionPane.showMessageDialog(null,
             "The Game Is Over. " + winner.getName() + " is the winner.");
-        InfoDialog.showInfoDialog("GameOver.html");
+        InfoDialog.showOptionDialog("GameOver.html", null);
         System.exit(0);
       }});
     t.start();

@@ -25,7 +25,7 @@ import javax.swing.event.HyperlinkListener;
 
 public class InfoDialog {
 
-  static int showInfoDialog(String infoFileName)
+  static int showOptionDialog(String infoFileName, String[] options)
   {
     InputStream is = PlayerGui.class.getResourceAsStream(infoFileName);
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -54,7 +54,7 @@ public class InfoDialog {
     final JEditorPane editorPane = new JEditorPane();
     editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
         Boolean.TRUE);
-    editorPane.setPreferredSize(new Dimension(500, 420));
+    editorPane.setPreferredSize(new Dimension(500, 475));
     editorPane.setEditable(false);
     editorPane.setContentType("text/html");
     editorPane.setText(aboutMsg.toString());
@@ -131,9 +131,13 @@ public class InfoDialog {
 
     JFrame frame = new JFrame();
     frame.setIconImage(PlayerGui.monopolyIcon.getImage());
-    int result = JOptionPane.showConfirmDialog(frame, sp, "About this program",
+    
+    Object defOption = null; 
+    if (options != null && options.length > 1) 
+      defOption = options[0];
+    int result = JOptionPane.showOptionDialog(frame, sp, "About this program",
         JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        PlayerGui.monopolyIcon);
+        null, options, defOption);
     frame.dispose();
 
     return result;
