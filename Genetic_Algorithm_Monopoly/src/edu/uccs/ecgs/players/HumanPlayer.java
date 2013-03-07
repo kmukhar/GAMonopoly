@@ -58,8 +58,8 @@ public class HumanPlayer extends AbstractPlayer {
     msg.append(htmlStart);
     msg.append("You landed on ").append(lot.name)
         .append(".<p>Do you want to buy ").append(lot.name).append(" for ")
-        .append(lot.getCost()).append(" dollars?<p>")
-        .append(getOtherOwners(lot.getGroup()))
+        .append(lot.getCost()).append(" dollars?")
+        .append(getOtherOwners(lot.getGroup())).append("<p>")
         .append("<table border=1 width=\"100%\"><tr><td>")
         .append(lot.getFormattedString())
         .append("</td></tr></table>")
@@ -169,9 +169,8 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     if (result.length() > 0) {
-      result.insert(0, "<p>Some properties in this group are "
+      result.insert(0, "<p><p>Some properties in this group are "
           + "owned by other players.<br>");
-      result.append("<p>");
     }
     
     return result.toString();
@@ -371,11 +370,26 @@ public class HumanPlayer extends AbstractPlayer {
       if (monopolies.size() == 0)
         break;
 
-      int result = JOptionPane.showOptionDialog(null, htmlStart
-          + "Do you want to buy any houses or hotels for your properties?"
-          + htmlEnd, "Build Houses or Hotels?",
-          JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-          new String[] { "Yes", "No" }, "No");
+      StringBuilder msg = new StringBuilder();
+      msg.append(htmlStart).append(
+          "Do you want to buy any houses or hotels for your ");
+      msg.append("properties?<p><p>You can current buy houses for the ");
+      msg.append("following properties:<p>");
+      msg.append("<table width=100% border=0>");
+      msg.append("<tr><th align=left>Property</th>").append(
+          "<th align=center>Cost of House/Hotel</th></tr>");
+      for (Location lot : monopolies) {
+        msg.append("<tr><td align=left>").append(lot.name)
+            .append("</td><td align=center>");
+        msg.append(lot.getHouseCost()).append("</td></tr>");
+      }
+      msg.append("</table>");
+      msg.append(htmlEnd);
+      
+      int result = JOptionPane.showOptionDialog(null, msg.toString(),
+          "Build Houses or Hotels?", JOptionPane.YES_NO_OPTION,
+          JOptionPane.QUESTION_MESSAGE, null, new String[] { "Yes", "No" },
+          "No");
 
       if (result == 1)
         break;
