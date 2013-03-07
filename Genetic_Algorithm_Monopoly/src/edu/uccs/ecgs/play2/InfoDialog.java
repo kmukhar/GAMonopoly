@@ -23,6 +23,10 @@ import javax.swing.UIDefaults;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.net.URLCodec;
+
 public class InfoDialog {
 
   static int showOptionDialog(String filename, String[] options)
@@ -96,10 +100,23 @@ public class InfoDialog {
       }
     }
 
-    String msg = aboutMsg.toString().replaceFirst("RESULTS", gameStats);
-    gameStats = gameStats.replace("%0D%0A", "<br>\n");
-    msg = msg.replaceFirst("RESULTS", gameStats);
+    String lineSeparator = System.getProperty("line.separator");
+    String gameStats2 = gameStats.replace("EOL", lineSeparator); 
+
+    URLCodec urlCodec = new URLCodec();
+    try {
+      gameStats2 = urlCodec.encode(gameStats2);
+    } catch (EncoderException e) {
+      e.printStackTrace();
+    }
+
+    String msg = aboutMsg.toString().replaceFirst("RESULTS", gameStats2);
+
+    gameStats2 = gameStats.replace("EOL", "<br>" + lineSeparator);
+    msg = msg.toString().replaceFirst("RESULTS", gameStats2);
+
     final JEditorPane editorPane = getEditorPane(msg);
+    editorPane.setPreferredSize(new Dimension(600, 500));
 
     JScrollPane sp = new JScrollPane(editorPane);
     sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -111,7 +128,7 @@ public class InfoDialog {
     
     Object defOption = null; 
 
-    int result = JOptionPane.showOptionDialog(frame, sp, "About this program",
+    JOptionPane.showOptionDialog(frame, sp, "About this program",
         JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
         null, null, defOption);
     frame.dispose();

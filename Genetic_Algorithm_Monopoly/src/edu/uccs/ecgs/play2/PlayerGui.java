@@ -2,6 +2,8 @@ package edu.uccs.ecgs.play2;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
@@ -113,7 +115,7 @@ public class PlayerGui extends JPanel {
   {
     main = new Main();
     main.pause();
-    Main.maxTurns = 100; // set a high number so the game can run to finish
+    Main.maxTurns = 1; // set a high number so the game can run to finish
 
     controller = new GameController(game);
     game.setFlowController(controller);
@@ -439,9 +441,12 @@ public class PlayerGui extends JPanel {
           .append(player.getNumProperties()).append(",")
           .append(player.getNumMonopolies()).append(",")
           .append(player.getNumHouses()).append(",")
-          .append(player.getNumHotels()).append("%0D%0A");
+          .append(player.getNumHotels()).append("EOL");
     }
 
+    String result = sb.toString();
+    sb.append(result.hashCode());
+    
     return sb.toString();
   }
 
