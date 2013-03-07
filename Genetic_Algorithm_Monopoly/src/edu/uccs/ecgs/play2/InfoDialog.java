@@ -140,13 +140,11 @@ public class InfoDialog {
   private static JEditorPane getEditorPane(String msg)
   {
     System.setProperty("awt.useSystemAAFontSettings", "on");
-    final JEditorPane editorPane = new JEditorPane();
+    final JEditorPane editorPane = new JEditorPane("text/html", msg);
     editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
         Boolean.TRUE);
     editorPane.setPreferredSize(new Dimension(500, 475));
     editorPane.setEditable(false);
-    editorPane.setContentType("text/html");
-    editorPane.setText(msg);
   
     // This section of code from
     // https://forums.oracle.com/forums/message.jspa?messageID=9909614
