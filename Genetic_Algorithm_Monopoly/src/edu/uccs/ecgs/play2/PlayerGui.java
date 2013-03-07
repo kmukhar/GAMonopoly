@@ -113,7 +113,7 @@ public class PlayerGui extends JPanel {
   {
     main = new Main();
     main.pause();
-    Main.maxTurns = 500; // set a high number so the game can run to finish
+    Main.maxTurns = 100; // set a high number so the game can run to finish
 
     controller = new GameController(game);
     game.setFlowController(controller);
@@ -420,10 +420,29 @@ public class PlayerGui extends JPanel {
         }
         JOptionPane.showMessageDialog(null,
             "The Game Is Over. " + winner.getName() + " is the winner.");
-        InfoDialog.showOptionDialog("GameOver.html", null);
+        String gameStats = getGameStats();
+        InfoDialog.showFinalDialog("GameOver.html", gameStats);
         System.exit(0);
       }});
+
     t.start();
+  }
+
+  private String getGameStats()
+  {
+    StringBuilder sb = new StringBuilder();
+
+    for (AbstractPlayer player : players) {
+      sb.append(player.getSourceName()).append(",")
+          .append(player.getFinishOrder()).append(",")
+          .append(player.getTotalWorth()).append(",")
+          .append(player.getNumProperties()).append(",")
+          .append(player.getNumMonopolies()).append(",")
+          .append(player.getNumHouses()).append(",")
+          .append(player.getNumHotels()).append("%0D%0A%20");
+    }
+
+    return sb.toString();
   }
 
   /**

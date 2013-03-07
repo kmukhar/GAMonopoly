@@ -25,9 +25,9 @@ import javax.swing.event.HyperlinkListener;
 
 public class InfoDialog {
 
-  static int showOptionDialog(String infoFileName, String[] options)
+  static int showOptionDialog(String filename, String[] options)
   {
-    InputStream is = PlayerGui.class.getResourceAsStream(infoFileName);
+    InputStream is = PlayerGui.class.getResourceAsStream(filename);
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
   
     StringBuilder aboutMsg = new StringBuilder();
@@ -50,6 +50,77 @@ public class InfoDialog {
       }
     }
   
+    final JEditorPane editorPane = getEditorPane(aboutMsg.toString());
+  
+    JScrollPane sp = new JScrollPane(editorPane);
+    sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    sp.setBorder(null);
+
+    JFrame frame = new JFrame();
+    frame.setIconImage(PlayerGui.monopolyIcon.getImage());
+    
+    Object defOption = null; 
+    if (options != null && options.length > 1) 
+      defOption = options[0];
+    int result = JOptionPane.showOptionDialog(frame, sp, "About this program",
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
+        null, options, defOption);
+    frame.dispose();
+
+    return result;
+  }
+
+  public static void showFinalDialog(String filename, String gameStats)
+  {
+    InputStream is = PlayerGui.class.getResourceAsStream(filename);
+    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+  
+    StringBuilder aboutMsg = new StringBuilder();
+  
+    String line = null;
+    try {
+      line = br.readLine();
+      while (line != null) {
+        aboutMsg.append(line);
+        line = br.readLine();
+      }
+    } catch (IOException e) {
+      aboutMsg = new StringBuilder();
+      aboutMsg.append("Monopoly");
+    } finally {
+      try {
+        br.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    String msg = aboutMsg.toString().replace("$RESULTS", gameStats);
+    final JEditorPane editorPane = getEditorPane(msg);
+
+    JScrollPane sp = new JScrollPane(editorPane);
+    sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    sp.setBorder(null);
+
+    JFrame frame = new JFrame();
+    frame.setIconImage(PlayerGui.monopolyIcon.getImage());
+    
+    Object defOption = null; 
+
+    int result = JOptionPane.showOptionDialog(frame, sp, "About this program",
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
+        null, null, defOption);
+    frame.dispose();
+  }
+
+  /**
+   * @param msg The text for the pane
+   * @return An instance of JEditorPane with the string
+   */
+  private static JEditorPane getEditorPane(String msg)
+  {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     final JEditorPane editorPane = new JEditorPane();
     editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
@@ -57,7 +128,7 @@ public class InfoDialog {
     editorPane.setPreferredSize(new Dimension(500, 475));
     editorPane.setEditable(false);
     editorPane.setContentType("text/html");
-    editorPane.setText(aboutMsg.toString());
+    editorPane.setText(msg);
   
     // This section of code from
     // https://forums.oracle.com/forums/message.jspa?messageID=9909614
@@ -123,23 +194,6 @@ public class InfoDialog {
         }
       }
     });
-  
-    JScrollPane sp = new JScrollPane(editorPane);
-    sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    sp.setBorder(null);
-
-    JFrame frame = new JFrame();
-    frame.setIconImage(PlayerGui.monopolyIcon.getImage());
-    
-    Object defOption = null; 
-    if (options != null && options.length > 1) 
-      defOption = options[0];
-    int result = JOptionPane.showOptionDialog(frame, sp, "About this program",
-        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        null, options, defOption);
-    frame.dispose();
-
-    return result;
+    return editorPane;
   }
 }
