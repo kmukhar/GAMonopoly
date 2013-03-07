@@ -96,7 +96,9 @@ public class InfoDialog {
       }
     }
 
-    String msg = aboutMsg.toString().replace("$RESULTS", gameStats);
+    String msg = aboutMsg.toString().replaceFirst("RESULTS", gameStats);
+    gameStats = gameStats.replace("%0D%0A", "<br>\n");
+    msg = msg.replaceFirst("RESULTS", gameStats);
     final JEditorPane editorPane = getEditorPane(msg);
 
     JScrollPane sp = new JScrollPane(editorPane);
