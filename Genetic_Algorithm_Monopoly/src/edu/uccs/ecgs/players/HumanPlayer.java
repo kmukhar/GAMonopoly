@@ -58,7 +58,8 @@ public class HumanPlayer extends AbstractPlayer {
     msg.append(htmlStart);
     msg.append("You landed on ").append(lot.name)
         .append(".<p>Do you want to buy ").append(lot.name).append(" for ")
-        .append(lot.getCost()).append(" dollars?<p><p>")
+        .append(lot.getCost()).append(" dollars?<p>")
+        .append(getOtherOwners(lot.getGroup()))
         .append("<table border=1 width=\"100%\"><tr><td>")
         .append(lot.getFormattedString())
         .append("</td></tr></table>")
@@ -98,18 +99,21 @@ public class HumanPlayer extends AbstractPlayer {
    * @see edu.uccs.ecgs.players.AbstractPlayer#getBidForLocation(edu.uccs.ecgs.ga.Location)
    */
   @Override
-  public int getBidForLocation(Location currentLocation)
+  public int getBidForLocation(Location lot)
   {
     int bid = 0;
+    StringBuilder msg = new StringBuilder();
+    msg.append(htmlStart).append(lot.name).append(" is being auctioned.<p><p>")
+        .append("The normal cost for this property is $").append(lot.getCost())
+        .append(getOtherOwners(lot.getGroup())).append("<p>")
+        .append("<table border=1 width=\"100%\"><tr><td>")
+        .append(lot.getFormattedString()).append("</td></tr></table><p><p>")
+        .append("What is the MAXIMUM you want to bid for this property? ")
+        .append("(0 to ").append(cash).append(")<p><p>").append(htmlEnd);
+
     while (true) {
-      String result = JOptionPane.showInputDialog(null, htmlStart
-          + currentLocation.name + " is being auctioned.<p><p>" 
-              + "The normal cost for this property is $"
-              + currentLocation.getCost() + ".<p><p>"
-              + getOtherOwners(currentLocation.getGroup())
-              + "What is the MAXIMUM you want to bid for this property? "
-              + "(0 to " + cash + ")" + htmlEnd, "Bid for property",
-          JOptionPane.QUESTION_MESSAGE);
+      String result = JOptionPane.showInputDialog(null, msg.toString(),
+          "Bid for property", JOptionPane.QUESTION_MESSAGE);
       try {
         bid = Integer.parseInt(result);
         if (bid < 0 || bid > cash)
@@ -165,9 +169,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     if (result.length() > 0) {
-      result.insert(0, "Some properties in this group are "
+      result.insert(0, "<p>Some properties in this group are "
           + "owned by other players.<br>");
-      result.append("<p><p>");
+      result.append("<p>");
     }
     
     return result.toString();
