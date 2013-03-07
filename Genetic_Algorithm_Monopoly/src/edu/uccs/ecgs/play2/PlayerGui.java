@@ -244,14 +244,14 @@ public class PlayerGui extends JPanel {
     createNextButton();
     buttonPanel.add(nextButton);
 
-    createResignButton();
-    buttonPanel.add(resignButton);
-
     createSellHouseButton();
     buttonPanel.add(sellHouseButton);
 
     createBuyHouseButton();
     buttonPanel.add(buyHouseButton);
+
+    createResignButton();
+    buttonPanel.add(resignButton);
 
     add(buttonPanel, BorderLayout.NORTH);
     add(gamePanel, BorderLayout.CENTER);
@@ -330,19 +330,19 @@ public class PlayerGui extends JPanel {
    */
   private void createResignButton()
   {
-    resignButton = new JButton("Resign");
+    resignButton = new JButton("End the Game");
     resignButton.setEnabled(false);
     resignButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
       {
-        // TODO Auto-generated method stub
+        game.terminate();
       }
     });
   }
 
   /**
-   * 
+   * Create the button to control each turn
    */
   private void createNextButton()
   {
@@ -360,7 +360,7 @@ public class PlayerGui extends JPanel {
   }
 
   /**
-   * 
+   * Create button to allow human player to sell houses or hotels
    */
   private void createSellHouseButton()
   {
@@ -376,7 +376,7 @@ public class PlayerGui extends JPanel {
   }
 
   /**
-   * 
+   * Create a button to let human player buy a house
    */
   private void createBuyHouseButton()
   {
@@ -411,6 +411,7 @@ public class PlayerGui extends JPanel {
       public void run()
       {
         gameThread.start();
+        resignButton.setEnabled(true);
 
         try {
           gameThread.join();

@@ -121,6 +121,8 @@ public class Monopoly implements Runnable, Controllable {
         if (flowController.isPaused()) {
           try {
             wait();
+            if (done)
+              break;
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
@@ -700,8 +702,19 @@ public class Monopoly implements Runnable, Controllable {
     notify();
   }
 
+  /**
+   * Pause the game
+   */
   public void pause() {
     paused  = true;
+  }
+
+  /**
+   * Terminate the game
+   */
+  public synchronized void terminate() {
+    done = true;
+    notify();
   }
 
   /**

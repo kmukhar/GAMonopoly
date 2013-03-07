@@ -115,7 +115,7 @@ public class InfoDialog {
     msg = msg.toString().replaceFirst("RESULTS", gameStats2);
 
     final JEditorPane editorPane = getEditorPane(msg);
-    editorPane.setPreferredSize(new Dimension(600, 500));
+    editorPane.setPreferredSize(new Dimension(600, 700));
 
     JScrollPane sp = new JScrollPane(editorPane);
     sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -124,12 +124,13 @@ public class InfoDialog {
 
     JFrame frame = new JFrame();
     frame.setIconImage(PlayerGui.monopolyIcon.getImage());
-    
-    Object defOption = null; 
+
+    Object[] values = 
+        new Object[] { "The results have been emailed, Close the window." };
 
     JOptionPane.showOptionDialog(frame, sp, "About this program",
-        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        null, null, defOption);
+        JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,
+        null, values, values[0]);
     frame.dispose();
   }
 
