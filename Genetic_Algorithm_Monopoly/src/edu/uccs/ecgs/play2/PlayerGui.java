@@ -330,7 +330,8 @@ public class PlayerGui extends JPanel {
    */
   private void createResignButton()
   {
-    resignButton = new JButton("End the Game");
+    resignButton = new JButton("Exit the Game");
+    resignButton.setMnemonic(KeyEvent.VK_X);
     resignButton.setEnabled(false);
     resignButton.addActionListener(new ActionListener() {
       @Override
@@ -348,7 +349,8 @@ public class PlayerGui extends JPanel {
   {
     nextButton = new JButton("Play a Turn");
     nextButton.setEnabled(true);
-    nextButton.setMnemonic(KeyEvent.VK_S);
+    nextButton.setMnemonic(KeyEvent.VK_P);
+
     nextButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
@@ -366,6 +368,7 @@ public class PlayerGui extends JPanel {
   {
     sellHouseButton = new JButton("Sell Houses");
     sellHouseButton.setEnabled(false);
+    sellHouseButton.setMnemonic(KeyEvent.VK_S);
     sellHouseButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
@@ -382,6 +385,7 @@ public class PlayerGui extends JPanel {
   {
     buyHouseButton = new JButton("Buy Houses");
     buyHouseButton.setEnabled(false);
+    buyHouseButton.setMnemonic(KeyEvent.VK_B);
     buyHouseButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
@@ -412,6 +416,7 @@ public class PlayerGui extends JPanel {
       {
         gameThread.start();
         resignButton.setEnabled(true);
+        nextButton.requestFocus();
 
         try {
           gameThread.join();
