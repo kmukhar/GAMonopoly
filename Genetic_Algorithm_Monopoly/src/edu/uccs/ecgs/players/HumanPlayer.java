@@ -2,6 +2,7 @@ package edu.uccs.ecgs.players;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JOptionPane;
@@ -526,6 +527,7 @@ public class HumanPlayer extends AbstractPlayer {
       if (cash > amount)
         done = true;
     }
+    super.getCash(amount);
   }
 
   /* (non-Javadoc)
@@ -564,6 +566,16 @@ public class HumanPlayer extends AbstractPlayer {
     }
     
     PlayerGui.updateHouseButtons(ableToSell, ableToBuy);
+
+    int countMortgaged = 0;
+    for (Location lot : getAllProperties().values()) {
+      if (lot.isMortgaged()) {
+        ++countMortgaged;
+        break;
+      }
+    }
+
+    PlayerGui.updateMortgageButton(countMortgaged > 0);
   }
 
   /**
@@ -649,6 +661,57 @@ public class HumanPlayer extends AbstractPlayer {
       int numHouses = location.getNumHouses() + location.getNumHotels() * 5;
       if (numHouses < groupMax[index]) {
         sellableLots.remove(location);
+      }
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#payOffMortgages()
+   */
+  @Override
+  public void payOffMortgages()
+  {
+    // don't do anything here, the gui allows the player to decide when to lift
+    // mortgages
+  }
+
+  public void liftMortgages() {
+    Vector<Location> mortgaged = getSortedMortgages(getAllProperties());
+
+    boolean done = false;
+    while (!done && mortgaged.size() > 0) {
+      Location lot = (Location) JOptionPane.showInputDialog(null, htmlStart
+          + " Which mortgaged property do you wish to lift the mortgage from? "
+          + "Click Cancel if you don't want to lift any more mortgages."
+          + htmlEnd, "Select Property", JOptionPane.QUESTION_MESSAGE, null,
+          mortgaged.toArray(), mortgaged.get(0));
+
+      if (lot == null) 
+        done = true;
+      else {
+        int payoff = (int)(1.1 * ((double)lot.getCost()) / 2.0);
+        if (payoff > cash) {
+          JOptionPane.showMessageDialog(null, htmlStart + "You don't have "
+              + "enough money to lift the mortgage for " + lot.name + ". You "
+              + "need $" + payoff + ", but you only have $" + cash + ".",
+              "Not enough cash", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+          int result = JOptionPane.showConfirmDialog(null, htmlStart
+              + "It will cost " + "$" + payoff
+              + " to lift the mortgage. Click OK to pay the " + "mortgage. "
+              + "Click cancel to quit." + htmlEnd, "Payoff cost",
+              JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+          if (result == JOptionPane.OK_OPTION) {
+            try {
+              getCash(payoff);
+              mortgaged.remove(lot);
+              lot.setMortgaged(false);
+            } catch (BankruptcyException ignored) {
+              // should not happen, payoff < cash was checked in if block
+            }
+            fireChangeEvent();
+          }
+        }        
       }
     }
   }

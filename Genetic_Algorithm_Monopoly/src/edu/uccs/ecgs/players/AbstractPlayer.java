@@ -1073,7 +1073,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param lots The set of Locations objects to check
    * @return A Sorted vector of Location objects
    */
-  private Vector<Location> getSortedMortgages(TreeMap<Integer, Location> lots) {
+  protected Vector<Location> getSortedMortgages(TreeMap<Integer, Location> lots) {
     TreeMap<Integer, Location> map = new TreeMap<Integer, Location>();
     int mOffset = 0; // index offset for mortgaged streets in monopolies
     int u2Offset = 40; // index offset for mortgaged utility monopolies

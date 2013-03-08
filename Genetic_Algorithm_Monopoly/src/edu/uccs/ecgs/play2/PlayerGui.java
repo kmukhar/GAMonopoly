@@ -19,6 +19,7 @@ public class PlayerGui extends JPanel {
   private JButton resignButton;
   private JButton sellHouseButton;
   private JButton buyHouseButton;
+  private JButton liftMortgageButton;
 
   private PlayerPanel[] playerPanels;
   private AbstractPlayer[] players;
@@ -250,6 +251,9 @@ public class PlayerGui extends JPanel {
     createBuyHouseButton();
     buttonPanel.add(buyHouseButton);
 
+    createLiftMortgageButton();
+    buttonPanel.add(liftMortgageButton);
+
     createResignButton();
     buttonPanel.add(resignButton);
 
@@ -405,6 +409,20 @@ public class PlayerGui extends JPanel {
     });
   }
 
+  private void createLiftMortgageButton()
+  {
+    liftMortgageButton = new JButton("Lift Mortgages");
+    liftMortgageButton.setEnabled(false);
+    liftMortgageButton.setMnemonic(KeyEvent.VK_L);
+    liftMortgageButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent arg0)
+      {
+        humanPlayer.liftMortgages();
+      }
+    });
+  }
+
   /**
    * 
    */
@@ -495,9 +513,19 @@ public class PlayerGui extends JPanel {
    * @param ableToSell True if the humanPlayer can sell houses or hotels 
    */
   public static void updateHouseButtons(boolean ableToSell, boolean ableToBuy) {
-    if (initialized ) {
+    if (initialized) {
       gui.sellHouseButton.setEnabled(ableToSell);
       gui.buyHouseButton.setEnabled(ableToBuy);
     }
+  }
+
+  /**
+   * Set the lift mortgage button enable or disabled
+   * @param b If True, enable the button, disable the button otherwise
+   */
+  public static void updateMortgageButton(boolean b)
+  {
+    if (initialized)
+      gui.liftMortgageButton.setEnabled(b);
   }
 }
