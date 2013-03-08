@@ -351,6 +351,16 @@ public class PlayerGui extends JPanel {
     nextButton.setEnabled(true);
     nextButton.setMnemonic(KeyEvent.VK_P);
 
+    nextButton.registerKeyboardAction(nextButton.getActionForKeyStroke(
+        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
+        KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+        JComponent.WHEN_FOCUSED);
+
+    nextButton.registerKeyboardAction(nextButton.getActionForKeyStroke(
+        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+        KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
+        JComponent.WHEN_FOCUSED);
+
     nextButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0)
