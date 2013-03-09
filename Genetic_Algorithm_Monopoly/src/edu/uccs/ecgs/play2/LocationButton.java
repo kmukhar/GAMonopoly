@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import edu.uccs.ecgs.ga.Location;
+import edu.uccs.ecgs.ga.PropertyGroups;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 @SuppressWarnings("serial")
@@ -22,16 +23,17 @@ public class LocationButton extends JButton implements ActionListener,
   private Location location;
   boolean[] players = new boolean[] { false, false, false, false, false };
   private Hashtable<String, ImageIcon> playerIcons;
+  private Hashtable<String, ImageIcon> houseIcons;
   private JDialog dialog;
 
 public LocationButton(Location location) {
     this.location = location;
 
     playerIcons = new Hashtable<String, ImageIcon>();
-    if (isDarkBlue())
-      createPlayerIconsWhite();
-    else
-      createPlayerIcons();
+    createPlayerIcons(isDarkBlue());
+
+    houseIcons = new Hashtable<String, ImageIcon>();
+    createHouseIcons(isDarkBlue());
 
     if (location.index == 0)
       players = new boolean[] { true, true, true, true, true };
@@ -58,6 +60,12 @@ public LocationButton(Location location) {
 
     this.addActionListener(this);
   }
+
+  private void createHouseIconsWhite()
+{
+  // TODO Auto-generated method stub
+  
+}
 
   @Override
   public void actionPerformed(ActionEvent arg0)
@@ -166,6 +174,7 @@ public LocationButton(Location location) {
       Location current = null;
       locationChange(player, previous, current);
     }
+    updateHouseIcons();
   }
 
   /**
@@ -212,6 +221,42 @@ public LocationButton(Location location) {
       setIcon(icon);
     }
     this.fireStateChanged();
+  }
+
+  /**
+   * Update which house icons are displayed on the button.
+   */
+  private void updateHouseIcons()
+  {
+    if (location.getGroup() == PropertyGroups.SPECIAL)
+      return;
+    if (location.getGroup() == PropertyGroups.UTILITIES)
+      return;
+    if (location.getGroup() == PropertyGroups.RAILROADS)
+      return;
+
+    DoubleIcon icon = (DoubleIcon) getIcon();
+    if (icon == null) 
+      icon = new DoubleIcon(null, null);
+
+    int numHotels = location.getNumHotels();
+    int numHouses = location.getNumHouses();
+
+    String name1 = "hotel.png";
+    String name2 = "house.png";
+    if (isDarkBlue()) {
+      name1 = "hotelw.png";
+      name2 = "housew.png";
+    }
+
+    if (numHotels == 1) {
+      icon.setIcon1(houseIcons.get(name1));
+    } else if (numHouses > 0) {
+      icon.setIcon1(houseIcons.get(numHouses + name2));
+    } else {
+      icon.setIcon1(null);
+    }
+    fireStateChanged();
   }
 
   /**
@@ -265,36 +310,61 @@ public LocationButton(Location location) {
     return location.index == PARK_PLACE || location .index == BOARDWALK;
   }
 
-  private void createPlayerIcons()
+  /**
+   * Load the player icons for the game. Black icons are used for all
+   * properties except for Boardwalk and Park Place (dark blue).
+   */
+  private void createPlayerIcons(boolean isDarkBlue)
   {
-    String[] iconNames = new String[] { "1.png", "12.png", "123.png",
-        "1234.png", "124.png", "13.png", "134.png", "14.png", "2.png",
-        "23.png", "234.png", "24.png", "3.png", "34.png", "4.png" };
+    String[] iconNames = new String[0];
 
-    for (String name : iconNames) {
-      java.net.URL imgURL = LocationButton.class.getResource(name);
-
-      if (imgURL != null) {
-        ImageIcon icon = new ImageIcon(imgURL);
-        playerIcons.put(name, icon);
-      } else {
-        System.err.println("Couldn't find file: " + name);
-      }
+    if (isDarkBlue) {
+      iconNames = new String[] { "1w.png", "12w.png", "123w.png", "1234w.png",
+          "124w.png", "13w.png", "134w.png", "14w.png", "2w.png", "23w.png",
+          "234w.png", "24w.png", "3w.png", "34w.png", "4w.png" };
+    } else {
+      iconNames = new String[] { "1.png", "12.png", "123.png", "1234.png",
+          "124.png", "13.png", "134.png", "14.png", "2.png", "23.png",
+          "234.png", "24.png", "3.png", "34.png", "4.png" };
     }
+    createIcons(playerIcons, iconNames);
   }
 
-  private void createPlayerIconsWhite()
+  /**
+   * Load the house icons for the game
+   */
+  private void createHouseIcons(boolean isDarkBlue)
   {
-    String[] iconNames = new String[] { "1w.png", "12w.png", "123w.png",
-        "1234w.png", "124w.png", "13w.png", "134w.png", "14w.png", "2w.png",
-        "23w.png", "234w.png", "24w.png", "3w.png", "34w.png", "4w.png" };
+    String[] iconNames = new String[0];
 
+    if (isDarkBlue) {
+      iconNames = new String[] { "1housew.png", "2housew.png", "3housew.png",
+          "4housew.png", "hotelw.png" };
+    } else {
+      iconNames = new String[] { "1house.png", "2house.png", "3house.png",
+          "4house.png", "hotel.png" };
+    }
+
+    createIcons(houseIcons, iconNames);
+  }
+
+  /**
+   * Load the icons given by iconNames and load them into the Hashtable
+   * 
+   * @param icons
+   *          The hashtable that holds the icons
+   * @param iconNames
+   *          The names of the icon files to load, these are also the keys into
+   *          the hashtable
+   */
+  private void createIcons(Hashtable<String, ImageIcon> icons, String[] iconNames)
+  {
     for (String name : iconNames) {
       java.net.URL imgURL = LocationButton.class.getResource(name);
 
       if (imgURL != null) {
         ImageIcon icon = new ImageIcon(imgURL);
-        playerIcons.put(name, icon);
+        icons.put(name, icon);
       } else {
         System.err.println("Couldn't find file: " + name);
       }
