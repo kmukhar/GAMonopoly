@@ -482,7 +482,7 @@ public class PlayerGui extends JPanel {
     }
 
     String result = sb.toString();
-    sb.append(result.hashCode());
+    sb.append(Integer.toHexString(result.hashCode()));
     
     return sb.toString();
   }
