@@ -69,7 +69,7 @@ public class Monopoly implements Runnable, Controllable {
     r.setSeed(seed);
 
     turnCounter = 0;
-    setNumHouses(32);
+    numHouses = 32;
     numHotels = 12;
 
     cards = Cards.getCards();
@@ -918,6 +918,9 @@ public class Monopoly implements Runnable, Controllable {
   public int getHouse() {
     numHouses--;
     assert numHouses >= 0;
+    for (AbstractPlayer player : players) {
+      player.setBankNumHouses(numHouses);
+    }
     return 1;
   }
   
@@ -925,15 +928,12 @@ public class Monopoly implements Runnable, Controllable {
     addHouses(1);
   }
   
-  public void setNumHouses(int num) {
-    numHouses = num;
-    assert numHouses >= 0;
-    assert numHouses <= 32;
-  }
-  
   public void addHouses(int num) {
     numHouses += num;
     assert numHouses < 33 : "Invalid number of houses: " + numHouses;
+    for (AbstractPlayer player : players) {
+      player.setBankNumHouses(numHouses);
+    }
   }
 
   public void mortgageProperty(Location lot) {

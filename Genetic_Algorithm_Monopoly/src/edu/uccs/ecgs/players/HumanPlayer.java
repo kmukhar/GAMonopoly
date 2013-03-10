@@ -382,6 +382,16 @@ public class HumanPlayer extends AbstractPlayer {
       } 
       else
         done = true;
+
+      if (game.getNumHousesInBank() == 0) {
+        done = true;
+        StringBuilder msg = new StringBuilder();
+        msg.append(htmlStart);
+        msg.append("The bank has no more houses to sell.");
+        msg.append(htmlEnd);
+        JOptionPane.showMessageDialog(null, msg.toString(),
+            "Bank out of houses", JOptionPane.INFORMATION_MESSAGE);
+      }
     }
   }
 
@@ -574,10 +584,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     // if this player has a monopoly AND...
-    // if the game has houses to sell AND...
+    // if the game has houses to sell...
     if (hasMonopoly() && game.getNumHousesInBank() > 0) {
-      // if the player can buy houses
-      // the min number of houses on the properties in a group
+      // update the list of properties that can have houses bought for them
       updateHouseReadyLots();
 
       if (monopolies.size() > 0)
@@ -763,6 +772,16 @@ public class HumanPlayer extends AbstractPlayer {
 
     if (result == 0)
       PlayerGui.pauseOff();
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#setBankNumHouses(int)
+   */
+  @Override
+  public void setBankNumHouses(int numHouses)
+  {
+    super.setBankNumHouses(numHouses);
+    fireChangeEvent();
   }
 
   @Override

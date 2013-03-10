@@ -79,6 +79,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private ChangeListener changeListener;
   private String sourceName = "";
   private int doublesCounter = 0;
+  private int numHousesInBank;
 
   /**
    * Constructor
@@ -1230,8 +1231,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
     // Create a list of all the groups for which a player has a monopoly,
     // and for which no property in the group is mortgaged.
-    Vector<PropertyGroups> groups1 = new Vector<PropertyGroups>();
-    Vector<PropertyGroups> groups2 = new Vector<PropertyGroups>();
+    // groupsWLT3 -- groups with less than 3 houses per property
+    Vector<PropertyGroups> groupsWLT3 = new Vector<PropertyGroups>();
+    // groupsWGTE3 -- groups with 3 or more houses per property
+    Vector<PropertyGroups> groupsWGTE3 = new Vector<PropertyGroups>();
 
     // Good strategy says to build all properties up to 3 houses first, and 
     // then if all monopolies of player have 3 houses, then build hotels.
@@ -1251,25 +1254,25 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
       if (aLocation.partOfMonopoly) {
         if (aLocation.getNumHouses() < 3 && aLocation.getNumHotels() == 0) {
-          if (!groups1.contains(group)) {
-            groups1.add(group);
+          if (!groupsWLT3.contains(group)) {
+            groupsWLT3.add(group);
             logFinest(group.toString()
                 + " added to list of monopolies in processDevelopHouseEvent");
           }
-          groups2.remove(group);
-          assert groups1.contains(group);
-          assert !groups2.contains(group);
+          groupsWGTE3.remove(group);
+          assert groupsWLT3.contains(group);
+          assert !groupsWGTE3.contains(group);
         } else if (aLocation.getNumHouses() >= 3) {
-          if (!groups1.contains(group) && !groups2.contains(group)) {
-            groups2.add(group);
-            assert !groups1.contains(group);
-            assert groups2.contains(group);
+          if (!groupsWLT3.contains(group) && !groupsWGTE3.contains(group)) {
+            groupsWGTE3.add(group);
+            assert !groupsWLT3.contains(group);
+            assert groupsWGTE3.contains(group);
           }
         }
       }
     }
 
-    if (groups1.size() == 0 && groups2.size() == 0)
+    if (groupsWLT3.size() == 0 && groupsWGTE3.size() == 0)
       return;
 
     for (int i = 0; i < groupOrder.length; i++) {
@@ -1281,9 +1284,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         break;
       }
 
-      Vector<PropertyGroups> groupsToDevelop = groups1;     
-      if (groups1.size() == 0) {
-        groupsToDevelop = groups2;
+      Vector<PropertyGroups> groupsToDevelop = groupsWLT3;     
+      if (groupsWLT3.size() == 0) {
+        groupsToDevelop = groupsWGTE3;
       }
 
       for (PropertyGroups group : groupsToDevelop) {
@@ -1729,5 +1732,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public String getSourceName() {
     return sourceName;
+  }
+
+  public void setBankNumHouses(int numHouses)
+  {
+    numHousesInBank = numHouses;
   }
 }
