@@ -496,6 +496,8 @@ public class PropertyNegotiator {
         if (!owner.needs(location2) || !owner2.needs(location))
           continue;
 
+        assert !location.getGroup().equals(location2.getGroup());
+        assert location.getGroup() != location2.getGroup();
         tradeProposals.add(new TradeProposal(location, location2));
       }
     }

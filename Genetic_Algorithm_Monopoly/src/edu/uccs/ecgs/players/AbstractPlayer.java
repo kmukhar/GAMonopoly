@@ -1608,7 +1608,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          for.
    */
   public void processTradeDecisionEvent(ArrayList<Location> locations) {
-    // only try to trade if this player owns at least one propertie
+    // only try to trade if this player owns at least one property
     // and other players own at least one property
     if (owned.size() > 0 && !locations.isEmpty()) {
       TradeProposal bestTrade = propertyTrader.findBestTrade();
