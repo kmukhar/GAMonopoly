@@ -601,12 +601,15 @@ public class Monopoly implements Runnable, Controllable {
       TreeMap<Integer, Vector<AbstractPlayer>> bids = 
           new TreeMap<Integer, Vector<AbstractPlayer>>();
       for (AbstractPlayer p : players) {
-        int bid = p.getBidForLocation(location);
-        Vector<AbstractPlayer> v = bids.get(bid);
-        if (v == null)
-          v = new Vector<AbstractPlayer>(); 
-        v.add(p);
-        bids.put(bid, v);
+        if (!p.bankrupt()) {
+
+          int bid = p.getBidForLocation(location);
+          Vector<AbstractPlayer> v = bids.get(bid);
+          if (v == null)
+            v = new Vector<AbstractPlayer>();
+          v.add(p);
+          bids.put(bid, v);
+        }
       }
 
       for (Integer bid : bids.keySet()) {

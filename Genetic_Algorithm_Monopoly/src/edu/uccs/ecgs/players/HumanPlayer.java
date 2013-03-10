@@ -106,6 +106,8 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public int getBidForLocation(Location lot)
   {
+    assert !bankrupt();
+
     int bid = 0;
     StringBuilder msg = new StringBuilder();
     msg.append(htmlStart).append(lot.name).append(" is being auctioned.<p><p>")
