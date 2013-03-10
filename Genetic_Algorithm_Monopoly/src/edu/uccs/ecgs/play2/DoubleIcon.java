@@ -34,6 +34,7 @@ public class DoubleIcon extends ImageIcon {
    */
   @Override
   public int getIconWidth() {
+    if (icon3 != null) return icon3.getIconWidth();
     if (icon2 != null) return icon2.getIconWidth();
     if (icon1 != null) return icon1.getIconWidth();
     return super.getIconWidth();
@@ -44,6 +45,7 @@ public class DoubleIcon extends ImageIcon {
    */
   @Override
   public int getIconHeight() {
+    if (icon3 != null) return icon3.getIconHeight();
     if (icon2 != null) return icon2.getIconHeight();
     if (icon1 != null) return icon1.getIconHeight();
     return super.getIconHeight();

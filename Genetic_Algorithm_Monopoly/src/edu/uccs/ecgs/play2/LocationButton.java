@@ -57,6 +57,8 @@ public LocationButton(Location location) {
       Color color = location.getGroup().getColor();
       setMargin(new Insets(0, 0, 0, 0));
       setBackground(color);
+      DoubleIcon dicon = new DoubleIcon(null, null); 
+      setIcon(dicon);
       if (isDarkBlue()) 
         setForeground(Color.white);
       setText("<html><body>" + name + "</body></html>");
@@ -161,6 +163,9 @@ public LocationButton(Location location) {
   @Override
   public void stateChanged(ChangeEvent e)
   {
+    updateHouseIcons();
+    updateOwnerIcons();
+
     AbstractPlayer player = (AbstractPlayer) e.getSource();
     if (e instanceof LocationChangeEvent) {
       LocationChangeEvent lce = (LocationChangeEvent) e;
@@ -172,8 +177,6 @@ public LocationButton(Location location) {
       Location current = null;
       locationChange(player, previous, current);
     }
-    updateHouseIcons();
-    updateOwnerIcons();
   }
 
   /**
@@ -209,16 +212,13 @@ public LocationButton(Location location) {
   {
     String key = getStringForPlayers();
 
-    DoubleIcon icon = (DoubleIcon) getIcon();
-    if (icon == null) {
-      icon = new DoubleIcon(null, null);
-      setIcon(icon);
-    }
+    DoubleIcon dIcon = (DoubleIcon) getIcon();
+    assert dIcon != null;
 
     if ("".equals(key)) {
-      icon.setIcon2(null);
+      dIcon.setIcon2(null);
     } else {
-      icon.setIcon2(playerIcons.get(key)); 
+      dIcon.setIcon2(playerIcons.get(key)); 
     }
     fireStateChanged();
   }
@@ -235,11 +235,8 @@ public LocationButton(Location location) {
     if (location.getGroup() == PropertyGroups.RAILROADS)
       return;
 
-    DoubleIcon icon = (DoubleIcon) getIcon();
-    if (icon == null) { 
-      icon = new DoubleIcon(null, null);
-      setIcon(icon);
-    }
+    DoubleIcon dIcon = (DoubleIcon) getIcon();
+    assert dIcon != null;
 
     int numHotels = location.getNumHotels();
     int numHouses = location.getNumHouses();
@@ -252,11 +249,11 @@ public LocationButton(Location location) {
     }
 
     if (numHotels == 1) {
-      icon.setIcon1(houseIcons.get(name1));
+      dIcon.setIcon1(houseIcons.get(name1));
     } else if (numHouses > 0) {
-      icon.setIcon1(houseIcons.get(numHouses + name2));
+      dIcon.setIcon1(houseIcons.get(numHouses + name2));
     } else {
-      icon.setIcon1(null);
+      dIcon.setIcon1(null);
     }
     fireStateChanged();
   }
@@ -269,17 +266,16 @@ public LocationButton(Location location) {
     if (location.getGroup() == PropertyGroups.SPECIAL)
       return;
 
-    DoubleIcon icon = (DoubleIcon) getIcon();
-    if (icon == null) { 
-      icon = new DoubleIcon(null, null);
-      setIcon(icon);
-    }
+    DoubleIcon dIcon = (DoubleIcon) getIcon();
+    assert dIcon != null;
 
     if (location.owner == null) 
-      icon.setIcon3(null);
+      dIcon.setIcon3(null);
     else {
-      String name = "owner" + location.owner.playerIndex + ".gif";
-      icon.setIcon3(ownerIcons.get(name));
+      String name = "owner" + location.owner.playerIndex + ".png";
+      ImageIcon ii = ownerIcons.get(name);
+      assert ii != null;
+      dIcon.setIcon3(ii);
     }
     fireStateChanged();
   }
@@ -378,8 +374,8 @@ public LocationButton(Location location) {
    */
   private void createOwnerIcons()
   {
-    String[] iconNames = new String[] { "owner1.gif", "owner2.gif",
-        "owner3.gif", "owner4.gif" };
+    String[] iconNames = new String[] { "owner1.png", "owner2.png",
+        "owner3.png", "owner4.png" };
 
     createIcons(ownerIcons, iconNames);
   }
