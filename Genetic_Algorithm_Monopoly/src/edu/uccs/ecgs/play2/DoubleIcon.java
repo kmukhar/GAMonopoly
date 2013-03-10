@@ -9,6 +9,7 @@ public class DoubleIcon extends ImageIcon {
 
   private Icon icon1;
   private Icon icon2;
+  private Icon icon3;
 
   public DoubleIcon(ImageIcon i1, ImageIcon i2) {
     if (i1 != null)
@@ -24,6 +25,8 @@ public class DoubleIcon extends ImageIcon {
       icon1.paintIcon(c, g, x, y);
     if (icon2 != null)
       icon2.paintIcon(c, g, x, y);
+    if (icon3 != null)
+      icon3.paintIcon(c, g, x, y);
   }
 
   /**
@@ -54,5 +57,9 @@ public class DoubleIcon extends ImageIcon {
   public void setIcon1(ImageIcon icon)
   {
     icon1 = icon;
+  }
+
+  public void setIcon3(ImageIcon icon) {
+    icon3 = icon;
   }
 }

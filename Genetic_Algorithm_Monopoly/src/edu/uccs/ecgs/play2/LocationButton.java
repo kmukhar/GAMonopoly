@@ -24,8 +24,9 @@ public class LocationButton extends JButton implements ActionListener,
   boolean[] players = new boolean[] { false, false, false, false, false };
   private Hashtable<String, ImageIcon> playerIcons;
   private Hashtable<String, ImageIcon> houseIcons;
+  private Hashtable<String, ImageIcon> ownerIcons;
   private JDialog dialog;
-
+  
 public LocationButton(Location location) {
     this.location = location;
 
@@ -34,6 +35,9 @@ public LocationButton(Location location) {
 
     houseIcons = new Hashtable<String, ImageIcon>();
     createHouseIcons(isDarkBlue());
+
+    ownerIcons = new Hashtable<String, ImageIcon>();
+    createOwnerIcons();
 
     if (location.index == 0)
       players = new boolean[] { true, true, true, true, true };
@@ -60,12 +64,6 @@ public LocationButton(Location location) {
 
     this.addActionListener(this);
   }
-
-  private void createHouseIconsWhite()
-{
-  // TODO Auto-generated method stub
-  
-}
 
   @Override
   public void actionPerformed(ActionEvent arg0)
@@ -175,6 +173,7 @@ public LocationButton(Location location) {
       locationChange(player, previous, current);
     }
     updateHouseIcons();
+    updateOwnerIcons();
   }
 
   /**
@@ -209,18 +208,19 @@ public LocationButton(Location location) {
   private void updatePlayerIcons()
   {
     String key = getStringForPlayers();
+
     DoubleIcon icon = (DoubleIcon) getIcon();
-    if (icon == null) 
+    if (icon == null) {
       icon = new DoubleIcon(null, null);
+      setIcon(icon);
+    }
 
     if ("".equals(key)) {
       icon.setIcon2(null);
-      setIcon(icon);
     } else {
       icon.setIcon2(playerIcons.get(key)); 
-      setIcon(icon);
     }
-    this.fireStateChanged();
+    fireStateChanged();
   }
 
   /**
@@ -236,8 +236,10 @@ public LocationButton(Location location) {
       return;
 
     DoubleIcon icon = (DoubleIcon) getIcon();
-    if (icon == null) 
+    if (icon == null) { 
       icon = new DoubleIcon(null, null);
+      setIcon(icon);
+    }
 
     int numHotels = location.getNumHotels();
     int numHouses = location.getNumHouses();
@@ -255,6 +257,29 @@ public LocationButton(Location location) {
       icon.setIcon1(houseIcons.get(numHouses + name2));
     } else {
       icon.setIcon1(null);
+    }
+    fireStateChanged();
+  }
+
+  /**
+   * Update the owner icon on the button
+   */
+  private void updateOwnerIcons()
+  {
+    if (location.getGroup() == PropertyGroups.SPECIAL)
+      return;
+
+    DoubleIcon icon = (DoubleIcon) getIcon();
+    if (icon == null) { 
+      icon = new DoubleIcon(null, null);
+      setIcon(icon);
+    }
+
+    if (location.owner == null) 
+      icon.setIcon3(null);
+    else {
+      String name = "owner" + location.owner.playerIndex + ".gif";
+      icon.setIcon3(ownerIcons.get(name));
     }
     fireStateChanged();
   }
@@ -346,6 +371,17 @@ public LocationButton(Location location) {
     }
 
     createIcons(houseIcons, iconNames);
+  }
+
+  /**
+   * Load the owner icons for the game
+   */
+  private void createOwnerIcons()
+  {
+    String[] iconNames = new String[] { "owner1.gif", "owner2.gif",
+        "owner3.gif", "owner4.gif" };
+
+    createIcons(ownerIcons, iconNames);
   }
 
   /**
