@@ -1187,7 +1187,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setBankrupt() {
     isBankrupt = true;
-    fireChangeEvent(new BankruptcyEvent(this));
+    fireChangeEvent();
+    getCurrentLocation().fireChangeEvent(new BankruptcyEvent(this));
   }
 
   /**
