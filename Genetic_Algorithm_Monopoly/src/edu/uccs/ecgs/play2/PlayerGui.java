@@ -216,7 +216,7 @@ public class PlayerGui extends JPanel {
     gamePanel.setLayout(new GridLayout(1, 2));
     gamePanel.add(tabbedPane);
 
-    // The following line enables to use scrolling tabs.
+    // The following line enables scrolling tabs.
     tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
     gameInfo = new JTextArea();
@@ -225,15 +225,13 @@ public class PlayerGui extends JPanel {
     gameInfo.setWrapStyleWord(true);
 
     JScrollPane scrollPane = new JScrollPane(gameInfo);
-    scrollPane.setPreferredSize(new Dimension(180, 50));
     scrollPane
         .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     scrollPane
-        .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
     JTextField columnHead = new JTextField("Game Information");
     columnHead.setEditable(false);
-    columnHead.setPreferredSize(new Dimension(180, 22));
     scrollPane.setColumnHeaderView(columnHead);
 
     gamePanel.add(scrollPane);
