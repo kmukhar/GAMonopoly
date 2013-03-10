@@ -7,7 +7,8 @@ public class Dice {
   private int[] result = new int[2];
   private boolean doubles;
   private int currentRoll = 0;
-  
+  private static Dice _ref = new Dice();
+
   private Dice() {
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -17,7 +18,7 @@ public class Dice {
   }
 
   public static Dice getDice() {
-    return new Dice();
+    return _ref;
   }
 
   public synchronized int[] roll() {

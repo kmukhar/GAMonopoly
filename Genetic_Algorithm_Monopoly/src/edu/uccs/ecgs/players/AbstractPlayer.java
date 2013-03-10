@@ -78,6 +78,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   protected String gameKey;
   private ArrayList<ChangeListener> changeListeners;
   private String sourceName = "";
+  private int doublesCounter = 0;
 
   /**
    * Constructor
@@ -153,7 +154,25 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * start of the player's turn.
    */
   public void resetDoubles() {
+    doublesCounter  = 0;
     rolledDoubles = false;
+    fireChangeEvent();
+  }
+
+  /**
+   * Increment the count of doubles rolled by this player in the current turn.
+   */
+  private void incrementDoubles()
+  {
+    doublesCounter++;
+    fireChangeEvent();
+  }
+
+  /**
+   * @return The count fo doubles rolled on the current turn.
+   */
+  public int getDoublesCount() {
+    return doublesCounter;
   }
 
   /**
@@ -219,6 +238,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public void setDoubles(boolean rolledDoubles) {
     this.rolledDoubles = rolledDoubles;
+
+    if (rolledDoubles)
+      incrementDoubles();
+
     if (inJail && !rolledDoubles) {
       --jailSentence;
 
@@ -1277,7 +1300,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       }
     }
     fireChangeEvent();
-    logInfo(toString());
   }
 
   /**

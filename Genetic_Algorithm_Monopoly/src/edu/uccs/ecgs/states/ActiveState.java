@@ -8,7 +8,6 @@ public class ActiveState extends PlayerState {
   @Override
   protected void enter() {
     super.enter();
-    this.numDoubles = 0;
   }
 
   @Override

@@ -29,8 +29,6 @@ public class PlayerState {
 
   Random r = new Random();
 
-  int numDoubles = 0;
-
   PlayerState() {
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -56,15 +54,11 @@ public class PlayerState {
     game.logDiceRoll(roll);
 
     player.setDoubles(dice.rolledDoubles());
-    if (dice.rolledDoubles()) {
-      numDoubles += 1;
-      game.logFinest("numDoubles : " + numDoubles);
-    }
 
     Location location;
     int currentRoll = roll[0] + roll[1];
 
-    if (numDoubles == 3) {
+    if (player.getDoublesCount() == 3) {
       // send to jail
       PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
       location = pf.getLocationAt(10);
