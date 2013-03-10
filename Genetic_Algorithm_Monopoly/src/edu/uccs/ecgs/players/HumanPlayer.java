@@ -9,8 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 
 import edu.uccs.ecgs.ga.*;
-import edu.uccs.ecgs.play2.LocationButton;
-import edu.uccs.ecgs.play2.PlayerGui;
+import edu.uccs.ecgs.play2.*;
 
 public class HumanPlayer extends AbstractPlayer {
 
@@ -148,6 +147,9 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public void auctionResult(AbstractPlayer player, Location lot,
       int amount) {
+    if (bankrupt())
+      return;
+
     JOptionPane.showMessageDialog(null, htmlStart + player.getName()
         + " won the auction for " + lot.name + " with a winning bid "
         + " (may not be the max bid) of $" + amount + "." + htmlEnd,
@@ -733,6 +735,36 @@ public class HumanPlayer extends AbstractPlayer {
         }        
       }
     }
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#setBankrupt()
+   */
+  @Override
+  public void setBankrupt()
+  {
+    super.setBankrupt();
+    String computer = "Let computer play";
+    String human = "I will keep playing";
+    String defaultOption = computer;
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(htmlStart)
+        .append("Since you are now out of the game, you can let the computer ")
+        .append("play the game to the end without pausing, or you can keep ")
+        .append("playing by pressing the 'Play a Turn' button.<p><p>")
+        .append("Click 'Let computer play' to let the computer play without ")
+        .append("pausing.<p><p>")
+        .append("Click 'I will keep playing' to continue controlling each turn.")
+        .append(htmlEnd);
+
+    int result = JOptionPane.showOptionDialog(null, sb.toString(),
+        "Let the computer finish?", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE, null, new String[] { computer, human },
+        defaultOption);
+
+    if (result == 0)
+      PlayerGui.pauseOff();
   }
 
   @Override

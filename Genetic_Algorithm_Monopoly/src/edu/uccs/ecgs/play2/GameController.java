@@ -28,4 +28,7 @@ public class GameController implements Controllable {
     return paused;
   }
 
+  public void setPause(boolean b) {
+    paused = false;
+  }
 }

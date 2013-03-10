@@ -528,4 +528,13 @@ public class PlayerGui extends JPanel {
     if (initialized)
       gui.liftMortgageButton.setEnabled(b);
   }
+
+  public static void pauseOff() {
+    gui.controller.setPause(false);
+    gui.nextButton.setEnabled(false);
+    gui.sellHouseButton.setEnabled(false);
+    gui.buyHouseButton.setEnabled(false);
+    gui.liftMortgageButton.setEnabled(false);
+    gui.resignButton.setEnabled(false);
+  }
 }
