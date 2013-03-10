@@ -194,23 +194,40 @@ public class HumanPlayer extends AbstractPlayer {
     String defaultOption = reject;
 
     int cash = bestTrade.cashDiff;
-    
+
+    Location lot1 = bestTrade.location;
+    AbstractPlayer owner1 = lot1.owner;
+    Location lot2 = bestTrade.location2;
+
     StringBuilder sb = new StringBuilder();
-    sb.append(htmlStart).append(bestTrade.location.owner.getName())
-        .append(" is proposing to trade ").append(bestTrade.location);
+    sb.append(htmlStart).append(owner1.getName())
+        .append(" is proposing to trade their property ").append(lot1);
     if (cash > 0)
       sb.append(" and ").append(cash).append(" dollars ");
 
-    sb.append(" for ").append(bestTrade.location2);
+    sb.append(" for your property ").append(lot2);
     if (cash < 0)
       sb.append(" and ").append(Math.abs(cash)).append(" dollars.")
-          .append("<p><p>")
-          .append("Do you want to Accept or Reject this trade").append(htmlEnd);
+          .append("<p><p>");
+
+    sb.append(owner1.getName()).append(" owns ");
+    boolean first = true;
+    for (Location lot : owner1.getAllProperties().values()) {
+      if (first)
+        first = false;
+      else
+        sb.append(", ");
+      sb.append(lot);
+    }
+    sb.append("<p><p>");
+
+    sb.append("Do you want to Accept or Reject this trade").append(htmlEnd);
     
     int result = JOptionPane.showOptionDialog(null, sb.toString(),
         "Trade Proposed", JOptionPane.DEFAULT_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, new String[] { accept, reject },
         defaultOption);
+
     if (result == 0) {
       return true;
     }
