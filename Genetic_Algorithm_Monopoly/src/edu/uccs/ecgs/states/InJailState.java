@@ -43,7 +43,8 @@ public class InJailState extends PlayerState {
         //did not roll doubles
         player.setDoubles(false);
         if (player.jailSentenceCompleted()) {
-          game.logInfo(player.getName() + " has been in jail for 3 turns, must leave jail now.");
+          game.logInfo(player.getName()
+              + " has been in jail for 3 turns, must leave jail now.");
           if (player.hasGetOutOfJailCard()) {
             player.useGetOutOfJailCard();
           } else {

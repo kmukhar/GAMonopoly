@@ -475,6 +475,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       throw new IllegalArgumentException(
           "Illegal attempt to use Get Out Of Jail Card");
     }
+    logInfo(getName() + " used Get Out of Jail Card.");
     fireChangeEvent();
   }
 
