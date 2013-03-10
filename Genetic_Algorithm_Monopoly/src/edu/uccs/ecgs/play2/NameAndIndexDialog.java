@@ -203,8 +203,10 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
     }
 
     private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {
-        saveName();
-        this.dispose();
+        if (nameField.getText().trim().length() > 0) {
+          saveName();
+          this.dispose();
+        }
     }
 
     private void saveName() {
@@ -213,7 +215,7 @@ public class NameAndIndexDialog extends javax.swing.JDialog {
 
         try {
           bw = new BufferedWriter(new FileWriter(f));
-          bw.write(nameField.getText());
+          bw.write(nameField.getText().trim());
         } catch (FileNotFoundException ignored) {
         } catch (IOException ignored) {
         } finally {
