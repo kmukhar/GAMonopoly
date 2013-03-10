@@ -19,6 +19,8 @@ public class PlayerPanel extends JPanel implements ChangeListener {
     new JPanel(false);
     filler = new JTextArea();
     filler.setEditable(false);
+    filler.setLineWrap(true);
+    filler.setWrapStyleWord(true);
     filler.setFont(new Font("Monospaced",Font.PLAIN, 11));
     setLayout(new GridLayout(1, 1));
     add(filler);
