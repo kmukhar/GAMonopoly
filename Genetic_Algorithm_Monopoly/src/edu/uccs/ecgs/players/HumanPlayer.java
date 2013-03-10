@@ -207,9 +207,9 @@ public class HumanPlayer extends AbstractPlayer {
 
     sb.append(" for your property ").append(lot2);
     if (cash < 0)
-      sb.append(" and ").append(Math.abs(cash)).append(" dollars.")
-          .append("<p><p>");
+      sb.append(" and ").append(Math.abs(cash)).append(" dollars.");
 
+    sb.append("<p><p>");
     sb.append(owner1.getName()).append(" owns ");
     boolean first = true;
     for (Location lot : owner1.getAllProperties().values()) {
