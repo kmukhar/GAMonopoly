@@ -61,13 +61,12 @@ public class HumanPlayer extends AbstractPlayer {
     StringBuilder msg = new StringBuilder();
 
     msg.append(htmlStart);
-    msg.append("You landed on ").append(lot.name)
-        .append(".<p>Do you want to buy ").append(lot.name).append(" for ")
-        .append(lot.getCost()).append(" dollars?")
+    msg.append("You landed on ").append(lot.name).append(". You have $")
+        .append(cash).append(".<p><p>Do you want to buy ").append(lot.name)
+        .append(" for ").append(lot.getCost()).append(" dollars?")
         .append(getOtherOwners(lot.getGroup())).append("<p>")
         .append("<table border=1 width=\"100%\"><tr><td>")
-        .append(lot.getFormattedString())
-        .append("</td></tr></table>")
+        .append(lot.getFormattedString()).append("</td></tr></table>")
         .append(htmlEnd);
 
     int result = JOptionPane.showConfirmDialog(null, msg.toString(),
@@ -111,9 +110,10 @@ public class HumanPlayer extends AbstractPlayer {
     int bid = 0;
     StringBuilder msg = new StringBuilder();
     msg.append(htmlStart).append(lot.name).append(" is being auctioned.<p><p>")
-        .append("The normal cost for this property is $").append(lot.getCost())
-        .append(getOtherOwners(lot.getGroup())).append("<p>")
-        .append("<table border=1 width=\"100%\"><tr><td>")
+        .append("You have $").append(cash)
+        .append(". The normal cost for this property is $")
+        .append(lot.getCost()).append(getOtherOwners(lot.getGroup()))
+        .append("<p>").append("<table border=1 width=\"100%\"><tr><td>")
         .append(lot.getFormattedString()).append("</td></tr></table><p><p>")
         .append("What is the MAXIMUM you want to bid for this property? ")
         .append("(0 to ").append(cash).append(")<p><p>").append(htmlEnd);
