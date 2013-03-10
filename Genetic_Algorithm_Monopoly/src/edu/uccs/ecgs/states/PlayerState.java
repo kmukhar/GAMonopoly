@@ -90,7 +90,7 @@ public class PlayerState {
         // location is one of the other special locations
         player.nextAction = Actions.PROCESS_SPECIAL_ACTION;
       }
-    } else if (location.owner != null) {
+    } else if (location.getOwner() != null) {
       player.nextAction = Actions.PAY_RENT;
     } else {
       player.nextAction = Actions.EVAL_PROPERTY;

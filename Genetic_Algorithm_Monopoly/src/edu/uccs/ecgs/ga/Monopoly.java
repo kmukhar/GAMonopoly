@@ -293,7 +293,7 @@ public class Monopoly implements Runnable, Controllable {
   public void sellHouse(Location location) {
     assert location.getNumHouses() > 0 : location.getFullInfoString();
     location.removeHouse();
-    location.owner.receiveCash(location.getHouseCost() / 2);
+    location.getOwner().receiveCash(location.getHouseCost() / 2);
     addHouse();
     
     logInfo("Sold house at " + location.toString() + "; property now has "
@@ -317,7 +317,7 @@ public class Monopoly implements Runnable, Controllable {
     player.receiveCash(proceeds);
   }
 
-  public void sellHotel2(Location location, Collection<Location> owned) 
+  public void sellHotel(Location location, Collection<Location> owned) 
   {
     PropertyFactory pf = PropertyFactory.getPropertyFactory(gamekey);
     ArrayList<Location> lots = pf.getAllPropertiesInGroup(location.getGroup());
@@ -387,7 +387,7 @@ public class Monopoly implements Runnable, Controllable {
     int proceeds = countHotels * location.getHotelCost() / 2;
     proceeds += countHouses * location.getHouseCost() / 2;
 
-    AbstractPlayer player = location.owner;
+    AbstractPlayer player = location.getOwner();
     if (countHotels > 0)
       logInfo(player.getName() + " sold " + countHotels
           + (countHotels == 1 ? " hotel." : " hotels."));
@@ -585,7 +585,7 @@ public class Monopoly implements Runnable, Controllable {
   public void auctionLots(Collection<Location> lotsToAuction) {
     // set owner to null and mortgaged to false for all lots
     for (Location location : lotsToAuction) {
-      location.owner = null;
+      location.setOwner(null);
       location.setMortgaged(false);
     }
 
@@ -661,7 +661,7 @@ public class Monopoly implements Runnable, Controllable {
     logInfo("Auction has ended " + msg);
     boolean printHead = true;
     for (Location location : lotsToAuction) {
-      if (location.owner == null) {
+      if (location.getOwner() == null) {
         if (printHead) {
           logInfo("The following lots were not bought at auction:");
           printHead = false;
@@ -871,8 +871,8 @@ public class Monopoly implements Runnable, Controllable {
    */
   public boolean proposeTrade(TradeProposal bestTrade)
   {
-    AbstractPlayer owner1 = bestTrade.location.owner;
-    AbstractPlayer owner2 = bestTrade.location2.owner;
+    AbstractPlayer owner1 = bestTrade.location.getOwner();
+    AbstractPlayer owner2 = bestTrade.location2.getOwner();
     boolean tradeAccepted = false;
 
     if (owner2.answerProposedTrade(bestTrade)) {
@@ -937,7 +937,7 @@ public class Monopoly implements Runnable, Controllable {
 
   public void mortgageProperty(Location lot) {
     lot.setMortgaged();
-    lot.owner.receiveCash(lot.getCost() / 2);
+    lot.getOwner().receiveCash(lot.getCost() / 2);
   }
 
   @Override

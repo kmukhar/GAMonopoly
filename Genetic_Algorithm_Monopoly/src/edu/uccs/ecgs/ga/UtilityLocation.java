@@ -37,10 +37,11 @@ public class UtilityLocation extends Location {
       // and if arrived from chance, roll the dice again
       int[] newRoll = Dice.getDice().roll();
       diceRoll = newRoll[0] + newRoll[1];
-      owner.logInfo("Arrived from Chance; roll for rent is " + newRoll[0] + "+"
-          + newRoll[1]);
+      getOwner().logInfo(
+          "Arrived from Chance; roll for rent is " + newRoll[0] + "+"
+              + newRoll[1]);
     } else {
-      setRentMultiplier(owner.getNumUtilities() == 1 ? 4 : 10);
+      setRentMultiplier(getOwner().getNumUtilities() == 1 ? 4 : 10);
     }
 
     int rent = 0;

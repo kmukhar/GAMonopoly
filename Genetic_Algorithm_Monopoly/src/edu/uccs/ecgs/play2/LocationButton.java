@@ -29,6 +29,7 @@ public class LocationButton extends JButton implements ActionListener,
   
 public LocationButton(Location location) {
     this.location = location;
+    location.addChangeListener(this);
 
     playerIcons = new Hashtable<String, ImageIcon>();
     createPlayerIcons(isDarkBlue());
@@ -163,19 +164,24 @@ public LocationButton(Location location) {
   @Override
   public void stateChanged(ChangeEvent e)
   {
-    updateHouseIcons();
-    updateOwnerIcons();
+    Object source = e.getSource();
+    if (source instanceof Location) {
+      updateHouseIcons();
+      updateOwnerIcons();
+    }
 
-    AbstractPlayer player = (AbstractPlayer) e.getSource();
-    if (e instanceof LocationChangeEvent) {
-      LocationChangeEvent lce = (LocationChangeEvent) e;
-      Location previous = lce.getPreviousLocation();
-      Location current = player.getCurrentLocation();
-      locationChange(player, previous, current);
-    } else if (e instanceof BankruptcyEvent) {
-      Location previous = player.getCurrentLocation();
-      Location current = null;
-      locationChange(player, previous, current);
+    if (source instanceof AbstractPlayer) {
+      AbstractPlayer player = (AbstractPlayer) source;
+      if (e instanceof LocationChangeEvent) {
+        LocationChangeEvent lce = (LocationChangeEvent) e;
+        Location previous = lce.getPreviousLocation();
+        Location current = player.getCurrentLocation();
+        locationChange(player, previous, current);
+      } else if (e instanceof BankruptcyEvent) {
+        Location previous = player.getCurrentLocation();
+        Location current = null;
+        locationChange(player, previous, current);
+      }
     }
   }
 
@@ -269,10 +275,10 @@ public LocationButton(Location location) {
     DoubleIcon dIcon = (DoubleIcon) getIcon();
     assert dIcon != null;
 
-    if (location.owner == null) 
+    if (location.getOwner() == null) 
       dIcon.setIcon3(null);
     else {
-      String name = "owner" + location.owner.playerIndex + ".png";
+      String name = "owner" + location.getOwner().playerIndex + ".png";
       ImageIcon ii = ownerIcons.get(name);
       assert ii != null;
       dIcon.setIcon3(ii);

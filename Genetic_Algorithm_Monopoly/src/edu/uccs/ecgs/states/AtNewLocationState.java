@@ -73,7 +73,7 @@ public class AtNewLocationState extends PlayerState {
             } else {
               player.nextAction = Actions.PROCESS_SPECIAL_ACTION;
             }
-          } else if (location.owner != null) {
+          } else if (location.getOwner() != null) {
             player.nextAction = Actions.PAY_RENT;
           } else {
             player.nextAction = Actions.EVAL_PROPERTY;
@@ -127,7 +127,7 @@ public class AtNewLocationState extends PlayerState {
               // If not jail or Go, must be another chance or community chest
               player.nextAction = Actions.PROCESS_SPECIAL_ACTION;
             }
-          } else if (location.owner != null) {
+          } else if (location.getOwner() != null) {
             // If not a special location, must be a property, so check to see
             // if player needs to pay rent
             player.nextAction = Actions.PAY_RENT;

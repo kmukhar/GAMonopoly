@@ -1,6 +1,8 @@
 package edu.uccs.ecgs.ga;
 
 import java.util.Properties;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import edu.uccs.ecgs.players.AbstractPlayer;
 
 /**
@@ -48,7 +50,7 @@ public abstract class Location implements Comparable<Location> {
    * A reference to the player that owns this location. Only has meaning for
    * locations of type Property, Railroad, or Utility.
    */
-  public AbstractPlayer owner = null;
+  private AbstractPlayer owner = null;
 
   /**
    * Whether this location is part of a monopoly. Only has meaning for locations
@@ -84,6 +86,11 @@ public abstract class Location implements Comparable<Location> {
    * Rent multiplier. See {@link #setRentMultiplier(int)}
    */
   protected int multiple = 1;
+
+  /**
+   * Object that wants to be notified of changes to this location
+   */
+  private ChangeListener changeListener;
 
   public Location(String key2, Properties properties) {
     key = key2;
@@ -188,6 +195,22 @@ public abstract class Location implements Comparable<Location> {
   public void setOwner(AbstractPlayer player)
   {
     owner = player;
+    fireChangeEvent(new ChangeEvent(this));
+  }
+
+  /**
+   * Temporarily set the owner for the property to the given player, for the 
+   * purposes of evaluating a trade. Since this is temporary, do not fire the
+   * change event. The caller must reset the owner before proceeding with
+   * play.
+   * 
+   * @param player
+   *          The player that could own the property after a trade, and for
+   *          which the caller wants to evaluate the trade result.
+   */
+  public void setOwnerForTradeEvaluation(AbstractPlayer player)
+  {
+    owner = player;
   }
 
   /**
@@ -259,6 +282,7 @@ public abstract class Location implements Comparable<Location> {
   {
     assert numHouses > 0 : "Illegal house count: " + numHouses;
     --numHouses;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   /**
@@ -268,6 +292,7 @@ public abstract class Location implements Comparable<Location> {
   {
     ++numHouses;
     assert numHouses < 5 : "Illegal house count: " + numHouses;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   /**
@@ -278,6 +303,7 @@ public abstract class Location implements Comparable<Location> {
   {
     --numHotels;
     assert numHotels == 0 : "Illegal hotel count: " + numHotels;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   /**
@@ -291,6 +317,7 @@ public abstract class Location implements Comparable<Location> {
     ++numHotels;
     assert numHotels == 1 : "Illegal hotel count: " + numHotels;
     numHouses = 0;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   /**
@@ -312,6 +339,7 @@ public abstract class Location implements Comparable<Location> {
   public void resetNumHouses()
   {
     numHouses = 0;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   /**
@@ -320,6 +348,7 @@ public abstract class Location implements Comparable<Location> {
   public void resetNumHotels()
   {
     numHotels = 0;
+    fireChangeEvent(new ChangeEvent(this));
   }
 
   @Override
@@ -362,5 +391,13 @@ public abstract class Location implements Comparable<Location> {
 
   public String getHyphenatedName() {
     return hname;
+  }
+
+  public void addChangeListener(ChangeListener cl) {
+    this.changeListener = cl;
+  }
+
+  public void fireChangeEvent(ChangeEvent event) {
+      changeListener.stateChanged(event);
   }
 }

@@ -98,13 +98,6 @@ public class PlayerGui extends JPanel {
     frame.add(gui.getNorthBorder(), BorderLayout.NORTH);
     frame.add(gui.getEastBorder(), BorderLayout.EAST);
 
-    for (AbstractPlayer player : gui.players) {
-      for (LocationButton lb : gui.locationButtons.values()) {
-        if (player != null)
-          player.addChangeListener(lb);
-      }
-    }
-
     // Display the window.
     frame.pack();
     frame.setLocationRelativeTo(null);

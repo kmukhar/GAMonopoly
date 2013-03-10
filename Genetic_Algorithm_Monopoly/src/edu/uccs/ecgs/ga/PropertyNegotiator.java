@@ -594,7 +594,7 @@ public class PropertyNegotiator {
     Location location2 = null;
     int startCash = owner.cash;
 
-    if (trade.location.owner == owner) {
+    if (trade.location.getOwner() == owner) {
       location2 = trade.location;
       location1 = trade.location2;
       owner.cash -= trade.cashDiff;
@@ -607,8 +607,8 @@ public class PropertyNegotiator {
     AbstractPlayer owner1 = location1.getOwner();
     AbstractPlayer owner2 = location2.getOwner();
 
-    location1.setOwner(owner2);
-    location2.setOwner(owner1);
+    location1.setOwnerForTradeEvaluation(owner2);
+    location2.setOwnerForTradeEvaluation(owner1);
     
     double bigU = evaluateOwnersHoldings();
 
@@ -616,8 +616,8 @@ public class PropertyNegotiator {
         * ((double) (computeShortTermLoss(location1) 
             + computeMidTermLoss(location1)));
 
-    location1.setOwner(owner1);
-    location2.setOwner(owner2);
+    location1.setOwnerForTradeEvaluation(owner1);
+    location2.setOwnerForTradeEvaluation(owner2);
     owner.cash = startCash;
 
     assert owner.cash == startCash;

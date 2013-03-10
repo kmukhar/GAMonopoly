@@ -171,9 +171,9 @@ public class HumanPlayer extends AbstractPlayer {
     ArrayList<Location> lots = pf.getAllPropertiesInGroup(group);
 
     for (Location lot : lots) {
-      if (lot.owner != null) {
+      if (lot.getOwner() != null) {
         result.append(lot.name).append(" is owned by ")
-            .append(lot.owner.getName()).append("<br>");
+            .append(lot.getOwner().getName()).append("<br>");
       }
     }
 
@@ -198,7 +198,7 @@ public class HumanPlayer extends AbstractPlayer {
     int cash = bestTrade.cashDiff;
 
     Location lot1 = bestTrade.location;
-    AbstractPlayer owner1 = lot1.owner;
+    AbstractPlayer owner1 = lot1.getOwner();
     Location lot2 = bestTrade.location2;
 
     StringBuilder sb = new StringBuilder();
@@ -288,7 +288,7 @@ public class HumanPlayer extends AbstractPlayer {
       assert bestTrade.location != null;
       assert bestTrade.location2 != null;
 
-      AbstractPlayer owner = locationToGet.owner;
+      AbstractPlayer owner = locationToGet.getOwner();
 
       boolean accepted = game.proposeTrade(bestTrade);
       StringBuilder sb = new StringBuilder();
@@ -382,8 +382,6 @@ public class HumanPlayer extends AbstractPlayer {
       } 
       else
         done = true;
-
-      fireChangeEvent();
     }
   }
 
@@ -423,7 +421,7 @@ public class HumanPlayer extends AbstractPlayer {
                 "Selling a hotel", JOptionPane.WARNING_MESSAGE,
                     null, selectionValues, selectionValues[0]);
           }
-          game.sellHotel2(selected,getAllProperties().values());
+          game.sellHotel(selected,getAllProperties().values());
         }
       } else {
         done = true;
@@ -533,7 +531,7 @@ public class HumanPlayer extends AbstractPlayer {
                 + " Which property has a hotel that you want to sell?",
             "Select hotel to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHotels.toArray(), lotsWithHotels.get(0));
-        game.sellHotel2(hotel, getAllProperties().values());
+        game.sellHotel(hotel, getAllProperties().values());
       }
 
       if (selected.equals(sellHouse)) {

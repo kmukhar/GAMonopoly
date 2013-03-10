@@ -190,9 +190,9 @@ public class PropertyFactory {
       int x = monos[i][0];
       int y = monos[i][1];
       int z = monos[i][2];
-      if (locations[x].owner != null) {
-        if (locations[x].owner == locations[y].owner
-            && locations[x].owner == locations[z].owner) {
+      if (locations[x].getOwner() != null) {
+        if (locations[x].getOwner() == locations[y].getOwner()
+            && locations[x].getOwner() == locations[z].getOwner()) {
           locations[x].partOfMonopoly = true;
           locations[y].partOfMonopoly = true;
           locations[z].partOfMonopoly = true;
@@ -211,8 +211,8 @@ public class PropertyFactory {
     for (int i = 0; i < monos.length; i++) {
       int x = monos[i][0];
       int y = monos[i][1];
-      if (locations[x].owner != null) {
-        if (locations[x].owner == locations[y].owner) {
+      if (locations[x].getOwner() != null) {
+        if (locations[x].getOwner() == locations[y].getOwner()) {
           locations[x].partOfMonopoly = true;
           locations[y].partOfMonopoly = true;
         }
@@ -251,7 +251,8 @@ public class PropertyFactory {
     int index = 0;
     Location[] properties = getStreetsOnEdge(edge);
     for (int i = 0; i < properties.length; i++) {
-      if (properties[i].owner != null && properties[i].owner != p && !properties[i].isMortgaged()) {
+      if (properties[i].getOwner() != null && properties[i].getOwner() != p
+          && !properties[i].isMortgaged()) {
         index = index + ((int) Math.pow(2, i));
       }
     }
@@ -360,7 +361,7 @@ public class PropertyFactory {
     Hashtable<PropertyGroups, Boolean> groups = new Hashtable<PropertyGroups, Boolean>();
 
     for (Location loc : locations) {
-      if (player == loc.owner) {
+      if (player == loc.getOwner()) {
         // partOfMonopoly should have same true or false value for all streets in group
         // so putting same group into Hashtable multiple times should not change result
         groups.put(loc.getGroup(), loc.partOfMonopoly);
@@ -414,10 +415,14 @@ public class PropertyFactory {
       break;
     }
 
-    if (locations[index1].owner != null && locations[index1].owner != p && locations[index1].partOfMonopoly) {
+    if (locations[index1].getOwner() != null
+        && locations[index1].getOwner() != p
+        && locations[index1].partOfMonopoly) {
       result += 1;
     }
-    if (locations[index2].owner != null && locations[index2].owner != p && locations[index2].partOfMonopoly) {
+    if (locations[index2].getOwner() != null
+        && locations[index2].getOwner() != p
+        && locations[index2].partOfMonopoly) {
       result += 2;
     }
 
@@ -476,7 +481,7 @@ public class PropertyFactory {
     ArrayList<Location> result = new ArrayList<Location>();
 
     for (Location lot : locations) {
-      if (lot.owner != null && lot.owner != xPlayer) {
+      if (lot.getOwner() != null && lot.getOwner() != xPlayer) {
         if (lot.getNumHotels() + lot.getNumHouses() == 0)
           result.add(lot);
       }      

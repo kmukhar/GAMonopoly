@@ -46,6 +46,6 @@ public class TradeProposal {
 
   public String getProposer()
   {
-    return location.owner.getName();
+    return location.getOwner().getName();
   }
 }

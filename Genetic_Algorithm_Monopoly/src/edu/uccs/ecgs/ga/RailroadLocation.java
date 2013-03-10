@@ -36,13 +36,8 @@ public class RailroadLocation extends Location {
   {
     assert !isMortgaged() : "Location is mortgaged in getRent";
     int result = 0;
-    int numRailroads = owner.getNumRailroads();
-    if (numRailroads == 0) {
-      owner.logInfo("!!! Bad numRailroads: " + numRailroads);
-      assert numRailroads > 0 : "!!! Bad numRailroads: " + numRailroads;
-      numRailroads = 1;
-      owner.logInfo(owner.toString());
-    }
+    int numRailroads = getOwner().getNumRailroads();
+
     double multiplier = Math.pow(2.0, numRailroads - 1);
     this.setRentMultiplier((int) multiplier);
 

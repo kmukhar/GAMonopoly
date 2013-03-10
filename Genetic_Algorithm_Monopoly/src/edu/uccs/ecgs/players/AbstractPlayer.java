@@ -76,7 +76,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
   protected String gameKey;
-  private ArrayList<ChangeListener> changeListeners;
+  private ChangeListener changeListener;
   private String sourceName = "";
   private int doublesCounter = 0;
 
@@ -88,7 +88,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param chromoType
    */
   public AbstractPlayer(int index, ChromoTypes chromoType) {
-    changeListeners = new ArrayList<ChangeListener>();
     this.chromoType = chromoType;
     long seed = 1241797664697L;
     if (Main.useRandomSeed) {
@@ -120,7 +119,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (owned != null) {
       owned.clear();
     }
-    fireChangeEvent();
   }
 
   /**
@@ -156,7 +154,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void resetDoubles() {
     doublesCounter  = 0;
     rolledDoubles = false;
-    fireChangeEvent();
   }
 
   /**
@@ -165,7 +162,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private void incrementDoubles()
   {
     doublesCounter++;
-    fireChangeEvent();
   }
 
   /**
@@ -306,14 +302,16 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *          The location where the player is currently located.
    */
   private void setCurrentLocation(Location lot) {
+    Location previous = getCurrentLocation();
     LocationChangeEvent lce = 
-        new LocationChangeEvent(this, getCurrentLocation());
+        new LocationChangeEvent(this, previous);
     this.location = lot;
-    fireChangeEvent(lce);
+    previous.fireChangeEvent(lce);
+    lot.fireChangeEvent(lce);
 
     logFinest(getName() + " moving to " + lot.name);
-    if (lot.owner != null) {
-      logInfo(lot.name + " is owned by " + lot.owner.getName());
+    if (lot.getOwner() != null) {
+      logInfo(lot.name + " is owned by " + lot.getOwner().getName());
     }
 
     if (lot.name.equals("Jail")) {
@@ -408,7 +406,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (location.partOfMonopoly) {
       logInfo(getName() + " acquired monopoly with " + location.name);
     }
-    fireChangeEvent();
   }
 
   /**
@@ -861,7 +858,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
           if (l.getNumHotels() > 0) {
             logInfo(getName() + " will sell hotel at " + l.name);
-            game.sellHotel2(l, owned.values());
+            game.sellHotel(l, owned.values());
           }
           if (cash >= amount) {
             return;
@@ -927,7 +924,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // add all properties first
     for (Location l : allProperties.values()) {
       owned.put(l.index, l);
-      l.owner = this;
+      l.setOwner(this);
       if (l.isMortgaged())
         mortgaged.put(l.index, l);
     }
@@ -941,8 +938,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (!gameOver) {
       processMortgagedNewProperties(mortgaged);
     }
-
-    fireChangeEvent();
   }
 
   /**
@@ -1160,10 +1155,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     PropertyFactory pf = PropertyFactory.getPropertyFactory(this.gameKey);
     for (int i = 0; i < 40; i++) {
       Location l = pf.getLocationAt(i);
-      if (l.getNumHouses() > 0 && l.owner != this) {
+      if (l.getNumHouses() > 0 && l.getOwner() != this) {
         result += (int) (l.getNumHouses() * l.getHouseCost() * 0.1);
       }
-      if (l.getNumHotels() > 0 && l.owner != this) {
+      if (l.getNumHotels() > 0 && l.getOwner() != this) {
         // multiply by 5 because hotels cost is hotelCost + 4 houses
         result += (int) (l.getNumHotels() * l.getHotelCost() * 0.1) * 5;
       }
@@ -1206,8 +1201,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       if (l.getNumHouses() > 0)
         game.liquidateHouses(this, l);
     }
-
-    fireChangeEvent();
   }
 
   /**
@@ -1299,7 +1292,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         }
       }
     }
-    fireChangeEvent();
   }
 
   /**
@@ -1702,9 +1694,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       getCash(200);
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
-    changeListeners.add(cl);
+    changeListener = cl;
   }
   
   protected void fireChangeEvent() {
@@ -1712,8 +1704,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   protected void fireChangeEvent(ChangeEvent event) {
-    for (ChangeListener cl : changeListeners)
-      cl.stateChanged(event);
+      changeListener.stateChanged(event);
   }
 
   public void auctionResult(AbstractPlayer highBidPlayer, Location location2,

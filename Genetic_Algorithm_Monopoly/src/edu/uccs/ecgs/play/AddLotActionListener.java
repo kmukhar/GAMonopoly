@@ -31,7 +31,7 @@ public class AddLotActionListener implements ActionListener {
     Location lot = (Location) comboBox.getSelectedItem();
     if (lot.getGroup() != PropertyGroups.SPECIAL) {
       PlayerGui.removeLotFromList(lot);
-      lot.owner = player;
+      lot.setOwner(player);
       PropertyFactory.getPropertyFactory(PlayerGui.factoryKey).checkForMonopoly();
 
       MTableModel tm = (MTableModel) table.getModel();

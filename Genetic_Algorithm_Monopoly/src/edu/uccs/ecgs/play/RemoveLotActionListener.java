@@ -25,7 +25,7 @@ public class RemoveLotActionListener implements ActionListener {
 
     MTableModel tm = (MTableModel) table.getModel();
     Location lot = (Location) tm.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
-    lot.owner = null;
+    lot.setOwner(null);
     PropertyFactory.getPropertyFactory(PlayerGui.factoryKey).checkForMonopoly();
 
     tm.removeItem(lot);

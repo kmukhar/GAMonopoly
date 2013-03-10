@@ -38,7 +38,7 @@ public enum Chance {
       location = PropertyFactory.getLocationAt(game.gamekey,locationIndex);
       game.logFinest("Advancing player to " + location.name);
       advancePlayer(player, locationIndex);
-      if (location.owner != null)
+      if (location.getOwner() != null)
         // rent is 10x dice roll when coming from chance
         location.arrivedFromChance = true;
 
@@ -55,7 +55,8 @@ public enum Chance {
       }
       advancePlayer(player, locationIndex);
       Location playerLocation = player.getCurrentLocation();
-      if (playerLocation.owner != null && playerLocation.owner != player) {
+      if (playerLocation.getOwner() != null
+          && playerLocation.getOwner() != player) {
         playerLocation.arrivedFromChance = true;
       }
       break;

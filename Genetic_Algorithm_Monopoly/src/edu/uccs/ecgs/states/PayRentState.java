@@ -22,7 +22,7 @@ public class PayRentState extends PlayerState {
     case PAY_RENT_EVENT:
       Location location = player.getCurrentLocation();
 
-      if (location.owner != player) {
+      if (location.getOwner() != player) {
         if (location.isMortgaged()) {
             game.logInfo("Lot is mortgaged, rent: 0");
             location.resetRentMultiplier();
@@ -35,10 +35,10 @@ public class PayRentState extends PlayerState {
           
           if (amount > 0) {
             try {
-              game.payRent(player, location.owner, amount);
+              game.payRent(player, location.getOwner(), amount);
             } catch (BankruptcyException e) {
               // e.printStackTrace();
-              game.processBankruptcy(player, location.owner);
+              game.processBankruptcy(player, location.getOwner());
               player.nextAction = Actions.DONE;
               return inactiveState;
             }

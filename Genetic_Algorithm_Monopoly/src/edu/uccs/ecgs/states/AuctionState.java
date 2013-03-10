@@ -26,7 +26,7 @@ public class AuctionState extends PlayerState {
       
       game.auctionLots(lotsToAuction);
 
-      if (location.owner == player) {
+      if (location.getOwner() == player) {
         player.nextAction = Actions.AUCTION_WON;
         buyPropertyState.enter();
         return buyPropertyState;
