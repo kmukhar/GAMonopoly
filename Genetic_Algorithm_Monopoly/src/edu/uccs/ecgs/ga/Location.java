@@ -342,15 +342,15 @@ public abstract class Location implements Comparable<Location> {
     fireChangeEvent(new ChangeEvent(this));
   }
 
-  /**
-   * Set number of hotels on property to 0.
-   */
-  public void resetNumHotels()
-  {
-    numHotels = 0;
-    fireChangeEvent(new ChangeEvent(this));
-  }
-
+//  /**
+//   * Set number of hotels on property to 0.
+//   */
+//  public void resetNumHotels()
+//  {
+//    numHotels = 0;
+//    fireChangeEvent(new ChangeEvent(this));
+//  }
+//
   @Override
   public int compareTo(Location arg0)
   {

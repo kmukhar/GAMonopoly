@@ -446,8 +446,8 @@ public class Monopoly implements Runnable, Controllable {
           location.getGroup()) : "Player tried to buy house; Some property in "
           + location.getGroup() + " is mortgaged.";
 
-      player.getCash(location.getHouseCost());
       location.addHouse();
+      player.getCash(location.getHouseCost());
 
       logInfo(player.getName() + " bought house for property group "
           + location.getGroup());
@@ -486,9 +486,10 @@ public class Monopoly implements Runnable, Controllable {
     try {
       assert player.canRaiseCash(location.getHotelCost()) : 
         "Player tried to buy house with insufficient cash";
-      player.getCash(location.getHotelCost());
 
       location.addHotel();
+      player.getCash(location.getHotelCost());
+
       --numHotels;
       assert numHotels >= 0 : "Invalid number of hotels: " + numHotels;
       
