@@ -120,6 +120,10 @@ public class HumanPlayer extends AbstractPlayer {
     while (true) {
       String result = JOptionPane.showInputDialog(null, msg.toString(),
           "Bid for property", JOptionPane.QUESTION_MESSAGE);
+
+      if (result == null || "".equals(result))
+        result = "0";
+
       try {
         bid = Integer.parseInt(result);
         if (bid < 0 || bid > cash)
@@ -338,6 +342,9 @@ public class HumanPlayer extends AbstractPlayer {
               + (result == 0 ? "give" : "receive") + "?<p>" + "(0 to " + cash
               + ")" + htmlEnd, "Bid for property",
           JOptionPane.QUESTION_MESSAGE);
+      if (strCash == null || "".equals(strCash))
+        return Integer.MIN_VALUE;
+
       try {
         amount = Integer.parseInt(strCash);
         if (amount < 0 || amount > cash)
