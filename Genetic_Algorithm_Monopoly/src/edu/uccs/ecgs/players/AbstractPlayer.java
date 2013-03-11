@@ -413,6 +413,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     if (location.partOfMonopoly) {
       logInfo(getName() + " acquired monopoly with " + location.name);
     }
+    fireChangeEvent();
   }
 
   /**
