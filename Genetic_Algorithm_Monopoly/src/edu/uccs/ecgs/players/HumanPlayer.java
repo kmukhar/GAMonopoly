@@ -281,6 +281,10 @@ public class HumanPlayer extends AbstractPlayer {
         return;
       
       int cash = getCashPartOfTrade();
+
+      if (cash == Integer.MIN_VALUE)
+        return;
+
       TradeProposal bestTrade = new TradeProposal(locationToTrade,
           locationToGet);
       bestTrade.setCash(cash);
@@ -312,17 +316,21 @@ public class HumanPlayer extends AbstractPlayer {
     String give = "Give";
     String receive = "Receive";
     String none = "No Cash";
+    String cancel = "Cancel trade";
     String defaultOption = none;
 
     int result = JOptionPane.showOptionDialog(null, htmlStart
         + "Do you want to give or receive cash with the trade?"
         + htmlEnd, "Cash Portion of Trade",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-        new String[] { give, receive, none }, defaultOption);
+        new String[] { give, receive, none, cancel }, defaultOption);
 
     if (result == 2)
       return 0;
 
+    if (result == 3) 
+      return Integer.MIN_VALUE;
+          
     int amount = 0;
     while (true) {
       String strCash = JOptionPane.showInputDialog(null,
