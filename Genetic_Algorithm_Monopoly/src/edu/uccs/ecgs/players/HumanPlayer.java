@@ -121,7 +121,7 @@ public class HumanPlayer extends AbstractPlayer {
       String result = JOptionPane.showInputDialog(null, msg.toString(),
           "Bid for property", JOptionPane.QUESTION_MESSAGE);
 
-      if (result == null || "".equals(result))
+      if (result == null)
         result = "0";
 
       try {
