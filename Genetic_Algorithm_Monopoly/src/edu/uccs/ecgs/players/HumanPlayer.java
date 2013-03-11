@@ -206,7 +206,7 @@ public class HumanPlayer extends AbstractPlayer {
     Location lot2 = bestTrade.location2;
 
     StringBuilder sb = new StringBuilder();
-    sb.append(htmlStart).append(owner1.getName())
+    sb.append(owner1.getName())
         .append(" is proposing to trade their property ").append(lot1);
     if (cash > 0)
       sb.append(" and ").append(cash).append(" dollars ");
@@ -214,6 +214,10 @@ public class HumanPlayer extends AbstractPlayer {
     sb.append(" for your property ").append(lot2);
     if (cash < 0)
       sb.append(" and ").append(Math.abs(cash)).append(" dollars.");
+
+    logInfo("\n"+sb.toString());
+
+    sb.insert(0, htmlStart);
 
     sb.append("<p><p>");
     sb.append(owner1.getName()).append(" owns ");
@@ -235,9 +239,11 @@ public class HumanPlayer extends AbstractPlayer {
         defaultOption);
 
     if (result == 0) {
+      logInfo("Trade accepted");
       return true;
     }
 
+    logInfo("Trade rejected");
     return false;
   }
 
