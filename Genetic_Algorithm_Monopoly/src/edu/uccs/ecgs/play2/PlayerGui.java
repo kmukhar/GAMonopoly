@@ -50,7 +50,7 @@ public class PlayerGui extends JPanel {
 
     Calendar endCal = GregorianCalendar.getInstance();
     // set end date for research to 30 Mar 2013
-    endCal.set(2013, 2, 30, 12, 0, 0);
+    endCal.set(2013, 1, 28, 12, 0, 0);
 
     Calendar nowCal = GregorianCalendar.getInstance();
     String infoFileName = "About.html";

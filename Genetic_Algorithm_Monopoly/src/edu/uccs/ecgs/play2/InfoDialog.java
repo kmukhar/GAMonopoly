@@ -115,7 +115,7 @@ public class InfoDialog {
     msg = msg.toString().replaceFirst("RESULTS", gameStats2);
 
     final JEditorPane editorPane = getEditorPane(msg);
-    editorPane.setPreferredSize(new Dimension(600, 700));
+    editorPane.setPreferredSize(new Dimension(550, 650));
 
     JScrollPane sp = new JScrollPane(editorPane);
     sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -144,7 +144,7 @@ public class InfoDialog {
     final JEditorPane editorPane = new JEditorPane("text/html", msg);
     editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
         Boolean.TRUE);
-    editorPane.setPreferredSize(new Dimension(500, 475));
+    editorPane.setPreferredSize(new Dimension(500, 500));
     editorPane.setEditable(false);
   
     // This section of code from
