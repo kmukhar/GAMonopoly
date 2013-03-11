@@ -80,6 +80,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private String sourceName = "";
   private int doublesCounter = 0;
   private int numHousesInBank;
+  private boolean sentToJail = false;
 
   /**
    * Constructor
@@ -309,9 +310,13 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     this.location = lot;
     previous.fireChangeEvent(lce);
     lot.fireChangeEvent(lce);
+    fireChangeEvent(lce);
 
-    logFinest(getName() + " moving to " + lot.name);
-    logInfo(getName() + " landed on " + lot.name);
+    // index 30 is the Go To Jail special location
+    if (!sentToJail ) {
+      logInfo(getName() + " landed on " + lot.name);
+    }
+
     if (lot.getOwner() != null) {
       logInfo(lot.name + " is owned by " + lot.getOwner().getName());
     }
@@ -748,6 +753,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   private void enteredJail() {
     inJail = true;
     jailSentence = 3;
+    sentToJail = true;
   }
 
   /**
@@ -767,6 +773,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public void leaveJail() {
     inJail = false;
     jailSentence = 0;
+    sentToJail = false;
   }
 
   /**
@@ -1647,7 +1654,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return True --> if the trade is accepted<br>False --> otherwise.
    */
   public boolean answerProposedTrade(TradeProposal bestTrade) {
-    logInfo(getName() + " is evaluating trade proposal from "
+    logInfo("\n" + getName() + " is evaluating trade proposal from "
         + bestTrade.getProposer() + "\n" + bestTrade.toString());
 
     // if the player has to give too much money, the reject the trade

@@ -62,7 +62,8 @@ public class Cards {
     }
 
     while (!temp.isEmpty()) {
-      chanceCards.add(temp.remove(random.nextInt(temp.size())));
+      Chance c = temp.remove(random.nextInt(temp.size()));
+      chanceCards.add(c);
     }
   }
 
@@ -73,7 +74,8 @@ public class Cards {
     }
 
     while (!temp.isEmpty()) {
-      ccCards.add(temp.remove(random.nextInt(temp.size())));
+      CommunityChest c = temp.remove(random.nextInt(temp.size())); 
+      ccCards.add(c);
     }
   }
 }

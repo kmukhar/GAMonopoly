@@ -60,11 +60,11 @@ public class PlayerState {
 
     if (player.getDoublesCount() == 3) {
       // send to jail
+      game.logInfo(player.getName()
+          + " rolled doubles 3 times in a row. Player sent to jail.");
       PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
       location = pf.getLocationAt(10);
       player.goToJail(location);
-      game.logInfo(player.getName()
-          + " rolled doubles 3 times in a row. Player sent to jail.");
       player.nextAction = Actions.MAKE_BUILD_DECISION;
 
     } else {

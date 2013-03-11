@@ -182,8 +182,6 @@ public class AtNewLocationState extends PlayerState {
           return developPropertyState;
         }
       } else if (location.name.equals("Go To Jail")) {
-        game.logInfo(player.getName() + " landed on Go To Jail.");
-
         PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
         Location jail = pf.getLocationAt(10);
         player.goToJail(jail);
