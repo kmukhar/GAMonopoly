@@ -20,7 +20,7 @@ public class Monopoly implements Runnable, Controllable {
 
   int playerIndex = 0;
   Dice dice = Dice.getDice();
-  int turnCounter = 0;
+  public int turnCounter = 0;
   Random r;
   private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss.SS");
   

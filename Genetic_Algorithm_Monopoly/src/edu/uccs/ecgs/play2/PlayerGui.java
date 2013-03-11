@@ -472,6 +472,7 @@ public class PlayerGui extends JPanel {
           .append(player.getNumHotels()).append("EOL");
     }
 
+    sb.append(game.turnCounter).append("EOL");
     String result = sb.toString();
     sb.append(Integer.toHexString(result.hashCode()));
     
