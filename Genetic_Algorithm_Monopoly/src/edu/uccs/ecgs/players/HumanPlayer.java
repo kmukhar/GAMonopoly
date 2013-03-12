@@ -17,6 +17,7 @@ public class HumanPlayer extends AbstractPlayer {
   private String htmlEnd = "</body></html>";
   private CopyOnWriteArrayList<Location> monopolies;
   private CopyOnWriteArrayList<Location> sellableLots;
+  private static String[] yesno = new String[] { "Yes", "No" };
 
   public HumanPlayer(int index, String name) {
     super(index, ChromoTypes.HUM);
@@ -258,9 +259,9 @@ public class HumanPlayer extends AbstractPlayer {
       return;
 
     int result = JOptionPane.showOptionDialog(null, htmlStart
-        + "Do you want to trade any of your properties?"+htmlEnd,
+        + "Do you want to trade any of your properties?" + htmlEnd,
         "Trade Properties", JOptionPane.YES_NO_OPTION,
-        JOptionPane.QUESTION_MESSAGE,null, new String[]{"Yes","No"}, "No");
+        JOptionPane.QUESTION_MESSAGE, null, yesno, yesno[1]);
 
     if (result == 0) {
       ArrayList<Location> list = new ArrayList<Location>();
