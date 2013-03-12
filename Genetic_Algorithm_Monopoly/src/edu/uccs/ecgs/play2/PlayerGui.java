@@ -388,7 +388,7 @@ public class PlayerGui extends JPanel {
    */
   private void createBuyHouseButton()
   {
-    buyHouseButton = new JButton("Buy Houses");
+    buyHouseButton = new JButton("Buy House");
     buyHouseButton.setEnabled(false);
     buyHouseButton.setMnemonic(KeyEvent.VK_B);
     buyHouseButton.addActionListener(new ActionListener() {
@@ -508,6 +508,12 @@ public class PlayerGui extends JPanel {
     if (initialized) {
       gui.sellHouseButton.setEnabled(ableToSell);
       gui.buyHouseButton.setEnabled(ableToBuy);
+
+      if (gui.game.getNumHousesInBank() > 0) {
+        gui.buyHouseButton.setText("Buy House");
+      } else {
+        gui.buyHouseButton.setText("Buy Hotel");
+      }
     }
   }
 

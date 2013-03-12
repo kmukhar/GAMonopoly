@@ -604,14 +604,21 @@ public class HumanPlayer extends AbstractPlayer {
       updateSellableLots();
     }
 
+    // update the list of properties that can have houses bought for them
+    updateHouseReadyLots();
+
     // if this player has a monopoly AND...
     // if the game has houses to sell...
     if (hasMonopoly() && game.getNumHousesInBank() > 0) {
-      // update the list of properties that can have houses bought for them
-      updateHouseReadyLots();
-
       if (monopolies.size() > 0)
         ableToBuy = true;
+    } else if (game.getNumHousesInBank() == 0) {
+      for (Location lot : monopolies) {
+        if (lot.getNumHouses() == 4) {
+          ableToBuy = true;
+          break;
+        }
+      }
     }
     
     PlayerGui.updateHouseButtons(ableToSell, ableToBuy);
@@ -628,7 +635,9 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /**
-   * Create a list of lots upon which a player can build houses. 
+   * Create a list of lots upon which a player can build houses or hotels.
+   * If no houses are available from the bank, then only list lots which
+   * can have a hotel.
    */
   private void updateHouseReadyLots() {
     int[] groupMin = new int[PropertyGroups.values().length];
@@ -662,12 +671,16 @@ public class HumanPlayer extends AbstractPlayer {
     // group. Houses and hotels must be balanced, so one can't build on a 
     // property that already has greater than the min number of houses. Also 
     // remove properties where the cost of a house is greater than the 
-    // player's cash.
+    // player's cash. Finally, if bank is out of houses, remove locations with
+    // less than 4 houses
     for (Location location : monopolies) {
       int index = location.getGroup().ordinal();
-      if (location.getNumHouses() > groupMin[index]) {
+      int numHouses = location.getNumHouses();
+      if (numHouses > groupMin[index]) {
         monopolies.remove(location);
       } else if (location.getHouseCost() > cash) {
+        monopolies.remove(location);
+      } else if (game.getNumHousesInBank() == 0 && numHouses < 4) {
         monopolies.remove(location);
       }
     }
