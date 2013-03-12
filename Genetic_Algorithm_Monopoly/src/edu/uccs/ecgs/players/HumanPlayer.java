@@ -1,8 +1,7 @@
 package edu.uccs.ecgs.players;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JOptionPane;
@@ -578,6 +577,53 @@ public class HumanPlayer extends AbstractPlayer {
         done = true;
     }
     super.getCash(amount);
+  }
+
+  /* (non-Javadoc)
+   * @see edu.uccs.ecgs.players.AbstractPlayer#processMortgagedNewProperties(java.util.TreeMap)
+   */
+  @Override
+  protected void processMortgagedNewProperties(TreeMap<Integer, 
+                                               Location> newProperties)
+      throws BankruptcyException
+  {
+    fireChangeEvent();
+    Vector<Location> mortgaged = getSortedMortgages(newProperties);
+
+    if (mortgaged.size() == 0)
+      return;
+
+    int interest = 0;
+    for (Location lot : mortgaged) {
+      interest += 0.1 * lot.getCost() / 2;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(" received ").append(mortgaged.size())
+        .append(" mortgaged properties.");
+    StringBuilder sb2 = new StringBuilder();
+    sb2.append(interest).append(" interest on all new properties.");
+    
+    logInfo(getName() + sb.toString());
+    for (Location lot : mortgaged)
+      logInfo(lot.toString());
+    logInfo(getName() + " owes $" + sb2.toString());
+
+    sb.insert(0, "You");
+    sb.insert(0, htmlStart);
+    sb.append("<p><p>");
+    sb.append("You owe $").append(sb2.toString());
+    sb.append(htmlEnd);
+
+    JOptionPane.showMessageDialog(null, sb.toString(), "Interest owed",
+        JOptionPane.INFORMATION_MESSAGE);
+
+    getCash(interest);
+
+    JOptionPane.showMessageDialog(null, htmlStart + "You paid $" + interest
+        + " in interest. You can lift the mortgages from any properties by "
+        + "clicking the Lift Mortgages button." + htmlEnd, "Interest payed",
+        JOptionPane.INFORMATION_MESSAGE);
   }
 
   /* (non-Javadoc)

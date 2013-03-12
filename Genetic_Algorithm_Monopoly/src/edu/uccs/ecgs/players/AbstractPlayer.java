@@ -968,9 +968,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @throws BankruptcyException
    *           If the player receiving the properties cannot pay the interest.
    */
-  private void processMortgagedNewProperties(
+  protected void processMortgagedNewProperties(
       TreeMap<Integer, Location> newProperties) throws BankruptcyException 
+
   {
+    fireChangeEvent();
     Vector<Location> mortgaged = getSortedMortgages(newProperties);
     Vector<Location> unlifted = new Vector<Location>();
 
