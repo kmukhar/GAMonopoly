@@ -126,11 +126,11 @@ public class InfoDialog {
     frame.setIconImage(PlayerGui.monopolyIcon.getImage());
 
     Object[] values = 
-        new Object[] { "The results have been emailed, Close the window." };
+        new Object[] { "I emailed the results, exit the game." };
 
     JOptionPane.showOptionDialog(frame, sp, "About this program",
         JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        null, values, values[0]);
+        null, values, null);
     frame.dispose();
   }
 
