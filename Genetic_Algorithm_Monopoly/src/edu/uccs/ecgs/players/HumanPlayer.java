@@ -364,7 +364,9 @@ public class HumanPlayer extends AbstractPlayer {
       }
     }
 
-    // TODO need to ensure this agrees with give or receive
+    if (result == 1)
+      amount = -amount;
+
     return amount;
   }
 
