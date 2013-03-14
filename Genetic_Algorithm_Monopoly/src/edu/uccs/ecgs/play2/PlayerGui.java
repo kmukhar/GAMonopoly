@@ -117,6 +117,7 @@ public class PlayerGui extends JPanel {
     game.setLogger(createTextAreaLogger());
 
     gameThread = new Thread(game);
+    
   }
 
   /**
@@ -231,8 +232,6 @@ public class PlayerGui extends JPanel {
 
     JPanel buttonPanel = new JPanel();
 
-    initializeGame();
-
     createNextButton();
     buttonPanel.add(nextButton);
 
@@ -250,6 +249,8 @@ public class PlayerGui extends JPanel {
 
     add(buttonPanel, BorderLayout.NORTH);
     add(gamePanel, BorderLayout.CENTER);
+
+    initializeGame();
 
     initialized = true;
   }
@@ -429,6 +430,9 @@ public class PlayerGui extends JPanel {
 
   private void startGame()
   {
+    resignButton.setEnabled(true);
+    nextButton.requestFocus();
+
     Thread t = new Thread(new Runnable() {
       @Override
       public void run()
@@ -453,7 +457,8 @@ public class PlayerGui extends JPanel {
         String gameStats = getGameStats();
         InfoDialog.showFinalDialog("GameOver.html", gameStats);
         System.exit(0);
-      }});
+      }
+    });
 
     t.start();
   }

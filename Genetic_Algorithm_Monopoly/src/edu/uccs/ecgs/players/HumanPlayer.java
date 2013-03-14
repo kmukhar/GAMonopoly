@@ -17,6 +17,7 @@ public class HumanPlayer extends AbstractPlayer {
   private String htmlEnd = "</body></html>";
   private CopyOnWriteArrayList<Location> monopolies;
   private CopyOnWriteArrayList<Location> sellableLots;
+  protected int result;
   private static String[] yesno = new String[] { "Yes", "No" };
 
   public HumanPlayer(int index, String name) {
@@ -41,9 +42,8 @@ public class HumanPlayer extends AbstractPlayer {
     if (this.hasGetOutOfJailCard()) {
       message = "Do you want to use your Get Out Of Jail card?";
     }
-    
-    int result = JOptionPane.showConfirmDialog(null,
-        message, "Pay Bail?",
+
+    int result = GuiHelper.showConfirmDialog(null, message, "Pay Bail?",
         JOptionPane.YES_NO_OPTION);
     return result == JOptionPane.YES_OPTION;
   }
@@ -68,7 +68,7 @@ public class HumanPlayer extends AbstractPlayer {
         .append(lot.getFormattedString()).append("</td></tr></table>")
         .append(htmlEnd);
 
-    int result = JOptionPane.showConfirmDialog(null, msg.toString(),
+    int result = GuiHelper.showConfirmDialog(null, msg.toString(),
         "Buy Property?", JOptionPane.YES_NO_OPTION);
 
     return result == JOptionPane.YES_OPTION;
@@ -78,21 +78,25 @@ public class HumanPlayer extends AbstractPlayer {
    * @see edu.uccs.ecgs.players.AbstractPlayer#payIncomeTax()
    */
   @Override
-  public void payIncomeTax() throws BankruptcyException {
-    int totalWorth = getTotalWorth();
-    String percent = "10%";
-    String flat = "$200";
+  public void payIncomeTax() throws BankruptcyException {    
+    final int totalWorth = getTotalWorth();
+    final String percent = "10%";
+    final String flat = "$200";
+
     String defaultOption = flat;
-    if (totalWorth < 2000) 
+    if (totalWorth < 2000)
       defaultOption = percent;
 
-    int result = JOptionPane.showOptionDialog(null,
-        htmlStart + "Your current net worth is " + totalWorth
-            + "<p>Do you want to pay 10% or $200"+htmlEnd, "Income Tax",
+    final String theDefault = new String(defaultOption);
+
+    int result = GuiHelper.showOptionDialog(null, htmlStart
+        + "Your current net worth is " + totalWorth
+        + "<p>Do you want to pay 10% or $200" + htmlEnd, "Income Tax",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-        new String[] { percent, flat }, defaultOption);
+        new String[] { percent, flat }, theDefault);
+
     if (result == 0) {
-      getCash(totalWorth/10);
+      getCash(totalWorth / 10);
     } else {
       getCash(200);
     }
@@ -118,7 +122,7 @@ public class HumanPlayer extends AbstractPlayer {
         .append("(0 to ").append(cash).append(")<p><p>").append(htmlEnd);
 
     while (true) {
-      String result = JOptionPane.showInputDialog(null, msg.toString(),
+      String result = GuiHelper.showInputDialog(null, msg.toString(),
           "Bid for property", JOptionPane.QUESTION_MESSAGE);
 
       if (result == null)
@@ -130,7 +134,7 @@ public class HumanPlayer extends AbstractPlayer {
           throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, htmlStart
+        GuiHelper.showMessageDialog(null, htmlStart
             + "Your bid does not appear to be valid.<p>"
             + "Please enter a dollar amount between 0 "
             + "and " + cash + ".<p>"
@@ -149,13 +153,16 @@ public class HumanPlayer extends AbstractPlayer {
    * (edu.uccs.ecgs.players.AbstractPlayer, edu.uccs.ecgs.ga.Location, int)
    */
   @Override
-  public void auctionResult(AbstractPlayer player, Location lot,
-      int amount) {
+  public void auctionResult(AbstractPlayer player, Location lot, int amount)
+  {
     if (bankrupt())
       return;
 
-    JOptionPane.showMessageDialog(null, htmlStart + player.getName()
-        + " won the auction for " + lot.name + " with a winning bid "
+    String playerName = new String(player.getName());
+    String lotName = new String(lot.name);
+
+    GuiHelper.showMessageDialog(null, htmlStart + playerName
+        + " won the auction for " + lotName + " with a winning bid "
         + " (may not be the max bid) of $" + amount + "." + htmlEnd,
         "Auction Complete", JOptionPane.INFORMATION_MESSAGE);
   }
@@ -233,7 +240,7 @@ public class HumanPlayer extends AbstractPlayer {
 
     sb.append("Do you want to Accept or Reject this trade").append(htmlEnd);
     
-    int result = JOptionPane.showOptionDialog(null, sb.toString(),
+    int result = GuiHelper.showOptionDialog(null, sb.toString(),
         "Trade Proposed", JOptionPane.DEFAULT_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, new String[] { accept, reject },
         defaultOption);
@@ -258,7 +265,7 @@ public class HumanPlayer extends AbstractPlayer {
     if (this.getNumProperties() == 0)
       return;
 
-    int result = JOptionPane.showOptionDialog(null, htmlStart
+    int result = GuiHelper.showOptionDialog(null, htmlStart
         + "Do you want to trade any of your properties?" + htmlEnd,
         "Trade Properties", JOptionPane.YES_NO_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, yesno, yesno[1]);
@@ -272,7 +279,7 @@ public class HumanPlayer extends AbstractPlayer {
           list.add(l);
       }
 
-      Location locationToTrade = (Location) JOptionPane.showInputDialog(null,
+      Location locationToTrade = (Location) GuiHelper.showInputDialog(null,
           htmlStart
               + " Which property of yours do you wish to trade?",
           "Select your property", JOptionPane.QUESTION_MESSAGE, null,
@@ -280,8 +287,8 @@ public class HumanPlayer extends AbstractPlayer {
 
       if (locationToTrade == null)
         return;
-      
-      Location locationToGet = (Location) JOptionPane.showInputDialog(null,
+
+      Location locationToGet = (Location) GuiHelper.showInputDialog(null,
           htmlStart
               + " Which property of another player do you wish to trade for?",
           "Select other player's property", JOptionPane.QUESTION_MESSAGE, null,
@@ -316,7 +323,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
       sb.append(htmlEnd);
 
-      JOptionPane.showMessageDialog(null, sb.toString(), "Trade Result",
+      GuiHelper.showMessageDialog(null, sb.toString(), "Trade Result",
           JOptionPane.INFORMATION_MESSAGE);
     }
   }
@@ -329,7 +336,7 @@ public class HumanPlayer extends AbstractPlayer {
     String cancel = "Cancel trade";
     String defaultOption = none;
 
-    int result = JOptionPane.showOptionDialog(null, htmlStart
+    int result = GuiHelper.showOptionDialog(null, htmlStart
         + "Do you want to give or receive cash with the trade?"
         + htmlEnd, "Cash Portion of Trade",
         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
@@ -343,11 +350,12 @@ public class HumanPlayer extends AbstractPlayer {
 
     int amount = 0;
     while (true) {
-      String strCash = JOptionPane.showInputDialog(null,
+      String strCash = GuiHelper.showInputDialog(null,
           htmlStart + "How much cash do you want to "
               + (result == 0 ? "give" : "receive") + "?<p>" + "(0 to " + cash
               + ")" + htmlEnd, "Bid for property",
           JOptionPane.QUESTION_MESSAGE);
+
       if (strCash == null || "".equals(strCash))
         return Integer.MIN_VALUE;
 
@@ -357,7 +365,7 @@ public class HumanPlayer extends AbstractPlayer {
           throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, htmlStart
+        GuiHelper.showMessageDialog(null, htmlStart
             + "The cash amount does not appear to be valid.<p>"
             + "Please enter a whole number between 0 " + "and " + cash + ".<p>"
             + htmlEnd, "Error", JOptionPane.ERROR_MESSAGE);
@@ -482,9 +490,10 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     if (!canRaiseCash(amount)) {
-      JOptionPane.showMessageDialog(null, htmlStart
+      GuiHelper.showMessageDialog(null, htmlStart
           + "You are unable to raise enough " + "cash to pay your bill of "
-          + amount + ". You are bankrupt!");
+          + amount + ". You are bankrupt!", "You are bankrupt",
+          JOptionPane.INFORMATION_MESSAGE);
       throw new BankruptcyException();
     }
 
@@ -492,7 +501,7 @@ public class HumanPlayer extends AbstractPlayer {
     String theGame = "Let Game raise cash for me";
     String defaultOption = myself;
 
-    int result = JOptionPane.showOptionDialog(null, htmlStart 
+    int result = GuiHelper.showOptionDialog(null, htmlStart 
         + "You do not have enough cash to pay what you owe. Do you want to "
         + "try to sell houses or hotels, and mortgage properties yourself to "
         + "raise the cash? Or do you want to let the game sell your properties "
@@ -546,7 +555,7 @@ public class HumanPlayer extends AbstractPlayer {
       if (!lotsWithHouses.isEmpty())
         options.add(sellHouse);
 
-      result = JOptionPane.showOptionDialog(null, htmlStart
+      result = GuiHelper.showOptionDialog(null, htmlStart
           + "Do you want to mortgage properties, sell hotels, or sell "
           + "houses to raise cash?"
           + htmlEnd, "Raise cash to pay bills",
@@ -556,7 +565,7 @@ public class HumanPlayer extends AbstractPlayer {
       String selected = options.get(result);
 
       if (selected.equals(mortgage)) {
-        Location locationToMortgage = (Location) JOptionPane.showInputDialog(
+        Location locationToMortgage = (Location) GuiHelper.showInputDialog(
             null, htmlStart
                 + " Which property of yours do you wish to mortgage?",
             "Select property to mortgage", JOptionPane.QUESTION_MESSAGE, null,
@@ -566,7 +575,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       if (selected.equals(sellHotel)) {
-        Location hotel = (Location) JOptionPane.showInputDialog(
+        Location hotel = (Location) GuiHelper.showInputDialog(
             null, htmlStart
                 + " Which property has a hotel that you want to sell?",
             "Select hotel to sell", JOptionPane.QUESTION_MESSAGE, null,
@@ -576,7 +585,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       if (selected.equals(sellHouse)) {
-        Location house = (Location) JOptionPane.showInputDialog(
+        Location house = (Location) GuiHelper.showInputDialog(
             null, htmlStart
                 + " Which property has a house that you want to sell?",
             "Select house to sell", JOptionPane.QUESTION_MESSAGE, null,
@@ -627,12 +636,12 @@ public class HumanPlayer extends AbstractPlayer {
     sb.append("You owe $").append(sb2.toString());
     sb.append(htmlEnd);
 
-    JOptionPane.showMessageDialog(null, sb.toString(), "Interest owed",
+    GuiHelper.showMessageDialog(null, sb.toString(), "Interest owed",
         JOptionPane.INFORMATION_MESSAGE);
 
     getCash(interest);
 
-    JOptionPane.showMessageDialog(null, htmlStart + "You paid $" + interest
+    GuiHelper.showMessageDialog(null, htmlStart + "You paid $" + interest
         + " in interest. You can lift the mortgages from any properties by "
         + "clicking the Lift Mortgages button." + htmlEnd, "Interest payed",
         JOptionPane.INFORMATION_MESSAGE);
@@ -679,7 +688,15 @@ public class HumanPlayer extends AbstractPlayer {
       }
     }
     
-    PlayerGui.updateHouseButtons(ableToSell, ableToBuy);
+    final boolean sell = ableToSell;
+    final boolean buy = ableToBuy;
+
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run()
+      {
+        PlayerGui.updateHouseButtons(sell, buy);
+      }
+    });
 
     int countMortgaged = 0;
     for (Location lot : getAllProperties().values()) {
@@ -689,7 +706,13 @@ public class HumanPlayer extends AbstractPlayer {
       }
     }
 
-    PlayerGui.updateMortgageButton(countMortgaged > 0);
+    final boolean hasMortgages = countMortgaged > 0;
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run()
+      {
+        PlayerGui.updateMortgageButton(hasMortgages);
+      }
+    });
   }
 
   /**
@@ -857,13 +880,19 @@ public class HumanPlayer extends AbstractPlayer {
         .append("Click 'I will keep playing' to continue controlling each turn.")
         .append(htmlEnd);
 
-    int result = JOptionPane.showOptionDialog(null, sb.toString(),
+    int result = GuiHelper.showOptionDialog(null, sb.toString(),
         "Let the computer finish?", JOptionPane.DEFAULT_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, new String[] { computer, human },
         defaultOption);
 
-    if (result == 0)
-      PlayerGui.pauseOff();
+    if (result == 0) {
+      java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run()
+        {
+          PlayerGui.pauseOff();
+        }
+      });
+    }
   }
 
   /* (non-Javadoc)
