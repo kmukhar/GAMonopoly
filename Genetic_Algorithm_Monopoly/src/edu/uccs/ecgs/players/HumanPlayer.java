@@ -340,7 +340,7 @@ public class HumanPlayer extends AbstractPlayer {
 
     if (result == 3) 
       return Integer.MIN_VALUE;
-          
+
     int amount = 0;
     while (true) {
       String strCash = JOptionPane.showInputDialog(null,
@@ -364,6 +364,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
     }
 
+    // TODO need to ensure this agrees with give or receive
     return amount;
   }
 
@@ -443,7 +444,7 @@ public class HumanPlayer extends AbstractPlayer {
           if (game.getNumHousesInBank() < 4) {
             Object[] selectionValues = new Object[] {
                 "Ok, I still want to sell that hotel", "No, let me reconsider" };
-            JOptionPane.showInputDialog(null, htmlStart
+            Object selection = JOptionPane.showInputDialog(null, htmlStart
                 + "Because the bank has less than 4 houses, "
                 + "you must sell more hotels or houses in addition to the"
                 + "hotel you have chosen to sell. If you choose to proceed, "
@@ -451,8 +452,13 @@ public class HumanPlayer extends AbstractPlayer {
                 + "hotels and houses." + htmlEnd,
                 "Selling a hotel", JOptionPane.WARNING_MESSAGE,
                     null, selectionValues, selectionValues[0]);
+
+            if (selection.equals(selectionValues[0])) {
+              game.sellHotel(selected, getAllProperties().values());
+            }
+          } else {
+            game.sellHotel(selected, getAllProperties().values());
           }
-          game.sellHotel(selected,getAllProperties().values());
         }
       } else {
         done = true;
@@ -553,7 +559,8 @@ public class HumanPlayer extends AbstractPlayer {
                 + " Which property of yours do you wish to mortgage?",
             "Select property to mortgage", JOptionPane.QUESTION_MESSAGE, null,
             unmortgaged.toArray(), unmortgaged.get(0));
-        game.mortgageProperty(locationToMortgage);
+        if (locationToMortgage != null)
+          game.mortgageProperty(locationToMortgage);
       }
 
       if (selected.equals(sellHotel)) {
@@ -562,7 +569,8 @@ public class HumanPlayer extends AbstractPlayer {
                 + " Which property has a hotel that you want to sell?",
             "Select hotel to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHotels.toArray(), lotsWithHotels.get(0));
-        game.sellHotel(hotel, getAllProperties().values());
+        if (hotel != null)
+          game.sellHotel(hotel, getAllProperties().values());
       }
 
       if (selected.equals(sellHouse)) {
@@ -571,7 +579,8 @@ public class HumanPlayer extends AbstractPlayer {
                 + " Which property has a house that you want to sell?",
             "Select house to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHouses.toArray(), lotsWithHouses.get(0));
-        game.sellHouse(house);
+        if (house != null)
+          game.sellHouse(house);
       }
       
       if (cash > amount)
