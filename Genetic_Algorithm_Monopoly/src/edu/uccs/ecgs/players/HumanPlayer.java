@@ -886,12 +886,7 @@ public class HumanPlayer extends AbstractPlayer {
         defaultOption);
 
     if (result == 0) {
-      java.awt.EventQueue.invokeLater(new Runnable() {
-        public void run()
-        {
-          PlayerGui.pauseOff();
-        }
-      });
+      PlayerGui.pauseOff();
     }
   }
 
