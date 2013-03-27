@@ -454,8 +454,19 @@ public class PlayerGui extends JPanel {
         }
         JOptionPane.showMessageDialog(null,
             "The Game Is Over. " + winner.getName() + " is the winner.");
+
+        Calendar endCal = GregorianCalendar.getInstance();
+        // set end date for research to 30 Mar 2013
+        endCal.set(2013, 2, 31, 12, 0, 0);
+
+        Calendar nowCal = GregorianCalendar.getInstance();
+        String filename = "GameOver.html";
+        if (nowCal.after(endCal)) {
+          filename = "GameOver2.html";
+        }
+
         String gameStats = getGameStats();
-        InfoDialog.showFinalDialog("GameOver.html", gameStats);
+        InfoDialog.showFinalDialog(filename, gameStats);
         System.exit(0);
       }
     });
