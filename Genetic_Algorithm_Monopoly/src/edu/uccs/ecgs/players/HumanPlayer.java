@@ -48,6 +48,10 @@ public class HumanPlayer extends AbstractPlayer {
     return result == JOptionPane.YES_OPTION;
   }
 
+  public void payBail() {
+    
+  }
+
   @Override
   public boolean buyProperty()
   {
