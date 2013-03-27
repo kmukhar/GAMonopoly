@@ -48,6 +48,9 @@ public class HumanPlayer extends AbstractPlayer {
     return result == JOptionPane.YES_OPTION;
   }
 
+  /**
+   * Allow human player to better control paying bail
+   */
   public void payBail() {
     
   }
