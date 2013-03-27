@@ -1750,10 +1750,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   /**
-   * Pay bail to leave jail
+   * Pay bail to leave jail.
    * @throws BankruptcyException
    */
   public void payBail() throws BankruptcyException {
+    // This method is YAGNI, but it's here just in case we want more control
+    // over paying bail later...
     getCash(50);
   }
 }

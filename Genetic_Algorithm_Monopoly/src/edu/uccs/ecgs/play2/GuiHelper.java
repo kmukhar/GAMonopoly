@@ -20,8 +20,8 @@ public class GuiHelper {
         @Override
         public void run()
         {
-          GuiHelper.strResult = JOptionPane.showInputDialog(parent, msg,
-              title, msgType);
+          GuiHelper.strResult = JOptionPane.showInputDialog(parent, msg, title,
+              msgType);
         }
       });
     } catch (InvocationTargetException e) {

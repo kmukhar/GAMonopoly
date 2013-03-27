@@ -38,33 +38,46 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public boolean payBailP()
   {
-    String message = "Do you want to pay bail to get out of Jail?";
+    String message = htmlStart + "Do you want to pay bail to get out of Jail?"
+        + htmlEnd;
     if (this.hasGetOutOfJailCard()) {
-      message = "Do you want to use your Get Out Of Jail card?";
+      message = htmlStart + "Do you want to use your Get Out Of Jail card?"
+          + htmlEnd;
     }
 
     int result = GuiHelper.showConfirmDialog(null, message, "Pay Bail?",
         JOptionPane.YES_NO_OPTION);
-    return result == JOptionPane.YES_OPTION;
-  }
 
-  /**
-   * Allow human player to better control paying bail
-   * @throws BankruptcyException 
-   */
-  @Override
-  public void payBail() throws BankruptcyException {
-    int minCash = getMinimumCash();
-    if (minCash < 50)
-      minCash = 50;
-
-    if (hasAtLeastCash(minCash)) {
-      getCash(50);
-      return;
+    // but in case the player accidentally clicked yes when they might not
+    // have enough money, force them to confirm if they don't have enough
+    // money
+    if (result == JOptionPane.YES_OPTION) {
+      if (canRaiseCash(50)) {
+        if (cash < 50) {
+          // they don't have enough money to pay bail
+          result = GuiHelper.showConfirmDialog(null, htmlStart
+              + "You do not have enough cash to pay bail. You will need to "
+              + " raise cash by selling hotels or houses,or mortgaging "
+              + "properties. Are you sure you want to pay bail of $50?"
+              + htmlEnd, "Confirm pay bail", JOptionPane.YES_NO_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+        } else if (cash < getMinimumCash()) {
+          // they have some money to pay bail, but not very much
+          result = GuiHelper.showConfirmDialog(null, htmlStart
+              + "You don't have a lot of cash. Are you sure you "
+              + "want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
+              JOptionPane.YES_NO_OPTION,  JOptionPane.INFORMATION_MESSAGE);
+        }
+      } else {
+        // if they pay bail, they will go bankrupt
+        result = GuiHelper.showConfirmDialog(null, htmlStart
+            + "If you try to pay bail, you will go bankrupt! Are you sure you "
+            + "want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
+            JOptionPane.YES_NO_OPTION,  JOptionPane.WARNING_MESSAGE);
+      }
     }
-
-    // TODO
     
+    return result == JOptionPane.YES_OPTION;
   }
 
   @Override
@@ -510,14 +523,14 @@ public class HumanPlayer extends AbstractPlayer {
 
     if (!canRaiseCash(amount)) {
       GuiHelper.showMessageDialog(null, htmlStart
-          + "You are unable to raise enough " + "cash to pay your bill of "
-          + amount + ". You are bankrupt!", "You are bankrupt",
+          + "You are unable to raise enough cash to pay your bill of "
+          + amount + ". You are bankrupt!" + htmlEnd, "You are bankrupt",
           JOptionPane.INFORMATION_MESSAGE);
       throw new BankruptcyException();
     }
 
-    String myself = "Raise cash myself";
-    String theGame = "Let Game raise cash for me";
+    String myself = "Raise cash myself"; // result == 0
+    String theGame = "Let Game raise cash for me"; // result == 1
     String defaultOption = myself;
 
     int result = GuiHelper.showOptionDialog(null, htmlStart 
@@ -531,6 +544,13 @@ public class HumanPlayer extends AbstractPlayer {
     if (result == 1) {
       super.getCash(amount);
       return;
+    }
+
+    if (result == -1) {
+      // user clicked close window button
+      GuiHelper.showMessageDialog(null, htmlStart + "Sorry. You can't cancel. "
+          + "You must sell houses or mortgage properties yourself." + htmlEnd,
+          "Cancel not allowed", JOptionPane.INFORMATION_MESSAGE);
     }
 
     boolean done = false;
@@ -574,12 +594,20 @@ public class HumanPlayer extends AbstractPlayer {
       if (!lotsWithHouses.isEmpty())
         options.add(sellHouse);
 
-      result = GuiHelper.showOptionDialog(null, htmlStart
-          + "Do you want to mortgage properties, sell hotels, or sell "
-          + "houses to raise cash?"
-          + htmlEnd, "Raise cash to pay bills",
-          JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-          options.toArray(), options.get(0));
+      do {
+        result = GuiHelper.showOptionDialog(null, htmlStart
+            + "Do you want to mortgage properties, sell hotels, or sell "
+            + "houses to raise cash?" + htmlEnd, "Raise cash to pay bills",
+            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+            options.toArray(), options.get(0));
+
+        if (result == -1) {
+          // user clicked close window button
+          GuiHelper.showMessageDialog(null, htmlStart
+              + "Sorry. You can't cancel. You must pick a valid option."
+              + htmlEnd, "Cancel not allowed", JOptionPane.INFORMATION_MESSAGE);
+        }
+      } while (result == -1);
 
       String selected = options.get(result);
 
