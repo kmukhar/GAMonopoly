@@ -1748,4 +1748,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   {
     numHousesInBank = numHouses;
   }
+
+  /**
+   * Pay bail to leave jail
+   * @throws BankruptcyException
+   */
+  public void payBail() throws BankruptcyException {
+    getCash(50);
+  }
 }

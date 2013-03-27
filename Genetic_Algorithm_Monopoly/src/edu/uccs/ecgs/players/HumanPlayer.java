@@ -50,8 +50,20 @@ public class HumanPlayer extends AbstractPlayer {
 
   /**
    * Allow human player to better control paying bail
+   * @throws BankruptcyException 
    */
-  public void payBail() {
+  @Override
+  public void payBail() throws BankruptcyException {
+    int minCash = getMinimumCash();
+    if (minCash < 50)
+      minCash = 50;
+
+    if (hasAtLeastCash(minCash)) {
+      getCash(50);
+      return;
+    }
+
+    // TODO
     
   }
 

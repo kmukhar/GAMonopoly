@@ -79,7 +79,7 @@ public class InJailState extends PlayerState {
       } else {
         //actually pay bail
         try {
-          player.getCash(50);
+          player.payBail();
         } catch (BankruptcyException e) {
           //e.printStackTrace();
           game.processBankruptcy(player, null);
