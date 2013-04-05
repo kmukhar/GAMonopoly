@@ -7,7 +7,7 @@ import edu.uccs.ecgs.players.AbstractPlayer;
 /**
  * A class to assist in negotiating properties in the game of Monopoly. The
  * algorithms used in this class come from the paper
- * "Negotiation strategy of agents in the Monopoly game" by Yasamura, Oguchi,
+ * "Negotiation strategy of agents in the Monopoly game" by Yasumura, Oguchi,
  * and Nitta.
  * 
  * https://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=1013210
@@ -321,7 +321,7 @@ public class PropertyNegotiator {
         // 2-0-0 (Case 2)
         // 2-1-0, and (Case 3)
         // 3-0-0 (Case 4)
-        // See the Yasamura paper for more details.
+        // See the Yasumura paper for more details.
         switch (selfOwned) {
         case 1:
           // ownership: 1-0-0, 1-1-0, 1-1-1, 1-2-0
@@ -356,7 +356,7 @@ public class PropertyNegotiator {
         // 2-0-0, 2-1-0, 3-0-0 (Case 2)
         // 2-2-0, 3-1-0 (Case 3)
         // 4-0-0 (Case 4)
-        // See the Yasamura paper for more details.
+        // See the Yasumura paper for more details.
         switch (selfOwned) {
         case 1:
           // ownership: 1-x-x-x
