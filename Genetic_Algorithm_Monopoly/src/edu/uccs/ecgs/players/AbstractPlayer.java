@@ -71,10 +71,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   // w1 + w2 = 1.0
   // a high w1 means the player tries to get gains
   // a high w2 means the player tries to avoid losses
-  public double w1 = 0.5;
-  public double w2 = 0.5;
+  public double w1 = 0;
+  public double w2 = 0;
   // if the profit exceeds this threshold, the player accepts the trade.
   private int tradeThreshold = 100;
+
   protected String gameKey;
   private ChangeListener changeListener;
   private String sourceName = "";
@@ -102,6 +103,20 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     clearAllProperties();
     cash = 1500;
     locationIndex = 0;
+
+    // modify the trading parameters
+    double p = r.nextDouble();
+    setW1(0.95);
+    if (p > 0.33)
+      setW1(0.65);
+    
+    if (p > 0.67)
+      setW1(0.80);
+
+    p = r.nextDouble();
+    tradeThreshold = 400;
+    if (p > 0.5)
+      tradeThreshold = 200;
   }
 
   /**
@@ -1757,5 +1772,21 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     // This method is YAGNI, but it's here just in case we want more control
     // over paying bail later...
     getCash(50);
+  }
+
+  private void setW1(double d)
+  {
+    w1 = d;
+    w2 = 1.0 - d;
+  }
+
+  public double getW1()
+  {
+    return w1;
+  }
+
+  public int getTradeThreshold()
+  {
+    return tradeThreshold;
   }
 }
