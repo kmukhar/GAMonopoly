@@ -100,7 +100,11 @@ public class InfoDialog {
     }
 
     String lineSeparator = System.getProperty("line.separator");
-    String gameStats2 = gameStats.replace("EOL", lineSeparator); 
+
+    String gameStats2 = gameStats.replace("EOL", "<br>" + lineSeparator);
+    String msg = aboutMsg.toString().replaceFirst("RESULTS", gameStats2);
+
+    gameStats2 = gameStats.replace("EOL", lineSeparator); 
 
     URLCodec urlCodec = new URLCodec();
     try {
@@ -109,9 +113,6 @@ public class InfoDialog {
       e.printStackTrace();
     }
 
-    String msg = aboutMsg.toString().replaceFirst("RESULTS", gameStats2);
-
-    gameStats2 = gameStats.replace("EOL", "<br>" + lineSeparator);
     msg = msg.toString().replaceFirst("RESULTS", gameStats2);
 
     final JEditorPane editorPane = getEditorPane(msg);
