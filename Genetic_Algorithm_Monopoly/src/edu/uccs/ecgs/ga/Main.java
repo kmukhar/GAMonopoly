@@ -97,7 +97,14 @@ public class Main {
    * game.
    */
   public static int numThreads = 6;
-  
+
+  /**
+   * Whether to allow property trading or not. During evolution this should
+   * probably be turned off, but during validation testing should probably be
+   * turned on.
+   */
+  public static boolean allowPropertyTrading = false;
+
   private GAEngine gaEngine;
 
   private Gui gui = null;
@@ -121,6 +128,7 @@ public class Main {
   public static final String fitEvalLabel = "Fitness Evaluator";
   public static final String debugLabel = "Debug Level";
   public static final String chromoLabel = "ChromosomeType";
+  public static final String allowTradingLabel = "Allow Players to trade properties";
 
   public static void main(String[] args)
   {
@@ -168,6 +176,7 @@ public class Main {
           { "Max number of turns per game", "" + maxTurns },
           { "Number of players in population", "" + maxPlayers },
           { "Number of players per game", "" + numPlayers },
+          { allowTradingLabel, new Boolean[] {Boolean.TRUE, Boolean.FALSE}},
           { fitEvalLabel, FitEvalTypes.values() },
 			    { loadFromDiskLabel, LoadTypes.values() },
           { "Generation to load", "" + loadGeneration },
@@ -268,19 +277,19 @@ public class Main {
       // Number of players per game
       numPlayers = Integer.parseInt(text);
       break;
-    case 7:
+    case 8:
       // Generation to load
       loadGeneration = Integer.parseInt(text);
       break;
-    case 10:
+    case 9:
       // Mutation Rate
       mutationRate = Double.parseDouble(text);
       break;
-    case 12:
+    case 13:
       // number of threads
       numThreads = Integer.parseInt(text);
       break;
-    case 13:
+    case 14:
       // dump period
       dumpPeriod = Integer.parseInt(text);
       break;
@@ -308,22 +317,25 @@ public class Main {
   public void setExecutionValue(int index, Object selectedItem) {
     switch (index) {
     case 5:
+      // allow trading
+      allowPropertyTrading = (Boolean) selectedItem;
+    case 6:
       // Fitness Evaluator
       fitnessEvaluator = (FitEvalTypes) selectedItem;
       break;
-    case 6:
+    case 7:
       // Load players from disk 
       loadFromDisk = (LoadTypes) selectedItem;
       break;
-    case 8:
+    case 9:
       // Debug
       debug = Level.parse(selectedItem.toString());
       break;
-    case 9:
+    case 10:
       // Chromosome Type
       chromoType = (ChromoTypes) selectedItem;
       break;
-    case 11:
+    case 12:
       // use random seed
       useRandomSeed = (Boolean) selectedItem;
       break;
@@ -347,6 +359,8 @@ public class Main {
       maxTurns = Integer.parseInt(value);
     } else if (key.equalsIgnoreCase("numPlayers")) {
       numPlayers = Integer.parseInt(value);
+    } else if (key.equalsIgnoreCase(allowTradingLabel)) {
+      allowPropertyTrading = Boolean.parseBoolean(value);
     } else if (key.equalsIgnoreCase("fitnessEvaluator")) {
       fitnessEvaluator = FitEvalTypes.valueOf(value);
     } else if (key.equalsIgnoreCase("loadFromDisk")) {

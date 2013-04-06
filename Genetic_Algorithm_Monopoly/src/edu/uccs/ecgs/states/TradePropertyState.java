@@ -18,13 +18,15 @@ public class TradePropertyState extends PlayerState {
     switch (event) {
     
     case TRADE_DECISION_EVENT:
-      game.logFinest("\nStarting process trade decision event");
-      PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
-      // get list of undeveloped lots owned by other players
-      ArrayList<Location> locations = pf.getPropertiesOwnedByOthers(player);
+      if (Main.allowPropertyTrading) {
+        game.logFinest("\nStarting process trade decision event");
+        PropertyFactory pf = PropertyFactory.getPropertyFactory(game.gamekey);
+        // get list of undeveloped lots owned by other players
+        ArrayList<Location> locations = pf.getPropertiesOwnedByOthers(player);
 
-      if (!locations.isEmpty())
-        player.processTradeDecisionEvent(locations);
+        if (!locations.isEmpty())
+          player.processTradeDecisionEvent(locations);
+      }
 
       player.nextAction = Actions.DONE;
       inactiveState.enter();
@@ -35,5 +37,4 @@ public class TradePropertyState extends PlayerState {
       throw new IllegalArgumentException(msg);
     }
   }
-
 }
