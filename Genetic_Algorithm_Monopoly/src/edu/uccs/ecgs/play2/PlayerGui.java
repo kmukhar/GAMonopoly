@@ -49,8 +49,8 @@ public class PlayerGui extends JPanel {
     }
 
     Calendar endCal = GregorianCalendar.getInstance();
-    // set end date for research to 30 Mar 2013
-    endCal.set(2013, 2, 31, 12, 0, 0);
+    // set end date for research to midnight 12 Apr 2013, 
+    endCal.set(2013, 3, 12, 0, 0, 0);
 
     Calendar nowCal = GregorianCalendar.getInstance();
     String infoFileName = "About.html";
@@ -457,7 +457,7 @@ public class PlayerGui extends JPanel {
 
         Calendar endCal = GregorianCalendar.getInstance();
         // set end date for research to 30 Mar 2013
-        endCal.set(2013, 2, 31, 12, 0, 0);
+        endCal.set(2013, 3, 12, 0, 0, 0);
 
         Calendar nowCal = GregorianCalendar.getInstance();
         String filename = "GameOver.html";
@@ -478,6 +478,7 @@ public class PlayerGui extends JPanel {
   {
     StringBuilder sb = new StringBuilder();
 
+    sb.append("BEGINEOL");
     for (AbstractPlayer player : players) {
       sb.append(player.getSourceName()).append(",")
           .append(player.getFinishOrder()).append(",")
@@ -485,12 +486,16 @@ public class PlayerGui extends JPanel {
           .append(player.getNumProperties()).append(",")
           .append(player.getNumMonopolies()).append(",")
           .append(player.getNumHouses()).append(",")
-          .append(player.getNumHotels()).append("EOL");
+          .append(player.getNumHotels()).append(",")
+          .append(player.getW1()).append(",")
+          .append(player.getTradeThreshold()).append("EOL");
     }
 
     sb.append(game.turnCounter).append("EOL");
     String result = sb.toString();
+    sb.append("END/");
     sb.append(Integer.toHexString(result.hashCode()));
+    sb.append("/EOL");
     
     return sb.toString();
   }
