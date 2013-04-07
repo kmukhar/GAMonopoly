@@ -111,6 +111,7 @@ public class PlayerGui extends JPanel {
     main = new Main();
     main.pause();
     Main.maxTurns = 100; // set a high number so the game can run to finish
+    Main.allowPropertyTrading = true;
 
     controller = new GameController(game);
     game.setFlowController(controller);
