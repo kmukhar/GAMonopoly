@@ -630,4 +630,32 @@ public class PropertyNegotiator {
 
     return (int) bigU;
   }
+
+  /**
+   * Evaluate player;s holdings if the player buys lot
+   * @param trade
+   * @return
+   */
+  public int evaluateProfitFromLot(Location lot)
+  {
+    int startCash = owner.cash;
+    owner.cash -= lot.getCost();
+
+    lot.setOwnerForTradeEvaluation(owner);
+    
+    double bigU = evaluateOwnersHoldings();
+
+    bigU -= owner.w2
+        * ((double) (computeShortTermLoss(lot) 
+            + computeMidTermLoss(lot)));
+
+    lot.setOwnerForTradeEvaluation(null);
+    owner.cash = startCash;
+
+    assert owner.cash == startCash;
+    assert lot.getOwner() == null;
+    assert !owner.getAllProperties().containsValue(lot);
+
+    return (int) bigU;
+  }
 }

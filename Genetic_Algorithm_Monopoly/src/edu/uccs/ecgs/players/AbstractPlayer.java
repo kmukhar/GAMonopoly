@@ -517,10 +517,10 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         totalWorth += (location.getHotelCost() * 5);
       }
 
-      if (location.isMortgaged()) {
+      // properties are worth half face value
+      // unmortgaged properties are worth nothing
+      if (!location.isMortgaged()) {
         totalWorth += location.getCost() / 2;
-      } else {
-        totalWorth += location.getCost();
       }
     }
 
@@ -726,34 +726,44 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   public int getBidForLocation(Location currentLocation) {
     int bid = 0;
 
-    if (cash < 50) {
+    PropertyNegotiator pn = new PropertyNegotiator(this, gameKey);
+    int baseWealth = pn.evaluateOwnersHoldings();
+    int newWealth = pn.evaluateProfitFromLot(currentLocation);
+    int profit = newWealth - baseWealth;
+
+    if (getTotalWorth() < 50) {
       bid = 0;
     } else if (buyProperty(currentLocation)) {
       // player wants to buy, so start with current cost
       bid = currentLocation.getCost();
 
-      double adjustFactor = Math.abs(r.nextGaussian());
-      adjustFactor = adjustFactor * (double) (bid / 10);
-      bid += (int) adjustFactor;
-    } else {
-      // otherwise, player does not want location
-      if (currentLocation == location) {
-        // if player is the one at the location, then bid some small
-        // amount (cost/2 or cost/3 or cost/4)
-        int factor = r.nextInt(3) + 2; // factor is 2,3,4
-        bid = currentLocation.getCost() / factor;
+      int adjustFactor = Math.abs(profit);
+      bid += adjustFactor;
+      double premium = 1.0;
+      if (profit < 0) {
+        // player agreed to buy, but will potentially be a loss so only
+        // bid a small premium up to 120% of cost
+        premium = 1.2;
       } else {
-        // otherwise, other players bid half cost
-        // plus some random fluctuation
-        bid = (currentLocation.getCost() / 2)
-            + (int) (Math.abs(r.nextGaussian()) * (double) (currentLocation
-                .getCost() / 6));
+        // this property is a gain for the player so bid up to 150% of cost
+        premium = 1.5;
       }
+      if (bid > currentLocation.getCost() * premium)
+        bid = (int) ((double) currentLocation.getCost() * premium);
+    } else {
+      // player does not want to buy property, but does want to prevent
+      // other players from getting property at ultra low cost
+      // bid 1/2 property cost plus some random fluctuation
+      bid = (currentLocation.getCost() / 2)
+          + (int) (Math.abs(r.nextGaussian()) * (double) (currentLocation
+              .getCost() / 6));
     }
 
     // ensure bid does not exceed cash
-    if (bid > cash) {
-      bid = cash;
+    if (bid > getTotalWorth()) {
+      bid = getTotalWorth() - getMinimumCash();
+      if (bid < 0) 
+        bid = cash;
     }
 
     assert bid >= 0 : "Invalid bid amount: " + bid;
