@@ -151,7 +151,7 @@ public class HumanPlayer extends AbstractPlayer {
         .append("<p>").append("<table border=1 width=\"100%\"><tr><td>")
         .append(lot.getFormattedString()).append("</td></tr></table><p><p>")
         .append("What is the MAXIMUM you want to bid for this property? ")
-        .append("(0 to ").append(this.getTotalWorth()).append(")<p><p>")
+        .append("(0 to ").append(this.getLiquidationValue()).append(")<p><p>")
         .append(htmlEnd);
 
     while (true) {
@@ -163,14 +163,14 @@ public class HumanPlayer extends AbstractPlayer {
 
       try {
         bid = Integer.parseInt(result);
-        if (bid < 0 || bid > getTotalWorth())
+        if (bid < 0 || bid > getLiquidationValue())
           throw new NumberFormatException();
         break;
       } catch (NumberFormatException e) {
         GuiHelper.showMessageDialog(null, htmlStart
             + "Your bid does not appear to be valid.<p>"
             + "Please enter a dollar amount between 0 "
-            + "and " + getTotalWorth() + ".<p>"
+            + "and " + getLiquidationValue() + ".<p>"
             + "Bid 0 to decline the auction" + htmlEnd, "Bid error",
             JOptionPane.ERROR_MESSAGE);
       }
