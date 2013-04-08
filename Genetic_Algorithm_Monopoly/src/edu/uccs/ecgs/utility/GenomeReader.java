@@ -39,7 +39,7 @@ public class GenomeReader {
 	private BitSet chrJailBS;
 
 	public void readGenome() {
-		JFileChooser chooser = new JFileChooser();
+		JFileChooser chooser = new JFileChooser("D:/Documents and Data/Kevin/Monopoly/gamedata/");
 		chooser.setDialogTitle("Select the player file to process");
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
