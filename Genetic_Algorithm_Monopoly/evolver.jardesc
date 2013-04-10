@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="C:/Users/kmukhar/Documents/Monopoly/MonopolyGame.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Genetic_Algorithm_Monopoly/evolver.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=Genetic_Algorithm_Monopoly/src&lt;edu.uccs.ecgs.ga{Main.java[Main" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=Genetic_Algorithm_Monopoly/src&lt;edu.uccs.ecgs.states"/>
+        <javaElement handleIdentifier="=Genetic_Algorithm_Monopoly/src&lt;edu.uccs.ecgs.ga"/>
+        <javaElement handleIdentifier="=Genetic_Algorithm_Monopoly/src&lt;edu.uccs.ecgs.players"/>
+        <file path="/Genetic_Algorithm_Monopoly/Main.properties"/>
+        <javaElement handleIdentifier="=Genetic_Algorithm_Monopoly/src&lt;edu.uccs.ecgs.play2"/>
+    </selectedElements>
+</jardesc>

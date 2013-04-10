@@ -167,11 +167,12 @@ public class GAEngine implements Runnable {
       if (program.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
         // when competing, we may want to use a different evaluator than
         // specified in the startup
-        String evaluator = System.getProperty("evaluator", FitEvalTypes.FINISH_ORDER.name());
+        String evaluator = System.getProperty("evaluator",
+            FitEvalTypes.FINISH_ORDER.name());
         fitEval = FitEvalTypes.valueOf(evaluator).get();
       }
 
-      validateNumMatches(fitEval);
+//      validateNumMatches(fitEval);
 
       while (matches < Main.numMatches) {
         program.setMatchNum(matches);
@@ -228,8 +229,6 @@ public class GAEngine implements Runnable {
         }
         fitEval.evaluate(playersDone);
 
-        ++matches;
-
         // Move the players back to the player pool.
         // When fitness evaluator is tournament, move winning players to
         // the player pool and losing players to the waiting pool.
@@ -241,9 +240,16 @@ public class GAEngine implements Runnable {
             else
               waitingPool.add(player);
           }
+
+          if (playerPool.size() < Main.numPlayers) {
+            ++matches;
+            playerPool.addAll(waitingPool);
+            waitingPool.clear();
+          }
         } else {
           // not tournament evaluator, so add all players back to pool
           playerPool.addAll(playersDone);
+          ++matches;
         }
 
         playersDone.removeAllElements();
@@ -379,7 +385,7 @@ public class GAEngine implements Runnable {
       bw.newLine();
 
       for (AbstractPlayer player : fitness) {
-        bw.write(player.getFitness() + "," + player.getName());
+        bw.write(player.getFitness() + "," + player.playerIndex);
         bw.newLine();
       }
     } catch (IOException e) {
