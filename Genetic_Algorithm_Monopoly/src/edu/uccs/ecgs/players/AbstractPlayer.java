@@ -1508,7 +1508,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
 
     return result.toString();
-    
   }
 
   /**
