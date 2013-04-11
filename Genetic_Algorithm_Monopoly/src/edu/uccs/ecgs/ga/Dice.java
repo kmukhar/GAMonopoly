@@ -10,7 +10,7 @@ public class Dice {
   private static Dice _ref = new Dice();
 
   private Dice() {
-    long seed = 1241797664697L;
+    long seed = Main.seed;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }

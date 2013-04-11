@@ -39,7 +39,6 @@ public class Monopoly implements Runnable, Controllable {
   private int numHotels;
 
   public String gamekey;
-  private long seed;
   private boolean paused = false;
 
   private Controllable flowController = this;
@@ -62,7 +61,7 @@ public class Monopoly implements Runnable, Controllable {
         + game;
 
     r = new Random();
-    seed = 1241797664697L;
+    long seed = Main.seed;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }
@@ -110,8 +109,6 @@ public class Monopoly implements Runnable, Controllable {
     for (AbstractPlayer player : players) {
       player.joinGame(this);
     }
-
-    logFinest("Game seed: " + seed);
 
     bankruptCount = 0;
 
@@ -523,6 +520,7 @@ public class Monopoly implements Runnable, Controllable {
 
     logInfo(player.getName() + " is bankrupt");
     player.setBankruptIndex(bankruptCount);
+    player.setBankrupt();
     ++bankruptCount;
 
     boolean gameOver = false;
@@ -571,7 +569,6 @@ public class Monopoly implements Runnable, Controllable {
       }
     }
 
-    player.setBankrupt();
     assert player.cash == 0;
   }
 
@@ -639,6 +636,12 @@ public class Monopoly implements Runnable, Controllable {
         if (finalBid > highBid) {
           finalBid = highBid;
         }
+      }
+
+      if (!highBidPlayer.canRaiseCash(finalBid)) {
+        System.out.println("ERROR");
+        System.out.println("Main.seed: "+ Main.seed);
+        System.out.println(highBidPlayer.toString());
       }
 
       assert finalBid > 0 : "Final bid is invalid: " + finalBid;

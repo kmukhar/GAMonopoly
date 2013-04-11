@@ -91,6 +91,8 @@ public class Main {
    */
   public static boolean useRandomSeed = true;
 
+  public static long seed = 1365454633550L;
+
   /**
    * The number of threads to use when running games. Each thread is used to run
    * 1 game, and when the game is complete, the thread can then run another
@@ -319,6 +321,7 @@ public class Main {
     case 5:
       // allow trading
       allowPropertyTrading = (Boolean) selectedItem;
+      break;
     case 6:
       // Fitness Evaluator
       fitnessEvaluator = (FitEvalTypes) selectedItem;

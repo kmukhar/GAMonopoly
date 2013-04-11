@@ -156,6 +156,8 @@ public class Gui extends JFrame {
       ((JComboBox) choice).setSelectedItem(Main.debug.toString());
     } else if (label.equalsIgnoreCase(Main.chromoLabel)) {
       ((JComboBox) choice).setSelectedItem(Main.chromoType);
+    } else if (label.equalsIgnoreCase(Main.allowTradingLabel)) {
+      ((JComboBox) choice).setSelectedItem(Main.allowPropertyTrading);
     }
   }
 

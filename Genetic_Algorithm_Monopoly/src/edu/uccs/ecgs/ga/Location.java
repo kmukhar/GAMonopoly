@@ -398,6 +398,7 @@ public abstract class Location implements Comparable<Location> {
   }
 
   public void fireChangeEvent(ChangeEvent event) {
+    if (changeListener != null)
       changeListener.stateChanged(event);
   }
 }

@@ -83,7 +83,7 @@ public class GAEngine implements Runnable {
     playersDone = new Vector<AbstractPlayer>(Main.maxPlayers);
 
     r = new Random();
-    long seed = 1241797664697L;
+    long seed = Main.seed;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }
@@ -129,7 +129,7 @@ public class GAEngine implements Runnable {
    * 
    * @return A list of four randomly selected players.
    */
-  private AbstractPlayer[] getFourPlayers()
+  private AbstractPlayer[] getPlayersForGame()
   {
     AbstractPlayer[] players = new AbstractPlayer[Main.numPlayers];
     for (int i = 0; i < players.length; i++) {
@@ -162,18 +162,17 @@ public class GAEngine implements Runnable {
       program.setGenNum(generation);
       matches = 0;
 
-      IFitnessEvaluator fitEval = null;
+      IFitnessEvaluator fitEval = Main.fitnessEvaluator.get();
+
       if (program.loadFromDisk == LoadTypes.LOAD_AND_COMPETE) {
         // when competing, we may want to use a different evaluator than
         // specified in the startup
-        String evaluator = System.getProperty("evaluator");
+        String evaluator = System.getProperty("evaluator",
+            FitEvalTypes.FINISH_ORDER.name());
         fitEval = FitEvalTypes.valueOf(evaluator).get();
-      } else {
-        // otherwise use the specified evaluator
-        fitEval = Main.fitnessEvaluator.get();
       }
 
-      validateNumMatches(fitEval);
+//      validateNumMatches(fitEval);
 
       while (matches < Main.numMatches) {
         program.setMatchNum(matches);
@@ -184,9 +183,9 @@ public class GAEngine implements Runnable {
         games = new ArrayList<Monopoly>();
         gaController = new GAController();
 
-        while (!playerPool.isEmpty()) {
+        while (playerPool.size() >= Main.numPlayers) {
           Monopoly game = new Monopoly(generation, matches, gameNumber,
-              getFourPlayers());
+              getPlayersForGame());
           gaController.addGame(game);
           game.setFlowController(gaController);
 
@@ -204,7 +203,7 @@ public class GAEngine implements Runnable {
           } catch (InterruptedException ignored) {
           }
         }
-        assert playerPool.isEmpty();
+        assert playerPool.size() < Main.numPlayers;
 
         // Start the executor shutdown process...
         gameExecutor.shutdown();
@@ -230,8 +229,6 @@ public class GAEngine implements Runnable {
         }
         fitEval.evaluate(playersDone);
 
-        ++matches;
-
         // Move the players back to the player pool.
         // When fitness evaluator is tournament, move winning players to
         // the player pool and losing players to the waiting pool.
@@ -243,9 +240,16 @@ public class GAEngine implements Runnable {
             else
               waitingPool.add(player);
           }
+
+          if (playerPool.size() < Main.numPlayers) {
+            ++matches;
+            playerPool.addAll(waitingPool);
+            waitingPool.clear();
+          }
         } else {
           // not tournament evaluator, so add all players back to pool
           playerPool.addAll(playersDone);
+          ++matches;
         }
 
         playersDone.removeAllElements();
@@ -381,7 +385,7 @@ public class GAEngine implements Runnable {
       bw.newLine();
 
       for (AbstractPlayer player : fitness) {
-        bw.write(player.getFitness() + "," + player.getName());
+        bw.write(player.getFitness() + "," + player.playerIndex);
         bw.newLine();
       }
     } catch (IOException e) {

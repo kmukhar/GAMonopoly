@@ -92,7 +92,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    */
   public AbstractPlayer(int index, ChromoTypes chromoType) {
     this.chromoType = chromoType;
-    long seed = 1241797664697L;
+    long seed = Main.seed;
     if (Main.useRandomSeed) {
       seed = System.currentTimeMillis();
     }
@@ -504,6 +504,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * @return The total worth of the player including cash, value of all houses
    *         and hotels, and value of all property owned by the player.
+   *         It is calculated as the sum of : (1) cash on hand; (2) lots,
+   *         utilities and railroads owned, at the price printed on the board;
+   *         (3) any mortgaged property owned, at one-half the price printed on 
+   *         the board; (4) houses, valued at purchase price; (5) hotels, 
+   *         valued at purchase price including the value of the four houses 
+   *         turned in.
    */
   public int getTotalWorth() {
     int totalWorth = cash;
@@ -517,10 +523,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         totalWorth += (location.getHotelCost() * 5);
       }
 
-      if (location.isMortgaged()) {
-        totalWorth += location.getCost() / 2;
-      } else {
+      // properties are worth half face value
+      // unmortgaged properties are worth nothing
+      if (!location.isMortgaged()) {
         totalWorth += location.getCost();
+      } else {
+        totalWorth += location.getCost()/2;
       }
     }
 
@@ -640,11 +648,9 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
 
   /**
    * Calculate whether the player has or can sell enough things to have at least
-   * the cash given by amount. If the player's cash is already greater than
-   * amount then the method simply returns true. if the player's current cash is
-   * less than amount, then the method determines if the player can sell enough
-   * houses, hotels, and mortgage properties to have cash greater than or equal
-   * to amount. This method does not actually sell any houses, hotels, or
+   * the cash given by amount. The method determines if the player can sell
+   * enough houses, hotels, and mortgage properties to have cash greater than or
+   * equal to amount. This method does not actually sell any houses, hotels, or
    * properties; it just computes how much cash could be raised if the player
    * sold everything.
    * 
@@ -654,28 +660,33 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    *         amount, false otherwise.
    */
   public boolean canRaiseCash(int amount) {
-    int totalWorth = cash;
+    return amount <= getLiquidationValue();
+  }
 
-    if (totalWorth >= amount) {
-      return true;
-    }
+  /**
+   * Calculate how much cash the player has after selling houses, hotels, and
+   * mortgaging properties This method does not actually sell any houses,
+   * hotels, or properties; it just computes how much cash could be raised if
+   * the player sold everything.
+   * 
+   * @return The amount of cash the player has if the player sells all their 
+   * properties, houses, and hotels.
+   */
+  public int getLiquidationValue() {
+    int result = cash;
 
     for (Location location : owned.values()) {
       // add selling price for all houses
-      totalWorth += location.getNumHouses() * location.getHouseCost() / 2;
+      result  += location.getNumHouses() * location.getHouseCost() / 2;
       // add selling price for all hotels (hotels == 5 houses)
-      totalWorth += location.getNumHotels() * 5 * location.getHotelCost() / 2;
+      result += location.getNumHotels() * 5 * location.getHotelCost() / 2;
       // add cash for mortgaging any unmortgaged properties
       if (!location.isMortgaged()) {
-        totalWorth += location.getCost() / 2;
+        result += location.getCost() / 2;
       }
     }
 
-    if (totalWorth >= amount) {
-      return true;
-    }
-
-    return false;
+    return result;
   }
 
   /**
@@ -724,36 +735,47 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @return The amount of this player's bid.
    */
   public int getBidForLocation(Location currentLocation) {
+
     int bid = 0;
 
-    if (cash < 50) {
+    PropertyNegotiator pn = new PropertyNegotiator(this, gameKey);
+    int baseWealth = pn.evaluateOwnersHoldings();
+    int newWealth = pn.evaluateProfitFromLot(currentLocation);
+    int profit = newWealth - baseWealth;
+
+    if (getLiquidationValue() < 50) {
       bid = 0;
     } else if (buyProperty(currentLocation)) {
       // player wants to buy, so start with current cost
       bid = currentLocation.getCost();
 
-      double adjustFactor = Math.abs(r.nextGaussian());
-      adjustFactor = adjustFactor * (double) (bid / 10);
-      bid += (int) adjustFactor;
-    } else {
-      // otherwise, player does not want location
-      if (currentLocation == location) {
-        // if player is the one at the location, then bid some small
-        // amount (cost/2 or cost/3 or cost/4)
-        int factor = r.nextInt(3) + 2; // factor is 2,3,4
-        bid = currentLocation.getCost() / factor;
+      int adjustFactor = Math.abs(profit);
+      bid += adjustFactor;
+      double premium = 1.0;
+      if (profit < 0) {
+        // player agreed to buy, but will potentially be a loss so only
+        // bid a small premium up to 110% of cost
+        premium = 1.1;
       } else {
-        // otherwise, other players bid half cost
-        // plus some random fluctuation
-        bid = (currentLocation.getCost() / 2)
-            + (int) (Math.abs(r.nextGaussian()) * (double) (currentLocation
-                .getCost() / 6));
+        // this property is a gain for the player so bid up to 150% of cost
+        premium = 1.5;
       }
+      if (bid > currentLocation.getCost() * premium)
+        bid = (int) ((double) currentLocation.getCost() * premium);
+    } else {
+      // player does not want to buy property, but does want to prevent
+      // other players from getting property at ultra low cost
+      // bid 1/2 property cost plus some random fluctuation
+      bid = (currentLocation.getCost() / 2)
+          + (int) (Math.abs(r.nextGaussian()) * (double) (currentLocation
+              .getCost() / 6));
     }
 
     // ensure bid does not exceed cash
-    if (bid > cash) {
-      bid = cash;
+    if (bid >= getLiquidationValue()) {
+      bid = getLiquidationValue() - getMinimumCash();
+      if (bid < 0) 
+        bid = cash;
     }
 
     assert bid >= 0 : "Invalid bid amount: " + bid;
@@ -1486,7 +1508,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     }
 
     return result.toString();
-    
   }
 
   /**
@@ -1735,6 +1756,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   }
 
   protected void fireChangeEvent(ChangeEvent event) {
+    if (changeListener != null)
       changeListener.stateChanged(event);
   }
 
