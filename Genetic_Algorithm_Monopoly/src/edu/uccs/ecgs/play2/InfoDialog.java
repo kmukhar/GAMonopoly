@@ -74,7 +74,8 @@ public class InfoDialog {
     return result;
   }
 
-  public static void showFinalDialog(String filename, String gameStats)
+  public static void showFinalDialog(String filename, String gameStats,
+                                     Object[] values)
   {
     InputStream is = PlayerGui.class.getResourceAsStream(filename);
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -125,9 +126,6 @@ public class InfoDialog {
 
     JFrame frame = new JFrame();
     frame.setIconImage(PlayerGui.monopolyIcon.getImage());
-
-    Object[] values = 
-        new Object[] { "I emailed the results, exit the game." };
 
     JOptionPane.showOptionDialog(frame, sp, "About this program",
         JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,

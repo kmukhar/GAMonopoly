@@ -462,12 +462,15 @@ public class PlayerGui extends JPanel {
 
         Calendar nowCal = GregorianCalendar.getInstance();
         String filename = "GameOver.html";
+        Object[] values = 
+            new Object[] { "I emailed the results, exit the game." };
         if (nowCal.after(endCal)) {
           filename = "GameOver2.html";
+          values = new Object[] { "Exit the game." };
         }
 
         String gameStats = getGameStats();
-        InfoDialog.showFinalDialog(filename, gameStats);
+        InfoDialog.showFinalDialog(filename, gameStats, values);
         System.exit(0);
       }
     });
