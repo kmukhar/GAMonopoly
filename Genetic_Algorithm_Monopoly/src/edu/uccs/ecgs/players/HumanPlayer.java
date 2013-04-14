@@ -162,7 +162,7 @@ public class HumanPlayer extends AbstractPlayer {
         result = "0";
 
       try {
-        bid = Integer.parseInt(result);
+        bid = Integer.parseInt(result.trim());
         if (bid < 0 || bid > getLiquidationValue())
           throw new NumberFormatException();
         break;
