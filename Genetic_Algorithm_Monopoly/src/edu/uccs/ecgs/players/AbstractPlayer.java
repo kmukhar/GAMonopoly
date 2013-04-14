@@ -132,9 +132,14 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * player's list of owned properties. No other changes are made to the
    * player's state or to the properties' state.
    */
-  public void clearAllProperties() {
+  public void clearAllProperties()
+  {
     if (owned != null) {
       owned.clear();
+      if (location != null) {
+        fireChangeEvent();
+        getCurrentLocation().fireChangeEvent(new BankruptcyEvent(this));
+      }
     }
   }
 

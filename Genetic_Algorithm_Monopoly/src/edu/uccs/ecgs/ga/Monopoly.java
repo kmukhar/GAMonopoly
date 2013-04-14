@@ -560,8 +560,10 @@ public class Monopoly implements Runnable, Controllable {
       // give all property to gaining player
       // mortgaged properties are handled in the addProperties method
       try {
-        gainingPlayer.addProperties(player.getAllProperties(), gameOver);
+        TreeMap<Integer, Location> lotsGained = new TreeMap<Integer, Location>();
+        lotsGained.putAll(player.getAllProperties());
         player.clearAllProperties();
+        gainingPlayer.addProperties(lotsGained, gameOver);
       } catch (BankruptcyException e) {
         //rarely, the player gaining the properties will not be able to raise
         //the case to pay the interest. The gainingPlayer goes bankrupt also.
