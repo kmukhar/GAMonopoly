@@ -38,42 +38,53 @@ public class HumanPlayer extends AbstractPlayer {
   @Override
   public boolean payBailP()
   {
-    String message = htmlStart + "Do you want to pay bail to get out of Jail?"
+    String message1 = htmlStart + "Do you want to pay bail to get out of Jail?"
         + htmlEnd;
     if (this.hasGetOutOfJailCard()) {
-      message = htmlStart + "Do you want to use your Get Out Of Jail card?"
+      message1 = htmlStart + "Do you want to use your Get Out Of Jail card?"
           + htmlEnd;
     }
 
-    int result = GuiHelper.showConfirmDialog(null, message, "Pay Bail?",
+    int result = GuiHelper.showConfirmDialog(null, message1, "Pay Bail?",
         JOptionPane.YES_NO_OPTION);
 
     // but in case the player accidentally clicked yes when they might not
     // have enough money, force them to confirm if they don't have enough
     // money
     if (result == JOptionPane.YES_OPTION) {
-      if (canRaiseCash(50)) {
-        if (cash < 50) {
-          // they don't have enough money to pay bail
+      if (hasGetOutOfJailCard()) {
+        if (cash < getMinimumCash()) {
           result = GuiHelper.showConfirmDialog(null, htmlStart
-              + "You do not have enough cash to pay bail. You will need to "
-              + " raise cash by selling hotels or houses,or mortgaging "
-              + "properties. Are you sure you want to pay bail of $50?"
-              + htmlEnd, "Confirm pay bail", JOptionPane.YES_NO_OPTION,
-              JOptionPane.WARNING_MESSAGE);
-        } else if (cash < getMinimumCash()) {
-          // they have some money to pay bail, but not very much
-          result = GuiHelper.showConfirmDialog(null, htmlStart
-              + "You don't have a lot of cash. Are you sure you "
-              + "want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
-              JOptionPane.YES_NO_OPTION,  JOptionPane.INFORMATION_MESSAGE);
+              + "You don't have a lot of cash. Are you sure you want to use "
+              + "your Get Out Of Jail card?" + htmlEnd, 
+              "Confirm use Get Out Of Jail card",
+              JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
         }
       } else {
-        // if they pay bail, they will go bankrupt
-        result = GuiHelper.showConfirmDialog(null, htmlStart
-            + "If you try to pay bail, you will go bankrupt! Are you sure you "
-            + "want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
-            JOptionPane.YES_NO_OPTION,  JOptionPane.WARNING_MESSAGE);
+        if (canRaiseCash(50)) {
+          if (cash < 50) {
+            // they don't have enough money to pay bail
+            result = GuiHelper
+                .showConfirmDialog(null, htmlStart 
+                    + "You do not have enough cash to pay $50 bail. You "
+                    + "will need to raise cash by selling hotels or "
+                    + "houses, or mortgaging  properties. Are you sure you "
+                    + "want to pay bail?" + htmlEnd, "Confirm pay bail",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+          } else if (cash < getMinimumCash()) {
+            // they have some money to pay bail, but not very much
+            result = GuiHelper.showConfirmDialog(null, htmlStart
+                + "You don't have a lot of cash. Are you sure you want to pay "
+                + "$50 bail?" + htmlEnd, "Confirm pay bail",
+                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+          }
+        } else {
+          // if they pay bail, they will go bankrupt
+          result = GuiHelper.showConfirmDialog(null, htmlStart
+              + "If you try to pay bail, you will go bankrupt! Are you sure "
+              + "you want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
+              JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        }
       }
     }
     
