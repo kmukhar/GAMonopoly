@@ -127,7 +127,7 @@ public class PlayerGui extends JPanel {
    */
   private AbstractPlayer[] createPlayers()
   {
-    playerName = dialog.getName();
+    playerName = dialog.getPlayerName();
     playerIndex = dialog.getIndex();
  
     PlayerLoader loader = PlayerLoader.getLoader();
