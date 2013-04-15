@@ -253,6 +253,14 @@ public abstract class Location implements Comparable<Location> {
   }
 
   /**
+   * @return True if the property can be mortgaged (property has no houses or
+   * hotels and is not already mortgaged. 
+   */
+  public boolean canBeMortgaged() {
+    return getNumHotels() == 0 && getNumHouses() == 0 && !isMortgaged();
+  }
+
+  /**
    * Set multiplier for rent. For example, unimproved properties in a monopoly
    * receive double rent so multiplier would be 2 in this case. Railroads
    * receive a multiple of the base rent depending on how many railroads are

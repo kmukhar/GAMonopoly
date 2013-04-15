@@ -575,25 +575,20 @@ public class HumanPlayer extends AbstractPlayer {
       ArrayList<Location> lotsWithHotels = new ArrayList<Location>();
       CopyOnWriteArrayList<Location> lotsWithHouses = 
           new CopyOnWriteArrayList<Location>();
-      
+
+      // create a list or lots that can be mortgaged
       for (Location lot : getAllProperties().values()) {
-        if (lot.getNumHotels() > 0) {
-          lotsWithHotels.add(lot);
-        } else if (lot.getNumHouses() > 0) {
-          lotsWithHouses.add(lot);
-        } else if (!lot.isMortgaged()) {
+        if (lot.canBeMortgaged()) {
           unmortgaged.add(lot);
         }
       }
 
-      // If any lots in group have a hotel, can't sell a house until all
-      // hotels in group are sold
-      for (Location lotWithHotel : lotsWithHotels) {
-        PropertyGroups group = lotWithHotel.getGroup();
-        for (Location lotWithHouse : lotsWithHouses) {
-          if (lotWithHouse.getGroup() == group)
-            lotsWithHouses.remove(lotWithHouse);
-        }
+      // create a list of lots with houses or hotels that can be sold
+      for (Location lot : sellableLots) {
+        if (lot.getNumHotels() > 0)
+          lotsWithHotels.add(lot);
+        if (lot.getNumHouses() > 0)
+          lotsWithHouses.add(lot);
       }
 
       ArrayList<String> options = new ArrayList<String>();
