@@ -85,19 +85,30 @@ public abstract class CGPlayer extends AbstractPlayer {
   public boolean buyProperty(Location aLocation) {
     PropertyFactory pf = PropertyFactory.getPropertyFactory(gameKey);
     GroupOwners flag = pf.getOwnerInformationForGroup(aLocation, this);
+    boolean result = false;
 
     switch (flag) {
     case NONE:
-      return r.nextDouble() < chrNoOwners[aLocation.index];
+      result = r.nextDouble() < chrNoOwners[aLocation.index];
+      break;
     case SELF:
-      return r.nextDouble() < chrPlayerOwns[aLocation.index];
+      result = r.nextDouble() < chrPlayerOwns[aLocation.index];
+      break;
     case ONE_OPPONENT:
-      return r.nextDouble() < chrOpponentOwns[aLocation.index];
+      result = r.nextDouble() < chrOpponentOwns[aLocation.index];
+      break;
     case TWO_OPPONENTS:
-      return r.nextDouble() < chrTwoOpponentOwns[aLocation.index];
+      result = r.nextDouble() < chrTwoOpponentOwns[aLocation.index];
+      break;
     }
 
-    return false;
+    if (result) {
+      // if the answer was true, ensure player can raise the cash 
+      // if not, change result to false
+      result = canRaiseCash(aLocation.getCost());
+    }
+
+    return result;
   }
 
   @Override
