@@ -19,6 +19,7 @@ public class PropertyNegotiator {
   private TreeMap<PropertyGroups, ArrayList<Location>> locationGroups;
   private String gamekey;
   private int alpha = 1;
+  // short term probabilities -- probability of given dice roll: 0, 1, 2, ...
   private static double[] stProbs = new double[] { 0.0, 0.0, 1.0 / 36.0,
       2.0 / 36.0, 3.0 / 36.0, 4.0 / 36.0, 5.0 / 36.0, 6.0 / 36.0, 5.0 / 36.0,
       4.0 / 36.0, 3.0 / 36.0, 2.0 / 36.0, 1.0 / 36.0 };
@@ -40,6 +41,8 @@ public class PropertyNegotiator {
 
     mtProbs = new TreeMap<PropertyGroups, Double>();
 
+    // mid term probabilities -- probability of landing on property in one
+    // trip around board
     mtProbs.put(PropertyGroups.RAILROADS, 0.64);
     mtProbs.put(PropertyGroups.ORANGE, 0.50);
     mtProbs.put(PropertyGroups.RED, 0.49);
@@ -477,7 +480,7 @@ public class PropertyNegotiator {
     ArrayList<Location> ownerProperties = new ArrayList<Location>();
     ArrayList<TradeProposal> tradeProposals = new ArrayList<TradeProposal>();
 
-    // start by getting all the properties owned by other players
+    // start by getting all the properties owned by players
     for (AbstractPlayer player : players) {
       if (owner == player)
         ownerProperties.addAll(player.getAllProperties().values());
@@ -494,6 +497,18 @@ public class PropertyNegotiator {
         // and only trade if each player needs the other property
         AbstractPlayer owner2 = location2.getOwner();
         if (!owner.needs(location2) || !owner2.needs(location))
+          continue;
+
+        // only trade if owner only has 1 property of 3 in  street group
+        // or if owner has 1 property of 4 in railroads or 1 of 2 in utilities
+        int count = owner.countPropertiesInGroup(location);
+        if (count > 1)
+          continue;
+
+        // if the trade would give the opponent a monopoly, but not give
+        // the player a monopoly, then don't propose it
+        if (owner2.wouldHaveMonopolyWith(location)
+            && !owner.wouldHaveMonopolyWith(location2))
           continue;
 
         assert !location.getGroup().equals(location2.getGroup());

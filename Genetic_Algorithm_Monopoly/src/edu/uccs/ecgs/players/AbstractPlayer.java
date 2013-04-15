@@ -67,14 +67,15 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   protected ChromoTypes chromoType;
 
   PropertyNegotiator propertyTrader;
-  // in the paper, w1 and w2 are used to balance risk taking against risk avoidance
+  // in the paper, w1 and w2 are used to balance risk taking against risk
+  // avoidance
   // w1 + w2 = 1.0
   // a high w1 means the player tries to get gains
   // a high w2 means the player tries to avoid losses
-  public double w1 = 0;
-  public double w2 = 0;
+  public double w1 = 0.725;
+  public double w2 = 1.0 - w1;
   // if the profit exceeds this threshold, the player accepts the trade.
-  private int tradeThreshold = 100;
+  private int tradeThreshold = 400;
 
   protected String gameKey;
   private ChangeListener changeListener;
@@ -103,20 +104,6 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     clearAllProperties();
     cash = 1500;
     locationIndex = 0;
-
-    // modify the trading parameters
-    double p = r.nextDouble();
-    setW1(0.95);
-    if (p > 0.33)
-      setW1(0.65);
-    
-    if (p > 0.67)
-      setW1(0.80);
-
-    p = r.nextDouble();
-    tradeThreshold = 400;
-    if (p > 0.5)
-      tradeThreshold = 200;
   }
 
   /**
@@ -1662,6 +1649,54 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         return true;
 
     return false;
+  }
+
+  /**
+   * Determine if this player would gain a monopoly if the location is acquired.
+   * 
+   * @param location
+   *          The location that the player could acquire
+   * @return True if gaining the location would give this player a monopoly,
+   *         False otherwise
+   */
+  public boolean wouldHaveMonopolyWith(Location location) {
+    int count = 0;
+    PropertyGroups group = location.getGroup();
+    for (Location lot : owned.values()) {
+      if (group == lot.getGroup())
+        ++count;
+    }
+
+    switch(group) {
+    case BROWN:
+    case DARK_BLUE:
+      return count == 1;
+
+    case GREEN:
+    case LIGHT_BLUE:
+    case ORANGE:
+    case PURPLE:
+    case RED:
+    case YELLOW:
+      return count == 2;
+
+    case RAILROADS:
+    case SPECIAL:
+    case UTILITIES:
+    default:
+    }
+    return false;
+  }
+
+  public int countPropertiesInGroup(Location location)
+  {
+    PropertyGroups group = location.getGroup();
+    int count = 0;
+    for (Location lot : owned.values())
+      if (lot.getGroup() == group)
+        ++count;
+
+    return count;
   }
 
   public int evaluateTrade(TradeProposal trade) {
