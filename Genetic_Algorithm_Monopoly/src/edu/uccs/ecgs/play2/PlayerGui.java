@@ -36,6 +36,8 @@ public class PlayerGui extends JPanel {
   static ImageIcon monopolyIcon;
   private static PlayerGui gui;
   private static boolean initialized = false;
+  private static Calendar endCal;
+  private static Calendar nowCal;
 
   /**
    * Create the GUI and show it. For thread safety, this method should be
@@ -48,16 +50,16 @@ public class PlayerGui extends JPanel {
       monopolyIcon = new ImageIcon(imgURL);
     }
 
-    Calendar endCal = GregorianCalendar.getInstance();
+    endCal = GregorianCalendar.getInstance();
     // set end date for research to midnight 12 Apr 2013, 
-    endCal.set(2013, 3, 12, 0, 0, 0);
+    endCal.set(2013, 3, 22, 0, 0, 0);
 
-    Calendar nowCal = GregorianCalendar.getInstance();
+    nowCal = GregorianCalendar.getInstance();
     String infoFileName = "About.html";
     String[] options = new String[] { "Let's Play!", "Get Me Out Of Here" };
     if (nowCal.after(endCal)) {
       infoFileName = "About2.html";
-      options = new String[] { "Ok" };
+      options = new String[] { "OK" };
     }
 
     int result = InfoDialog.showOptionDialog(infoFileName, options);
@@ -456,11 +458,6 @@ public class PlayerGui extends JPanel {
         JOptionPane.showMessageDialog(null,
             "The Game Is Over. " + winner.getName() + " is the winner.");
 
-        Calendar endCal = GregorianCalendar.getInstance();
-        // set end date for research to 30 Mar 2013
-        endCal.set(2013, 3, 12, 0, 0, 0);
-
-        Calendar nowCal = GregorianCalendar.getInstance();
         String filename = "GameOver.html";
         Object[] values = 
             new Object[] { "I emailed the results, exit the game." };
