@@ -316,6 +316,7 @@ public class Monopoly implements Runnable, Controllable {
 
   public void sellHotel(Location location, Collection<Location> owned) 
   {
+    assert location.getNumHotels() == 1;
     PropertyFactory pf = PropertyFactory.getPropertyFactory(gamekey);
     ArrayList<Location> lots = pf.getAllPropertiesInGroup(location.getGroup());
 
@@ -323,7 +324,7 @@ public class Monopoly implements Runnable, Controllable {
     int countHouses = 0;
     // sell one hotel and replace with 4 houses
     for (Location lot : lots) {
-      if (lot.getNumHotels() == 1) {
+      if (lot == location) {
         lot.removeHotel();
         ++countHotels;
         ++numHotels;
