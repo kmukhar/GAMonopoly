@@ -51,8 +51,8 @@ public class PlayerGui extends JPanel {
     }
 
     endCal = GregorianCalendar.getInstance();
-    // set end date for research to midnight 12 Apr 2013, 
-    endCal.set(2013, 3, 22, 0, 0, 0);
+    // set end date for research to midnight 28 Apr 2013, 
+    endCal.set(2013, 3, 28, 0, 0, 0);
 
     nowCal = GregorianCalendar.getInstance();
     String infoFileName = "About.html";
@@ -133,12 +133,12 @@ public class PlayerGui extends JPanel {
     playerIndex = dialog.getIndex();
  
     PlayerLoader loader = PlayerLoader.getLoader();
-    AbstractPlayer[] players = loader.get4Players();
+    ArrayList<AbstractPlayer> players = loader.get3Players();
 
     humanPlayer = new HumanPlayer(playerIndex, playerName);
-    players[playerIndex - 1] = humanPlayer;
+    players.add(playerIndex - 1, humanPlayer);
 
-    return players;
+    return players.toArray(new AbstractPlayer[players.size()]);
   }
 
   private static void getNameAndIndex()
@@ -194,6 +194,7 @@ public class PlayerGui extends JPanel {
 
     playerPanels = new PlayerPanel[4];
     int tabWidth = 48;
+    int initialSelection = 0;
 
     for (int i = 0; i < playerPanels.length; i++) {
       PlayerPanel panel = makePlayerPanel();
@@ -201,12 +202,15 @@ public class PlayerGui extends JPanel {
       tabbedPane.addTab("<html><body><table width='" + tabWidth + "'>"
           + players[i].getName() + "</table></body></html>", panel);
       playerPanels[i].setPlayer(players[i]);
+      if (players[i] instanceof HumanPlayer) 
+        initialSelection = i;
     }
 
     tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
     tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
     tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
     tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
+    tabbedPane.setSelectedIndex(initialSelection);
 
     // Add the tabbed pane to this panel.
     JPanel gamePanel = new JPanel();
@@ -481,15 +485,8 @@ public class PlayerGui extends JPanel {
 
     sb.append("BEGINEOL");
     for (AbstractPlayer player : players) {
-      sb.append(player.getSourceName()).append(",")
-          .append(player.getFinishOrder()).append(",")
-          .append(player.getTotalWorth()).append(",")
-          .append(player.getNumProperties()).append(",")
-          .append(player.getNumMonopolies()).append(",")
-          .append(player.getNumHouses()).append(",")
-          .append(player.getNumHotels()).append(",")
-          .append(player.getW1()).append(",")
-          .append(player.getTradeThreshold()).append("EOL");
+      StringBuilder s = player.getGameStats();
+      sb.append(s).append("EOL");
     }
 
     sb.append(game.turnCounter).append("EOL");

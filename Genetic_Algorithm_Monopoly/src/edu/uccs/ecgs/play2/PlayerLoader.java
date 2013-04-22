@@ -67,6 +67,7 @@ public class PlayerLoader {
       ChromoTypes chromoType = ChromoTypes.valueOf(headerStr);
       player = chromoType.getPlayer(index, dis);
       player.setSourceName(filename);
+      player.setTradingParameters();
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -86,21 +87,23 @@ public class PlayerLoader {
 	}
 
   /**
-   * @return An array of 4 AbstractPlayers loaded from randomly selected data
-   * files.
+   * @return A 4 element array of 3 AbstractPlayers loaded from randomly
+   *         selected data files; the 4th element is empty. The caller should
+   *         insert the 4th player into the array appropriately (add to end or
+   *         insert into middle and move other players).
    */
-  public AbstractPlayer[] get4Players() {
-    AbstractPlayer[] players = new AbstractPlayer[4];
+  public ArrayList<AbstractPlayer> get3Players() {
+    ArrayList<AbstractPlayer> players = new ArrayList<AbstractPlayer>();
 
     ArrayList<Object> filenames = new ArrayList<Object>();
     filenames.addAll(playerFiles.keySet());
 
     Random r = new Random(System.currentTimeMillis());
 
-    for (int i = 0; i < players.length; i++) {
+    for (int i = 0; i < 3; i++) {
       int playerIndex = i + 1;
       Object path = filenames.remove(r.nextInt(filenames.size()));
-      players[i] = this.loadPlayer(playerIndex, path.toString());
+      players.add(this.loadPlayer(playerIndex, path.toString()));
     }
 
     return players;

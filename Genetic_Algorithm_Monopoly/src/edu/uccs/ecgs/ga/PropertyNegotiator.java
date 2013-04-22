@@ -465,7 +465,7 @@ public class PropertyNegotiator {
     }
 
     bigU += owner.cash;
-    bigU *= owner.w1;
+    bigU *= owner.getW1();
 
     return (int) bigU;
   }
@@ -489,6 +489,12 @@ public class PropertyNegotiator {
     }
 
     for (Location location : ownerProperties) {
+      // trading away a monopoly would probably be weeded out because it 
+      // drastically lowers the player expected gain, but eliminate it here
+      // anyway.
+      if (location.partOfMonopoly) 
+        continue;
+
       for (Location location2 : otherProperties) {
         // no point in trading two properties in the same group
         if (location.getGroup() == location2.getGroup())
@@ -502,7 +508,7 @@ public class PropertyNegotiator {
         // only trade if owner only has 1 property of 3 in  street group
         // or if owner has 1 property of 4 in railroads or 1 of 2 in utilities
         int count = owner.countPropertiesInGroup(location);
-        if (count > 1)
+        if (count > 1 && !owner.wouldHaveMonopolyWith(location2))
           continue;
 
         // if the trade would give the opponent a monopoly, but not give
@@ -627,7 +633,7 @@ public class PropertyNegotiator {
     
     double bigU = evaluateOwnersHoldings();
 
-    bigU -= owner.w2
+    bigU -= owner.getW2()
         * ((double) (computeShortTermLoss(location1) 
             + computeMidTermLoss(location1)));
 
@@ -660,7 +666,7 @@ public class PropertyNegotiator {
     
     double bigU = evaluateOwnersHoldings();
 
-    bigU -= owner.w2
+    bigU -= owner.getW2()
         * ((double) (computeShortTermLoss(lot) 
             + computeMidTermLoss(lot)));
 

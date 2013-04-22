@@ -67,15 +67,8 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   protected ChromoTypes chromoType;
 
   PropertyNegotiator propertyTrader;
-  // in the paper, w1 and w2 are used to balance risk taking against risk
-  // avoidance
-  // w1 + w2 = 1.0
-  // a high w1 means the player tries to get gains
-  // a high w2 means the player tries to avoid losses
-  public double w1 = 0.725;
-  public double w2 = 1.0 - w1;
-  // if the profit exceeds this threshold, the player accepts the trade.
-  private int tradeThreshold = 400;
+  private double w1 = 0.5;
+  private int threshold = 200;
 
   protected String gameKey;
   private ChangeListener changeListener;
@@ -104,6 +97,31 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     clearAllProperties();
     cash = 1500;
     locationIndex = 0;
+  }
+
+  public void setTradingParameters()
+  {
+    // set trading parameters here, for now we Do the Simplest thing possible
+    // for the competition validation
+    // TODO Create better parameter setting code
+    // we get three RGA players and one human player, for the RGA players set
+    // the parameters based on source name, for the human, do nothing
+    if (this instanceof RGAPlayer) {
+      if (sourceName.indexOf("0101") > 0) {
+        // best player overall, did best with threshold = 400, use average w1
+        w1 = 0.725;
+        threshold = 400;
+      } else if (sourceName.indexOf("0423") > 0) {
+        // this player did best with w1 = 0.95, use average threshold
+        w1 = 0.95;
+        threshold = 300;
+      } else if (sourceName.indexOf("0667") > 0) {
+        // this player did best with w1 = .65, use average threshold
+        w1 = 0.65;
+        threshold = 300;
+      }
+      // if none of the clauses above are true, then just keep the defaults
+    }
   }
 
   /**
@@ -1751,7 +1769,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     
     int profit = newValue - baseValue + bestTrade.cashDiff;
     
-    if (profit < tradeThreshold) {
+    if (profit < getThreshold()) {
       logFinest("Trade does not exceed profit threshold");
       logInfo("Trade refused");
       return false;
@@ -1836,19 +1854,49 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     getCash(50);
   }
 
-  private void setW1(double d)
-  {
-    w1 = d;
-    w2 = 1.0 - d;
-  }
-
+  /**
+   * @return The omega_1 parameter for the trading algorithm. This parameter
+   * is related to omega_2: omega_1 + omega_2 = 1.0
+   */
   public double getW1()
   {
     return w1;
   }
 
-  public int getTradeThreshold()
+  /**
+   * @return The omega_2 parameter for the trading algorithm. This parameter
+   * is related to omega_2: omega_1 + omega_2 = 1.0
+   */
+  public double getW2() {
+    return 1.0 - w1;
+  }
+
+  /**
+   * @return The trading threshold for this player.
+   */
+  private int getThreshold()
   {
-    return tradeThreshold;
+    return threshold;
+  }
+
+  /**
+   * @return A string with the following game statistics for this player: Name,
+   *         finish order, total worth, number of properties owned at end of
+   *         game, number of monopolies, number of houses, number of hotels,
+   *         omega_1, and trading threshold.
+   */
+  public StringBuilder getGameStats()
+  {
+    StringBuilder s = new StringBuilder();
+    s.append(getSourceName()).append(",")
+    .append(getFinishOrder()).append(",")
+    .append(getTotalWorth()).append(",")
+    .append(getNumProperties()).append(",")
+    .append(getNumMonopolies()).append(",")
+    .append(getNumHouses()).append(",")
+    .append(getNumHotels()).append(",")
+    .append(getW1()).append(",")
+    .append(getThreshold());
+    return s;
   }
 }
