@@ -476,6 +476,8 @@ public class HumanPlayer extends AbstractPlayer {
    */
   public void sellHouses() {
     boolean done = false;
+    if (sellableLots == null)
+      updateSellableLots();
 
     while (!done) {
       if (sellableLots.size() == 0) {
@@ -582,6 +584,9 @@ public class HumanPlayer extends AbstractPlayer {
           unmortgaged.add(lot);
         }
       }
+
+      if (sellableLots == null) 
+        updateSellableLots();
 
       // create a list of lots with houses or hotels that can be sold
       for (Location lot : sellableLots) {
