@@ -138,6 +138,11 @@ public class PlayerGui extends JPanel {
     humanPlayer = new HumanPlayer(playerIndex, playerName);
     players.add(playerIndex - 1, humanPlayer);
 
+    int i = 1;
+    for (AbstractPlayer p : players) {
+      p.setIndex(i++);
+    }
+
     return players.toArray(new AbstractPlayer[players.size()]);
   }
 
