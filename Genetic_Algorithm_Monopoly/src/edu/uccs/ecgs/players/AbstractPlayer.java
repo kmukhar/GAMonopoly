@@ -1658,7 +1658,7 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
    * @param location2
    *          The location to check
    * @return True if the player owns another property in the same group as
-   *         location
+   *         location.
    */
   public boolean needs(Location location2) {
     PropertyGroups group = location2.getGroup();
@@ -1667,6 +1667,26 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         return true;
 
     return false;
+  }
+
+  /**
+   * Determine if the player passed to this method can use the given location 
+   * needs the given location.
+   * 
+   * @param owner2
+   *          The other player that might need the location.
+   * @param location2
+   *          The location to check
+   * @return True if the player owns another property in the same group as
+   *         location, of if the location is a utility or railroad
+   */
+  public boolean opponentNeeds(AbstractPlayer owner2, Location location2)
+  {
+    PropertyGroups group = location2.getGroup();
+    if (group == PropertyGroups.UTILITIES || group == PropertyGroups.RAILROADS)
+      return true;
+
+    return owner2.needs(location2);
   }
 
   /**
@@ -1699,8 +1719,11 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       return count == 2;
 
     case RAILROADS:
-    case SPECIAL:
+      return count == 3;
     case UTILITIES:
+      return count == 1;
+
+    case SPECIAL:
     default:
     }
     return false;
@@ -1747,12 +1770,15 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
   /**
    * Evaluate the proposed trade and respond true or false depending on whether
    * the trade is accepted or not.
-   * @param bestTrade The proposed trade
-   * @return True --> if the trade is accepted<br>False --> otherwise.
+   * 
+   * @param bestTrade
+   *          The proposed trade
+   * @return True --> if the trade is accepted<br>
+   *         False --> otherwise.
    */
   public boolean answerProposedTrade(TradeProposal bestTrade) {
     logInfo("\n" + getName() + " is evaluating trade proposal from "
-        + bestTrade.getProposer() + "\n" + bestTrade.toString());
+        + bestTrade.getProposerName() + "\n" + bestTrade.toString());
 
     // if the player has to give too much money, the reject the trade
     if (cash + bestTrade.cashDiff < getMinimumCash()) {
@@ -1774,6 +1800,33 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
       logInfo("Trade refused");
       return false;
     }
+
+    // the location offered by other player
+    Location lot1 = bestTrade.location;
+    // the location owned by this player
+    Location lot2 = bestTrade.location2;
+
+    // don't trade properties in same group
+    if (lot1.getGroup() == lot2.getGroup())
+      return false;
+
+    // ensure this player needs property
+    if (!needs(lot1))
+      return false;
+
+    // only trade if the property being traded away is the only property in the
+    // group owned by this player.
+    // but if trade would give player a monopoly, trade even if player has
+    // more than one property in group begin traded away.
+    int count = this.countPropertiesInGroup(lot2);
+    if (count > 1 && !this.wouldHaveMonopolyWith(lot1))
+      return false;
+
+    // if the trade would give the opponent a monopoly, but not give
+    // the player a monopoly, then don't propose it
+    if (bestTrade.getProposer().wouldHaveMonopolyWith(lot2)
+        && !this.wouldHaveMonopolyWith(lot1))
+      return false;
 
     logInfo(getName() + ": trade accepted");
     return true;

@@ -1,5 +1,7 @@
 package edu.uccs.ecgs.ga;
 
+import edu.uccs.ecgs.players.AbstractPlayer;
+
 public class TradeProposal {
 
   public Location location;
@@ -44,8 +46,19 @@ public class TradeProposal {
     return sb.toString();
   }
 
-  public String getProposer()
+  /**
+   * @return The name of the proposer of this trade
+   */
+  public String getProposerName()
   {
     return location.getOwner().getName();
+  }
+
+  /**
+   * @return The player that is the proposer of this trade
+   */
+  public AbstractPlayer getProposer()
+  {
+    return location.getOwner();
   }
 }

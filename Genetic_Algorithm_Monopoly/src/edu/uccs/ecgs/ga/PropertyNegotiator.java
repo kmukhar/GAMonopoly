@@ -502,11 +502,13 @@ public class PropertyNegotiator {
 
         // and only trade if each player needs the other property
         AbstractPlayer owner2 = location2.getOwner();
-        if (!owner.needs(location2) || !owner2.needs(location))
+        if (!owner.needs(location2) || !owner.opponentNeeds(owner2, location))
           continue;
 
-        // only trade if owner only has 1 property of 3 in  street group
-        // or if owner has 1 property of 4 in railroads or 1 of 2 in utilities
+        // only trade if the property being traded away is the only property in 
+        // the group owned by the player.
+        // but if trade would give player a monopoly, trade even if player has
+        // more than one property in group begin traded away.
         int count = owner.countPropertiesInGroup(location);
         if (count > 1 && !owner.wouldHaveMonopolyWith(location2))
           continue;
