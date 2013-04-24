@@ -726,10 +726,18 @@ public class HumanPlayer extends AbstractPlayer {
 
     getCash(interest);
 
-    GuiHelper.showMessageDialog(null, htmlStart + "You paid $" + interest
+    Object[] options = new String[] { "Lift Mortgages", "Later" };
+    int result = GuiHelper.showOptionDialog(null, htmlStart + "You paid $"
+        + interest
         + " in interest. You can lift the mortgages from any properties by "
-        + "clicking the Lift Mortgages button." + htmlEnd, "Interest payed",
-        JOptionPane.INFORMATION_MESSAGE);
+        + "clicking the Lift Mortgages button. If you want to lift the "
+        + "mortgages later, click the Later button." + htmlEnd,
+        "Interest Payed", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    
+    if (result == 0) {
+      liftMortgages(false);
+    }
   }
 
   /*
@@ -914,10 +922,33 @@ public class HumanPlayer extends AbstractPlayer {
     // mortgages
   }
 
+  /**
+   * Allows the player to pay interest and mortgage amount to lift mortgages
+   * from properties that are owned by this player.
+   */
   public void liftMortgages()
+  {
+    liftMortgages(true);
+  }
+
+  /**
+   * Lift the mortgages from properties owned by this player.
+   * 
+   * @param payInterest
+   *          If true, player pays the interest and the mortgage, if false,
+   *          player only pays the mortgage. When the player has received the
+   *          properties through another player's bankruptcy, the
+   *          processMortgagedNewProperties method pays the interest, so it
+   *          doesn't need to be paid here if that method calls this method.
+   */
+  public void liftMortgages(boolean payInterest)
   {
     Vector<Location> mortgaged = getSortedMortgages(getAllProperties());
 
+    double interest = 1.0;
+    if (payInterest) {
+      interest = 1.1;
+    }
     boolean done = false;
     while (!done && mortgaged.size() > 0) {
       Location lot = (Location) JOptionPane.showInputDialog(null, htmlStart
@@ -929,7 +960,7 @@ public class HumanPlayer extends AbstractPlayer {
       if (lot == null)
         done = true;
       else {
-        int payoff = (int) (1.1 * ((double) lot.getCost()) / 2.0);
+        int payoff = (int) (interest * ((double) lot.getCost()) / 2.0);
         if (payoff > cash) {
           JOptionPane.showMessageDialog(null, htmlStart + "You don't have "
               + "enough money to lift the mortgage for " + lot.name + ". You "
