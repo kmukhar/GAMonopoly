@@ -3,10 +3,8 @@ package edu.uccs.ecgs.players;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
-
 import edu.uccs.ecgs.ga.*;
 import edu.uccs.ecgs.play2.*;
 
@@ -27,7 +25,7 @@ public class HumanPlayer extends AbstractPlayer {
 
   /**
    * @return the player's name in the form "Player s" where s is the player's
-   * name.
+   *         name.
    */
   @Override
   public String getName()
@@ -56,21 +54,20 @@ public class HumanPlayer extends AbstractPlayer {
         if (cash < getMinimumCash()) {
           result = GuiHelper.showConfirmDialog(null, htmlStart
               + "You don't have a lot of cash. Are you sure you want to use "
-              + "your Get Out Of Jail card?" + htmlEnd, 
-              "Confirm use Get Out Of Jail card",
-              JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+              + "your Get Out Of Jail card?" + htmlEnd,
+              "Confirm use Get Out Of Jail card", JOptionPane.YES_NO_OPTION,
+              JOptionPane.INFORMATION_MESSAGE);
         }
       } else {
         if (canRaiseCash(50)) {
           if (cash < 50) {
             // they don't have enough money to pay bail
-            result = GuiHelper
-                .showConfirmDialog(null, htmlStart 
-                    + "You do not have enough cash to pay $50 bail. You "
-                    + "will need to raise cash by selling hotels or "
-                    + "houses, or mortgaging  properties. Are you sure you "
-                    + "want to pay bail?" + htmlEnd, "Confirm pay bail",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            result = GuiHelper.showConfirmDialog(null, htmlStart
+                + "You do not have enough cash to pay $50 bail. You "
+                + "will need to raise cash by selling hotels or "
+                + "houses, or mortgaging  properties. Are you sure you "
+                + "want to pay bail?" + htmlEnd, "Confirm pay bail",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
           } else if (cash < getMinimumCash()) {
             // they have some money to pay bail, but not very much
             result = GuiHelper.showConfirmDialog(null, htmlStart
@@ -82,19 +79,19 @@ public class HumanPlayer extends AbstractPlayer {
           // if they pay bail, they will go bankrupt
           result = GuiHelper.showConfirmDialog(null, htmlStart
               + "If you try to pay bail, you will go bankrupt! Are you sure "
-              + "you want to pay bail of $50?" + htmlEnd, "Confirm pay bail", 
+              + "you want to pay bail of $50?" + htmlEnd, "Confirm pay bail",
               JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         }
       }
     }
-    
+
     return result == JOptionPane.YES_OPTION;
   }
 
   @Override
   public boolean buyProperty()
   {
-    return buyProperty (location);
+    return buyProperty(location);
   }
 
   @Override
@@ -117,11 +114,14 @@ public class HumanPlayer extends AbstractPlayer {
     return result == JOptionPane.YES_OPTION;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#payIncomeTax()
    */
   @Override
-  public void payIncomeTax() throws BankruptcyException {    
+  public void payIncomeTax() throws BankruptcyException
+  {
     final int totalWorth = getTotalWorth();
     final String percent = "10%";
     final String flat = "$200";
@@ -145,8 +145,12 @@ public class HumanPlayer extends AbstractPlayer {
     }
   }
 
-  /* (non-Javadoc)
-   * @see edu.uccs.ecgs.players.AbstractPlayer#getBidForLocation(edu.uccs.ecgs.ga.Location)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * edu.uccs.ecgs.players.AbstractPlayer#getBidForLocation(edu.uccs.ecgs.ga
+   * .Location)
    */
   @Override
   public int getBidForLocation(Location lot)
@@ -180,10 +184,9 @@ public class HumanPlayer extends AbstractPlayer {
       } catch (NumberFormatException e) {
         GuiHelper.showMessageDialog(null, htmlStart
             + "Your bid does not appear to be valid.<p>"
-            + "Please enter a dollar amount between 0 "
-            + "and " + getLiquidationValue() + ".<p>"
-            + "Bid 0 to decline the auction" + htmlEnd, "Bid error",
-            JOptionPane.ERROR_MESSAGE);
+            + "Please enter a dollar amount between 0 " + "and "
+            + getLiquidationValue() + ".<p>" + "Bid 0 to decline the auction"
+            + htmlEnd, "Bid error", JOptionPane.ERROR_MESSAGE);
       }
     }
 
@@ -191,10 +194,11 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /**
-   * Receive the results of an auction and provide a dialog so the actual
-   * human player is notified of the results.
+   * Receive the results of an auction and provide a dialog so the actual human
+   * player is notified of the results.
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#auctionResult
-   * (edu.uccs.ecgs.players.AbstractPlayer, edu.uccs.ecgs.ga.Location, int)
+   *      (edu.uccs.ecgs.players.AbstractPlayer, edu.uccs.ecgs.ga.Location, int)
    */
   @Override
   public void auctionResult(AbstractPlayer player, Location lot, int amount)
@@ -220,7 +224,8 @@ public class HumanPlayer extends AbstractPlayer {
    * @return A String with a list of other owners of properties in the group.
    *         Empty String if there are no other properties owned in the group.
    */
-  private String getOtherOwners(PropertyGroups group) {
+  private String getOtherOwners(PropertyGroups group)
+  {
     StringBuilder result = new StringBuilder();
     PropertyFactory pf = PropertyFactory.getPropertyFactory(this.gameKey);
     ArrayList<Location> lots = pf.getAllPropertiesInGroup(group);
@@ -236,12 +241,16 @@ public class HumanPlayer extends AbstractPlayer {
       result.insert(0, "<p><p>Some properties in this group are "
           + "owned by other players.<br>");
     }
-    
+
     return result.toString();
   }
 
-  /* (non-Javadoc)
-   * @see edu.uccs.ecgs.players.AbstractPlayer#answerProposedTrade(edu.uccs.ecgs.ga.TradeProposal)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * edu.uccs.ecgs.players.AbstractPlayer#answerProposedTrade(edu.uccs.ecgs.
+   * ga.TradeProposal)
    */
   @Override
   public boolean answerProposedTrade(TradeProposal bestTrade)
@@ -266,7 +275,7 @@ public class HumanPlayer extends AbstractPlayer {
     if (cash < 0)
       sb.append(" and ").append(Math.abs(cash)).append(" dollars.");
 
-    logInfo("\n"+sb.toString());
+    logInfo("\n" + sb.toString());
 
     sb.insert(0, htmlStart);
 
@@ -283,7 +292,7 @@ public class HumanPlayer extends AbstractPlayer {
     sb.append("<p><p>");
 
     sb.append("Do you want to Accept or Reject this trade").append(htmlEnd);
-    
+
     int result = GuiHelper.showOptionDialog(null, sb.toString(),
         "Trade Proposed", JOptionPane.DEFAULT_OPTION,
         JOptionPane.QUESTION_MESSAGE, null, new String[] { accept, reject },
@@ -324,8 +333,7 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       Location locationToTrade = (Location) GuiHelper.showInputDialog(null,
-          htmlStart
-              + " Which property of yours do you wish to trade?",
+          htmlStart + " Which property of yours do you wish to trade?",
           "Select your property", JOptionPane.QUESTION_MESSAGE, null,
           list.toArray(), list.get(0));
 
@@ -338,9 +346,9 @@ public class HumanPlayer extends AbstractPlayer {
           "Select other player's property", JOptionPane.QUESTION_MESSAGE, null,
           locations.toArray(), locations.get(0));
 
-      if (locationToGet == null) 
+      if (locationToGet == null)
         return;
-      
+
       int cash = getCashPartOfTrade();
 
       if (cash == Integer.MIN_VALUE)
@@ -381,38 +389,47 @@ public class HumanPlayer extends AbstractPlayer {
     String defaultOption = none;
 
     int result = GuiHelper.showOptionDialog(null, htmlStart
-        + "Do you want to give or receive cash with the trade?"
-        + htmlEnd, "Cash Portion of Trade",
-        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-        new String[] { give, receive, none, cancel }, defaultOption);
+        + "Do you want to give or receive cash with the trade?" + htmlEnd,
+        "Cash Portion of Trade", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE, null, new String[] { give, receive, none,
+            cancel }, defaultOption);
 
     if (result == 2)
       return 0;
 
-    if (result == 3) 
+    if (result == 3)
       return Integer.MIN_VALUE;
 
     int amount = 0;
     while (true) {
       String strCash = GuiHelper.showInputDialog(null,
           htmlStart + "How much cash do you want to "
-              + (result == 0 ? "give" : "receive") + "?<p>" + "(0 to " + cash
-              + ")" + htmlEnd, "Bid for property",
-          JOptionPane.QUESTION_MESSAGE);
+              + (result == 0 ? "give (0 to " + cash +")" : "receive") + "?<p>"
+              + htmlEnd, "Bid for property", JOptionPane.QUESTION_MESSAGE);
 
       if (strCash == null || "".equals(strCash))
         return Integer.MIN_VALUE;
 
       try {
         amount = Integer.parseInt(strCash);
-        if (amount < 0 || amount > cash)
+        if (amount < 0)
           throw new NumberFormatException();
+        if (result == 0 && amount > cash)
+          throw new NumberFormatException();
+
         break;
       } catch (NumberFormatException e) {
-        GuiHelper.showMessageDialog(null, htmlStart
-            + "The cash amount does not appear to be valid.<p>"
-            + "Please enter a whole number between 0 " + "and " + cash + ".<p>"
-            + htmlEnd, "Error", JOptionPane.ERROR_MESSAGE);
+        if (result == 0) {
+          GuiHelper.showMessageDialog(null, htmlStart
+              + "The cash amount does not appear to be valid.<p>"
+              + "Please enter a whole number between 0 " + "and " + cash
+              + ".<p>" + htmlEnd, "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+          GuiHelper.showMessageDialog(null, htmlStart
+              + "The cash amount does not appear to be valid.<p>"
+              + "Please enter a whole number greater than 0.<p>" + htmlEnd,
+              "Error", JOptionPane.ERROR_MESSAGE);
+        }
       }
     }
 
@@ -422,11 +439,14 @@ public class HumanPlayer extends AbstractPlayer {
     return amount;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#processDevelopHouseEvent()
    */
   @Override
-  public void processDevelopHouseEvent() {
+  public void processDevelopHouseEvent()
+  {
     // don't do anything here, the gui allows the player to decide when to buy
     // houses
   }
@@ -434,7 +454,8 @@ public class HumanPlayer extends AbstractPlayer {
   /**
    * Buy houses for monopolies
    */
-  public void buyHouses() {
+  public void buyHouses()
+  {
     boolean done = false;
     while (!done) {
       if (monopolies.size() == 0) {
@@ -455,8 +476,7 @@ public class HumanPlayer extends AbstractPlayer {
           game.buyHouse(this, selected);
         else
           game.buyHotel(this, selected);
-      } 
-      else
+      } else
         done = true;
 
       if (game.getNumHousesInBank() == 0) {
@@ -474,7 +494,8 @@ public class HumanPlayer extends AbstractPlayer {
   /**
    * Sell houses
    */
-  public void sellHouses() {
+  public void sellHouses()
+  {
     boolean done = false;
     if (sellableLots == null)
       updateSellableLots();
@@ -505,9 +526,9 @@ public class HumanPlayer extends AbstractPlayer {
                 + "you must sell more hotels or houses in addition to the"
                 + "hotel you have chosen to sell. If you choose to proceed, "
                 + "the bank will automatically sell the correct number of "
-                + "hotels and houses." + htmlEnd,
-                "Selling a hotel", JOptionPane.WARNING_MESSAGE,
-                    null, selectionValues, selectionValues[0]);
+                + "hotels and houses." + htmlEnd, "Selling a hotel",
+                JOptionPane.WARNING_MESSAGE, null, selectionValues,
+                selectionValues[0]);
 
             if (selection.equals(selectionValues[0])) {
               game.sellHotel(selected, getAllProperties().values());
@@ -524,7 +545,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#getCash(int)
    */
   @Override
@@ -537,8 +560,8 @@ public class HumanPlayer extends AbstractPlayer {
 
     if (!canRaiseCash(amount)) {
       GuiHelper.showMessageDialog(null, htmlStart
-          + "You are unable to raise enough cash to pay your bill of "
-          + amount + ". You are bankrupt!" + htmlEnd, "You are bankrupt",
+          + "You are unable to raise enough cash to pay your bill of " + amount
+          + ". You are bankrupt!" + htmlEnd, "You are bankrupt",
           JOptionPane.INFORMATION_MESSAGE);
       throw new BankruptcyException();
     }
@@ -547,13 +570,16 @@ public class HumanPlayer extends AbstractPlayer {
     String theGame = "Let Game raise cash for me"; // result == 1
     String defaultOption = myself;
 
-    int result = GuiHelper.showOptionDialog(null, htmlStart 
-        + "You do not have enough cash to pay what you owe. Do you want to "
-        + "try to sell houses or hotels, and mortgage properties yourself to "
-        + "raise the cash? Or do you want to let the game sell your properties "
-        + "to raise the cash?" + htmlEnd, "Raise cash to pay bills",
-        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-        new String[] { myself, theGame }, defaultOption);
+    int result = GuiHelper
+        .showOptionDialog(
+            null,
+            htmlStart
+                + "You do not have enough cash to pay what you owe. Do you want to "
+                + "try to sell houses or hotels, and mortgage properties yourself to "
+                + "raise the cash? Or do you want to let the game sell your properties "
+                + "to raise the cash?" + htmlEnd, "Raise cash to pay bills",
+            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+            new String[] { myself, theGame }, defaultOption);
 
     if (result == 1) {
       super.getCash(amount);
@@ -575,8 +601,7 @@ public class HumanPlayer extends AbstractPlayer {
 
       ArrayList<Location> unmortgaged = new ArrayList<Location>();
       ArrayList<Location> lotsWithHotels = new ArrayList<Location>();
-      CopyOnWriteArrayList<Location> lotsWithHouses = 
-          new CopyOnWriteArrayList<Location>();
+      CopyOnWriteArrayList<Location> lotsWithHouses = new CopyOnWriteArrayList<Location>();
 
       // create a list or lots that can be mortgaged
       for (Location lot : getAllProperties().values()) {
@@ -585,7 +610,7 @@ public class HumanPlayer extends AbstractPlayer {
         }
       }
 
-      if (sellableLots == null) 
+      if (sellableLots == null)
         updateSellableLots();
 
       // create a list of lots with houses or hotels that can be sold
@@ -634,9 +659,8 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       if (selected.equals(sellHotel)) {
-        Location hotel = (Location) GuiHelper.showInputDialog(
-            null, htmlStart
-                + " Which property has a hotel that you want to sell?",
+        Location hotel = (Location) GuiHelper.showInputDialog(null, htmlStart
+            + " Which property has a hotel that you want to sell?",
             "Select hotel to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHotels.toArray(), lotsWithHotels.get(0));
         if (hotel != null)
@@ -644,27 +668,29 @@ public class HumanPlayer extends AbstractPlayer {
       }
 
       if (selected.equals(sellHouse)) {
-        Location house = (Location) GuiHelper.showInputDialog(
-            null, htmlStart
-                + " Which property has a house that you want to sell?",
+        Location house = (Location) GuiHelper.showInputDialog(null, htmlStart
+            + " Which property has a house that you want to sell?",
             "Select house to sell", JOptionPane.QUESTION_MESSAGE, null,
             lotsWithHouses.toArray(), lotsWithHouses.get(0));
         if (house != null)
           game.sellHouse(house);
       }
-      
+
       if (cash > amount)
         done = true;
     }
     super.getCash(amount);
   }
 
-  /* (non-Javadoc)
-   * @see edu.uccs.ecgs.players.AbstractPlayer#processMortgagedNewProperties(java.util.TreeMap)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * edu.uccs.ecgs.players.AbstractPlayer#processMortgagedNewProperties(java
+   * .util.TreeMap)
    */
   @Override
-  protected void processMortgagedNewProperties(TreeMap<Integer, 
-                                               Location> newProperties)
+  protected void processMortgagedNewProperties(TreeMap<Integer, Location> newProperties)
       throws BankruptcyException
   {
     fireChangeEvent();
@@ -683,7 +709,7 @@ public class HumanPlayer extends AbstractPlayer {
         .append(" mortgaged properties.");
     StringBuilder sb2 = new StringBuilder();
     sb2.append(interest).append(" interest on all new properties.");
-    
+
     logInfo(getName() + sb.toString());
     for (Location lot : mortgaged)
       logInfo(lot.toString());
@@ -706,24 +732,32 @@ public class HumanPlayer extends AbstractPlayer {
         JOptionPane.INFORMATION_MESSAGE);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#getSourceName()
    */
   @Override
-  public String getSourceName() {
+  public String getSourceName()
+  {
     return getName();
   }
 
-  /* (non-Javadoc)
-   * @see edu.uccs.ecgs.players.AbstractPlayer#fireChangeEvent(javax.swing.event.ChangeEvent)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * edu.uccs.ecgs.players.AbstractPlayer#fireChangeEvent(javax.swing.event.
+   * ChangeEvent)
    */
   @Override
-  protected void fireChangeEvent(ChangeEvent event) {
+  protected void fireChangeEvent(ChangeEvent event)
+  {
     super.fireChangeEvent(event);
 
     boolean ableToSell = false;
     boolean ableToBuy = false;
-    
+
     // if the player has houses or hotels, then enable sell
     if (getNumHotels() + getNumHouses() > 0) {
       ableToSell = true;
@@ -746,7 +780,7 @@ public class HumanPlayer extends AbstractPlayer {
         }
       }
     }
-    
+
     final boolean sell = ableToSell;
     final boolean buy = ableToBuy;
 
@@ -775,16 +809,17 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /**
-   * Create a list of lots upon which a player can build houses or hotels.
-   * If no houses are available from the bank, then only list lots which
-   * can have a hotel.
+   * Create a list of lots upon which a player can build houses or hotels. If no
+   * houses are available from the bank, then only list lots which can have a
+   * hotel.
    */
-  private void updateHouseReadyLots() {
+  private void updateHouseReadyLots()
+  {
     int[] groupMin = new int[PropertyGroups.values().length];
     for (PropertyGroups group : PropertyGroups.values()) {
       groupMin[group.ordinal()] = Integer.MAX_VALUE;
     }
-    
+
     // Create a list of all the properties that the player owns that are also
     // part of monopolies
     monopolies = new CopyOnWriteArrayList<Location>();
@@ -798,8 +833,7 @@ public class HumanPlayer extends AbstractPlayer {
 
       if (location.partOfMonopoly && location.getNumHotels() == 0) {
         monopolies.add(location);
-        if (location.getNumHouses() < groupMin[location.getGroup().ordinal()]) 
-        {
+        if (location.getNumHouses() < groupMin[location.getGroup().ordinal()]) {
           groupMin[location.getGroup().ordinal()] = location.getNumHouses();
         }
         logFinest(location.toString()
@@ -808,9 +842,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
 
     // now remove any properties that have more than the min properties in a
-    // group. Houses and hotels must be balanced, so one can't build on a 
-    // property that already has greater than the min number of houses. Also 
-    // remove properties where the cost of a house is greater than the 
+    // group. Houses and hotels must be balanced, so one can't build on a
+    // property that already has greater than the min number of houses. Also
+    // remove properties where the cost of a house is greater than the
     // player's cash. Finally, if bank is out of houses, remove locations with
     // less than 4 houses
     for (Location location : monopolies) {
@@ -827,14 +861,15 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   /**
-   * Create a list of lots from which a player can sell houses. 
+   * Create a list of lots from which a player can sell houses.
    */
-  private void updateSellableLots() {
+  private void updateSellableLots()
+  {
     int[] groupMax = new int[PropertyGroups.values().length];
     for (PropertyGroups group : PropertyGroups.values()) {
       groupMax[group.ordinal()] = Integer.MIN_VALUE;
     }
-    
+
     // Create a list of all the properties that the player owns that are also
     // part of monopolies
     sellableLots = new CopyOnWriteArrayList<Location>();
@@ -867,7 +902,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#payOffMortgages()
    */
   @Override
@@ -877,7 +914,8 @@ public class HumanPlayer extends AbstractPlayer {
     // mortgages
   }
 
-  public void liftMortgages() {
+  public void liftMortgages()
+  {
     Vector<Location> mortgaged = getSortedMortgages(getAllProperties());
 
     boolean done = false;
@@ -888,10 +926,10 @@ public class HumanPlayer extends AbstractPlayer {
           + htmlEnd, "Select Property", JOptionPane.QUESTION_MESSAGE, null,
           mortgaged.toArray(), mortgaged.get(0));
 
-      if (lot == null) 
+      if (lot == null)
         done = true;
       else {
-        int payoff = (int)(1.1 * ((double)lot.getCost()) / 2.0);
+        int payoff = (int) (1.1 * ((double) lot.getCost()) / 2.0);
         if (payoff > cash) {
           JOptionPane.showMessageDialog(null, htmlStart + "You don't have "
               + "enough money to lift the mortgage for " + lot.name + ". You "
@@ -913,12 +951,14 @@ public class HumanPlayer extends AbstractPlayer {
             }
             fireChangeEvent();
           }
-        }        
+        }
       }
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#setBankrupt()
    */
   @Override
@@ -936,7 +976,8 @@ public class HumanPlayer extends AbstractPlayer {
         .append("playing by pressing the 'Play a Turn' button.<p><p>")
         .append("Click 'Let computer play' to let the computer play without ")
         .append("pausing.<p><p>")
-        .append("Click 'I will keep playing' to continue controlling each turn.")
+        .append(
+            "Click 'I will keep playing' to continue controlling each turn.")
         .append(htmlEnd);
 
     int result = GuiHelper.showOptionDialog(null, sb.toString(),
@@ -949,7 +990,9 @@ public class HumanPlayer extends AbstractPlayer {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see edu.uccs.ecgs.players.AbstractPlayer#setBankNumHouses(int)
    */
   @Override
@@ -960,10 +1003,14 @@ public class HumanPlayer extends AbstractPlayer {
   }
 
   @Override
-  public void dumpGenome(DataOutputStream out) throws IOException {}
+  public void dumpGenome(DataOutputStream out) throws IOException
+  {
+  }
 
   @Override
-  public void printGenome() {}
+  public void printGenome()
+  {
+  }
 
   @Override
   public AbstractPlayer[] createChildren(AbstractPlayer parent2, int index)
@@ -993,5 +1040,5 @@ public class HumanPlayer extends AbstractPlayer {
 
   public HumanPlayer(int index, DataInputStream dis) {
     super(index, ChromoTypes.HUM);
-  }  
+  }
 }
