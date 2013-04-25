@@ -402,10 +402,11 @@ public class HumanPlayer extends AbstractPlayer {
 
     int amount = 0;
     while (true) {
-      String strCash = GuiHelper.showInputDialog(null,
-          htmlStart + "How much cash do you want to "
-              + (result == 0 ? "give (0 to " + cash +")" : "receive") + "?<p>"
-              + htmlEnd, "Bid for property", JOptionPane.QUESTION_MESSAGE);
+      String strCash = GuiHelper.showInputDialog(null, htmlStart
+          + "How much cash do you want to "
+          + (result == 0 ? "give (0 to " + getLiquidationValue() + ")"
+              : "receive") + "?<p>" + htmlEnd, "Bid for property",
+          JOptionPane.QUESTION_MESSAGE);
 
       if (strCash == null || "".equals(strCash))
         return Integer.MIN_VALUE;
@@ -414,7 +415,7 @@ public class HumanPlayer extends AbstractPlayer {
         amount = Integer.parseInt(strCash);
         if (amount < 0)
           throw new NumberFormatException();
-        if (result == 0 && amount > cash)
+        if (result == 0 && amount > getLiquidationValue())
           throw new NumberFormatException();
 
         break;
@@ -422,8 +423,9 @@ public class HumanPlayer extends AbstractPlayer {
         if (result == 0) {
           GuiHelper.showMessageDialog(null, htmlStart
               + "The cash amount does not appear to be valid.<p>"
-              + "Please enter a whole number between 0 " + "and " + cash
-              + ".<p>" + htmlEnd, "Error", JOptionPane.ERROR_MESSAGE);
+              + "Please enter a whole number between 0 and "
+              + getLiquidationValue() + ".<p>" + htmlEnd, "Error",
+              JOptionPane.ERROR_MESSAGE);
         } else {
           GuiHelper.showMessageDialog(null, htmlStart
               + "The cash amount does not appear to be valid.<p>"
