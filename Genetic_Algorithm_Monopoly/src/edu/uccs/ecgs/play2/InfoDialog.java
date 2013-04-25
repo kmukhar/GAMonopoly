@@ -129,7 +129,7 @@ public class InfoDialog {
 
     JOptionPane.showOptionDialog(frame, sp, "About this program",
         JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        null, values, null);
+        null, values, values[0]);
     frame.dispose();
   }
 
