@@ -155,10 +155,10 @@ public class PlayerGui extends JPanel {
 
   public static void main(String[] args)
   {
-    /* Set some properties for when the user is on a Mac */
-    System.setProperty("apple.laf.useScreenMenuBar", "true");
-    System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-        "Monopoly");
+//    /* Set some properties for when the user is on a Mac */
+//    System.setProperty("apple.laf.useScreenMenuBar", "true");
+//    System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+//        "Monopoly");
 
     /* Set the Nimbus look and feel */
     /*
