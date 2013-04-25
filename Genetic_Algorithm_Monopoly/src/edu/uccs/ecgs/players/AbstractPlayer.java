@@ -1807,26 +1807,34 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
     Location lot2 = bestTrade.location2;
 
     // don't trade properties in same group
-    if (lot1.getGroup() == lot2.getGroup())
+    if (lot1.getGroup() == lot2.getGroup()) {
+      logInfo("Trade refused");
       return false;
+    }
 
     // ensure this player needs property
-    if (!needs(lot1))
+    if (!needs(lot1)) {
+      logInfo("Trade refused");
       return false;
+    }
 
     // only trade if the property being traded away is the only property in the
     // group owned by this player.
     // but if trade would give player a monopoly, trade even if player has
     // more than one property in group begin traded away.
     int count = this.countPropertiesInGroup(lot2);
-    if (count > 1 && !this.wouldHaveMonopolyWith(lot1))
+    if (count > 1 && !this.wouldHaveMonopolyWith(lot1)) {
+      logInfo("Trade refused");
       return false;
+    }
 
     // if the trade would give the opponent a monopoly, but not give
     // the player a monopoly, then don't propose it
     if (bestTrade.getProposer().wouldHaveMonopolyWith(lot2)
-        && !this.wouldHaveMonopolyWith(lot1))
+        && !this.wouldHaveMonopolyWith(lot1)) {
+      logInfo("Trade refused");
       return false;
+    }
 
     logInfo(getName() + ": trade accepted");
     return true;
