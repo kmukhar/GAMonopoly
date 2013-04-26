@@ -113,12 +113,12 @@ public abstract class AbstractPlayer implements Comparable<AbstractPlayer>,
         threshold = 400;
       } else if (sourceName.indexOf("0423") > 0) {
         // this player did best with w1 = 0.95, use average threshold
-        w1 = 0.95;
-        threshold = 300;
+        w1 = 0.5;
+        threshold = 200;
       } else if (sourceName.indexOf("0667") > 0) {
         // this player did best with w1 = .65, use average threshold
-        w1 = 0.65;
-        threshold = 300;
+        w1 = 0.5;
+        threshold = 200;
       }
       // if none of the clauses above are true, then just keep the defaults
     }
